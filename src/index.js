@@ -1,5 +1,5 @@
 import './config/env.js';
-import { debug, error, info, success } from './utils/logger.js';
+import { debug, error, info, success } from '../common/utils/logger.js';
 import client from './services/discord.js';
 import fs from 'fs';
 import path from 'path';

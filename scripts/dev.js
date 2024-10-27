@@ -1,5 +1,5 @@
 import nodemon from 'nodemon';
-import { info, warn, error } from '../src/utils/logger.js';
+import { info, warn, error } from '../common/utils/logger.js';
 
 const mon = nodemon({
     script: 'src/index.js',

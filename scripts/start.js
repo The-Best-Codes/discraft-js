@@ -1,5 +1,5 @@
 import { spawn } from 'child_process';
-import { info, error } from '../src/utils/logger.js';
+import { info, error } from '../common/utils/logger.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

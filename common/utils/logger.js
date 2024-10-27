@@ -1,4 +1,4 @@
-import { logLevel } from "../config/bot.config.js";
+import { logLevel } from "../../src/config/bot.config.js";
 
 const colors = {
     reset: '\x1b[0m',

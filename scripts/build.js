@@ -1,15 +1,13 @@
-import { exec } from 'child_process';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { info, error, success } from '../src/utils/logger.js';
+import { info, error, success } from '../common/utils/logger.js';
 import inquirer from 'inquirer';
 import { Command } from 'commander';
-import { minify } from 'terser';
-import { promisify } from 'util';
 import { rollup } from 'rollup';
+import { getFileSizes, displaySizeComparison } from './utils/fileSizeUtil.js';
+import { minifyWithTerser } from './utils/minifyUtilTerser.js';
 
-const execPromise = promisify(exec);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distPath = path.join(__dirname, '..', 'dist');
 
@@ -22,33 +20,6 @@ program
   .parse(process.argv);
 
 const options = program.opts();
-
-function formatBytes(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-async function getFileSizes(dir, originalSizes = new Map()) {
-  const files = await fs.promises.readdir(dir, { withFileTypes: true });
-  const sizes = new Map();
-
-  for (const file of files) {
-    const fullPath = path.join(dir, file.name);
-    if (file.isDirectory()) {
-      const subSizes = await getFileSizes(fullPath, originalSizes);
-      for (const [subPath, size] of subSizes) {
-        sizes.set(subPath, size);
-      }
-    } else if (file.name.endsWith('.js')) {
-      const stats = await fs.promises.stat(fullPath);
-      sizes.set(fullPath, stats.size);
-    }
-  }
-  return sizes;
-}
 
 // Copy directory recursively
 async function copyDir(src, dest) {
@@ -64,66 +35,6 @@ async function copyDir(src, dest) {
     } else {
       await fs.promises.copyFile(srcPath, destPath);
     }
-  }
-}
-
-async function minifyWithTerser(filePath, config) {
-  const code = await fs.promises.readFile(filePath, 'utf8');
-
-  const terserOptions = {
-    module: true,
-    toplevel: true,
-    compress: {
-      ecma: 2020,
-      module: true,
-      toplevel: true,
-      passes: config.maxOptimize ? 3 : 1,
-      keep_fnames: config.keepFunctionNames,
-      pure_getters: true,
-      dead_code: true,
-      unused: true,
-      properties: true,
-      drop_debugger: true,
-      arguments: true,
-      booleans_as_integers: false,
-      hoist_funs: true,
-      hoist_props: true,
-      hoist_vars: true,
-      join_vars: true,
-      negate_iife: true,
-      reduce_vars: true,
-      collapse_vars: true,
-      inline: 3,
-      evaluate: true,
-      pure_funcs: ['console.log', 'console.debug'],
-      drop_console: config.maxOptimize,
-    },
-    mangle: {
-      module: true,
-      toplevel: true,
-      keep_fnames: config.keepFunctionNames,
-      properties: config.maxOptimize ? {
-        reserved: ['_events', '_eventsCount', '_maxListeners', 'domain'],
-        regex: /^_/
-      } : false
-    },
-    format: {
-      ecma: 2020,
-      comments: !config.removeComments,
-      ascii_only: true,
-      beautify: false
-    },
-    sourceMap: config.sourceMaps,
-    parse: {
-      module: true,
-      ecma: 2020
-    }
-  };
-
-  const result = await minify(code, terserOptions);
-  await fs.promises.writeFile(filePath, result.code);
-  if (result.map && config.sourceMaps) {
-    await fs.promises.writeFile(`${filePath}.map`, result.map);
   }
 }
 
@@ -177,7 +88,7 @@ async function build() {
 
     // Get final file sizes and display comparison
     const newSizes = await getFileSizes(outputDir);
-    displaySizeComparison(originalSizes, newSizes);
+    displaySizeComparison(originalSizes, newSizes, distPath);
 
     info(`Output location: ${outputDir}`);
     success('Build completed successfully.');
@@ -185,44 +96,6 @@ async function build() {
     error('Build failed:', err);
     process.exit(1);
   }
-}
-
-function displaySizeComparison(originalSizes, newSizes) {
-  let totalOriginal = 0;
-  let totalNew = 0;
-  const comparisons = [];
-
-  for (const [file, newSize] of newSizes) {
-    const relPath = path.relative(distPath, file);
-    const srcPath = path.join(process.cwd(), 'src', relPath);
-    const originalSize = originalSizes.get(srcPath) || 0;
-
-    totalOriginal += originalSize;
-    totalNew += newSize;
-
-    const reduction = ((originalSize - newSize) / originalSize * 100).toFixed(1);
-    comparisons.push({
-      file: relPath,
-      original: formatBytes(originalSize),
-      new: formatBytes(newSize),
-      reduction: reduction
-    });
-  }
-
-  info('\nBuild Statistics:');
-  info('================');
-  comparisons.forEach(({ file, original, new: newSize, reduction }) => {
-    info(`${file}:`);
-    info(`  Original: ${original}`);
-    info(`  Built   : ${newSize}`);
-    info(`  Saved   : ${reduction}%\n`);
-  });
-
-  const totalReduction = ((totalOriginal - totalNew) / totalOriginal * 100).toFixed(1);
-  success('\nTotal Results:');
-  success(`Original Size: ${formatBytes(totalOriginal)}`);
-  success(`Final Size  : ${formatBytes(totalNew)}`);
-  success(`Total Saved : ${totalReduction}%`);
 }
 
 async function getBuildConfig() {
