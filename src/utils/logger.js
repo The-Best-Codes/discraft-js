@@ -18,7 +18,7 @@ const colors = {
         magenta: '\x1b[35m',
         cyan: '\x1b[36m',
         white: '\x1b[37m',
-        crimson: '\x1b[38m' // Scarlet
+        crimson: '\x1b[38m'
     },
     bg: {
         black: '\x1b[40m',
@@ -34,7 +34,7 @@ const colors = {
 };
 
 export const log = (message, ...args) => {
-    console.log(`${colors.fg.white}[LOG]${colors.reset} ${message}`, ...args);
+    console.log(`${colors.bg.white}[LOG]${colors.reset} ${message}`, ...args);
 };
 
 export const info = (message, ...args) => {
@@ -42,16 +42,11 @@ export const info = (message, ...args) => {
 };
 
 export const warn = (message, ...args) => {
-    console.warn(`${colors.fg.yellow}[WARN]${colors.reset} ${message}`, ...args);
+    console.warn(`${colors.bg.yellow}[WARN]${colors.reset} ${message}`, ...args);
 };
 
 export const error = (message, ...args) => {
-    console.error(`${colors.fg.red}[ERROR]${colors.reset} ${message}`, ...args);
-};
-
-export const debug = (message, ...args) => {
-    if (logLevel !== 'debug') return;
-    console.debug(`${colors.fg.cyan}[DEBUG]${colors.reset} ${message}`, ...args);
+    console.error(`${colors.bg.red}[ERROR]${colors.reset} ${message}`, ...args);
 };
 
 export const trace = (message, ...args) => {
@@ -59,5 +54,10 @@ export const trace = (message, ...args) => {
 };
 
 export const success = (message, ...args) => {
-    console.log(`${colors.fg.green}[SUCCESS]${colors.reset} ${message}`, ...args);
+    console.log(`${colors.bg.green}[SUCCESS]${colors.reset} ${message}`, ...args);
 }
+
+export const debug = (message, ...args) => {
+    if (logLevel !== 'debug') return;
+    console.debug(`${colors.fg.cyan}[DEBUG]${colors.reset} ${message}`, ...args);
+};

@@ -188,7 +188,8 @@ async function getBuildConfig() {
       type: 'confirm',
       name: 'sourceMaps',
       message: 'Generate source maps?',
-      default: false
+      default: false,
+      when: answers => answers.minify
     }
   ]);
 }

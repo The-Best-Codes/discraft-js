@@ -1,5 +1,5 @@
 import { Collection, REST, Routes } from 'discord.js';
-import { log, error, info, debug, success } from '../utils/logger.js';
+import { error, info, debug, success } from '../utils/logger.js';
 import { token, clientId } from '../config/bot.config.js';
 import { commands } from '../commands/index.js';
 
@@ -35,7 +35,7 @@ export class CommandHandler {
 
     // Handle guild joins
     this.client.on('guildCreate', async (guild) => {
-      log(`Bot joined new guild: ${guild.name} (${guild.id})`);
+      debug(`Bot joined new guild: ${guild.name} (${guild.id})`);
       await this.registerCommands();
     });
 
