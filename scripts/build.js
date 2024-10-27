@@ -63,6 +63,7 @@ async function analyzeDependencies(bundlePath, rollupBundle) {
   // Create minimal package.json with only runtime dependencies
   const minimalPackage = {
     name: "discraft-bot",
+    type: "module",
     version: "1.0.0",
     description: `Bot created with version ${mainPackageJson.version} of discraft-js`,
     main: "bundle.js",
