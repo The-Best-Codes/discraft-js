@@ -19,6 +19,66 @@ program
 
 const options = program.opts();
 
+async function analyzeDependencies(bundlePath, rollupBundle) {
+  // Get external dependencies from rollup metadata
+  const externalDeps = new Set();
+
+  // Analyze the chunk modules from rollup
+  for (const chunk of rollupBundle.output) {
+    if (chunk.imports) {
+      chunk.imports.forEach(imp => externalDeps.add(imp));
+    }
+    if (chunk.modules) {
+      Object.keys(chunk.modules).forEach(id => {
+        // Check if the module is from node_modules
+        if (id.includes('node_modules')) {
+          const matches = id.match(/node_modules\/([^/]+)/);
+          if (matches && matches[1]) {
+            // Handle scoped packages
+            if (matches[1].startsWith('@')) {
+              const scopedMatch = id.match(/node_modules\/([@][^/]+\/[^/]+)/);
+              if (scopedMatch) {
+                externalDeps.add(scopedMatch[1]);
+              }
+            } else {
+              externalDeps.add(matches[1]);
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // Also analyze the pre-minified bundle content as backup
+  const content = await fs.promises.readFile(bundlePath, 'utf-8');
+  const requirePattern = /(?:require|import)[\s\(]['"]([^./@][^'"]+)['"]\)?/g;
+  let match;
+  while ((match = requirePattern.exec(content)) !== null) {
+    const packageName = match[1].split('/')[0];
+    externalDeps.add(packageName);
+  }
+
+  const mainPackageJson = JSON.parse(await fs.promises.readFile('package.json', 'utf-8'));
+
+  // Create minimal package.json with only runtime dependencies
+  const minimalPackage = {
+    name: "discraft-bot",
+    version: "1.0.0",
+    description: `Bot created with version ${mainPackageJson.version} of discraft-js`,
+    main: "bundle.js",
+    dependencies: {}
+  };
+
+  // Add found packages with their versions from main package.json
+  for (const pkg of externalDeps) {
+    if (mainPackageJson.dependencies?.[pkg]) {
+      minimalPackage.dependencies[pkg] = mainPackageJson.dependencies[pkg];
+    }
+  }
+
+  return minimalPackage;
+}
+
 async function build() {
   try {
     info('Starting build process...');
@@ -47,8 +107,18 @@ async function build() {
     info('Running Rollup bundler...');
     const rollupConfig = (await import('../rollup.config.js')).default;
     const bundle = await rollup(rollupConfig);
-    await bundle.write(rollupConfig.output);
-    await bundle.close();
+    const { output } = await bundle.write(rollupConfig.output);
+
+    const bundlePath = path.join(outputDir, 'bundle.js');
+
+    // Analyze dependencies before minification
+    info('Analyzing dependencies...');
+    const minimalPackage = await analyzeDependencies(bundlePath, { output });
+    await fs.promises.writeFile(
+      path.join(outputDir, 'package.json'),
+      JSON.stringify(minimalPackage, null, 2)
+    );
+    info('Generated minimal package.json in dist directory');
 
     // Minify the bundle if enabled
     if (config.minify) {
@@ -56,10 +126,10 @@ async function build() {
       if (config.maxOptimize) {
         info('Using maximum optimization settings (this may take longer)...');
       }
-
-      const bundlePath = path.join(outputDir, 'bundle.js');
       await minifyWithTerser(bundlePath, config);
     }
+
+    await bundle.close();
 
     // Display size comparison
     await displaySizeComparison(originalSize, outputDir);
