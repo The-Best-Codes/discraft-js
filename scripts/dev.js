@@ -1,5 +1,11 @@
 import nodemon from 'nodemon';
-import { info, warn, error } from '../common/utils/logger.js';
+import { info, warn, error, success } from '../common/utils/logger.js';
+import generateCommands from './compile/genCommands.js';
+import generateEvents from './compile/genEvents.js';
+
+// On startup, generate commands and events
+generateCommands();
+generateEvents();
 
 const mon = nodemon({
     exec: 'node -r dotenv/config',
@@ -23,6 +29,9 @@ mon.on('error', (err) => {
 // Log restart information
 mon.on('restart', (files) => {
     info(`Restarting due to changes in ${files.length} files...`);
+    generateCommands();
+    generateEvents();
+    success('Restart complete');
 });
 
 // Handle process signals

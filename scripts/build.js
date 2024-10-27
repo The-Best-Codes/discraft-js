@@ -6,6 +6,8 @@ import { Command } from 'commander';
 import { rollup } from 'rollup';
 import { getFileSizes, displaySizeComparison } from './utils/fileSizeUtil.js';
 import { minifyWithTerser } from './utils/minifyUtilTerser.js';
+import generateCommands from './compile/genCommands.js';
+import generateEvents from './compile/genEvents.js';
 
 const program = new Command();
 
@@ -20,6 +22,13 @@ const options = program.opts();
 async function build() {
   try {
     info('Starting build process...');
+
+    info('Generating commands and events...');
+    await new Promise((resolve) => {
+      generateCommands();
+      generateEvents();
+      resolve();
+    })
 
     const config = await getBuildConfig();
 
