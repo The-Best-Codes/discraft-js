@@ -1,7 +1,7 @@
 {
-  "name": "discrafter",
-  "version": "1.0.0",
-  "description": "Craft your Discord experience, one bot at a time.",
+  "name": "discraft",
+  "version": "1.0.1",
+  "description": "Best framework for discord bots",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/The-Best-Codes/discrafter-js.git"
+    "url": "git+https://github.com/The-Best-Codes/discraft-js.git"
   },
   "keywords": [
     "discord",
@@ -21,9 +21,9 @@
   "author": "The-Best-Codes",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/The-Best-Codes/discrafter-js/issues"
+    "url": "https://github.com/The-Best-Codes/discraft-js/issues"
   },
-  "homepage": "https://github.com/The-Best-Codes/discrafter-js#readme",
+  "homepage": "https://github.com/The-Best-Codes/discraft-js#readme",
   "dependencies": {
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.5"
