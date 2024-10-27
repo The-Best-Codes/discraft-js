@@ -2,6 +2,7 @@ import nodemon from 'nodemon';
 import { info, warn, error } from '../common/utils/logger.js';
 
 const mon = nodemon({
+    exec: 'node -r dotenv/config',
     script: 'src/index.js',
     watch: ['src'],
     ext: 'js',

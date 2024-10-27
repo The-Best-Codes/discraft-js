@@ -10,59 +10,41 @@ export function formatBytes(bytes) {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
-export async function getFileSizes(dir, originalSizes = new Map()) {
+export async function getFileSizes(dir) {
     const files = await fs.promises.readdir(dir, { withFileTypes: true });
-    const sizes = new Map();
+    let totalSize = 0;
 
     for (const file of files) {
         const fullPath = path.join(dir, file.name);
         if (file.isDirectory()) {
-            const subSizes = await getFileSizes(fullPath, originalSizes);
-            for (const [subPath, size] of subSizes) {
-                sizes.set(subPath, size);
-            }
+            totalSize += await getFileSizes(fullPath);
         } else if (file.name.endsWith('.js')) {
             const stats = await fs.promises.stat(fullPath);
-            sizes.set(fullPath, stats.size);
+            totalSize += stats.size;
         }
     }
-    return sizes;
+    return totalSize;
 }
 
-export function displaySizeComparison(originalSizes, newSizes, distPath) {
-    let totalOriginal = 0;
-    let totalNew = 0;
-    const comparisons = [];
+export async function displaySizeComparison(srcSize, distPath) {
+    // Get bundle size
+    const bundlePath = path.join(distPath, 'bundle.js');
+    const bundleSize = fs.existsSync(bundlePath) ? 
+        (await fs.promises.stat(bundlePath)).size : 0;
 
-    for (const [file, newSize] of newSizes) {
-        const relPath = path.relative(distPath, file);
-        const srcPath = path.join(process.cwd(), 'src', relPath);
-        const originalSize = originalSizes.get(srcPath) || 0;
-
-        totalOriginal += originalSize;
-        totalNew += newSize;
-
-        const reduction = ((originalSize - newSize) / originalSize * 100).toFixed(1);
-        comparisons.push({
-            file: relPath,
-            original: formatBytes(originalSize),
-            new: formatBytes(newSize),
-            reduction: reduction
-        });
-    }
+    const reduction = srcSize > 0 ? 
+        ((srcSize - bundleSize) / srcSize * 100).toFixed(1) : 0;
 
     info('\nBuild Statistics:');
     info('================');
-    comparisons.forEach(({ file, original, new: newSize, reduction }) => {
-        info(`${file}:`);
-        info(`  Original: ${original}`);
-        info(`  Built   : ${newSize}`);
-        info(`  Saved   : ${reduction}%\n`);
-    });
+    info('Source Files:');
+    info(`  Original Size: ${formatBytes(srcSize)}`);
+    info('\nBundle:');
+    info(`  Final Size: ${formatBytes(bundleSize)}`);
+    info(`  Size Reduction: ${reduction}%\n`);
 
-    const totalReduction = ((totalOriginal - totalNew) / totalOriginal * 100).toFixed(1);
     success('\nTotal Results:');
-    success(`Original Size: ${formatBytes(totalOriginal)}`);
-    success(`Final Size  : ${formatBytes(totalNew)}`);
-    success(`Total Saved : ${totalReduction}%`);
+    success(`Original Size: ${formatBytes(srcSize)}`);
+    success(`Final Size  : ${formatBytes(bundleSize)}`);
+    success(`Total Saved : ${reduction}%`);
 }

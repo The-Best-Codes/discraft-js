@@ -7,12 +7,9 @@ import babel from '@rollup/plugin-babel';
 const config = {
   input: 'src/index.js',
   output: {
-    dir: 'dist',
+    file: 'dist/bundle.js',
     format: 'es',
-    preserveModules: true,
-    preserveModulesRoot: 'src',
     minifyInternalExports: true,
-    hoistTransitiveImports: true
   },
   external: [
     // Keep node built-ins external
@@ -36,7 +33,7 @@ const config = {
       exportConditions: ['node']
     }),
     commonjs({
-      ignoreDynamicRequires: true
+      ignoreDynamicRequires: false
     }),
     json(),
     babel({
@@ -52,7 +49,8 @@ const config = {
     })
   ],
   treeshake: {
-    moduleSideEffects: true,
+    moduleSideEffects: false,
+    propertyReadSideEffects: false,
     tryCatchDeoptimization: false
   }
 };

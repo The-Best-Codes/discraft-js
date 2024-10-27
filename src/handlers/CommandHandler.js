@@ -1,12 +1,7 @@
 import { Collection, REST, Routes } from 'discord.js';
 import { log, error, info, debug } from '../../common/utils/logger.js';
 import { token, clientId } from '../config/bot.config.js';
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import { commands } from '../commands/index.js';
 
 export class CommandHandler {
   constructor(client, startTime) {
@@ -59,23 +54,14 @@ export class CommandHandler {
     this.commands.clear();
     this.commandsData = [];
 
-    const commandsPath = path.join(__dirname, '..', 'commands');
-    const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
-
-    for (const file of commandFiles) {
-      try {
-        const filePath = `file://${path.join(commandsPath, file)}`;
-        const command = await import(filePath);
-
-        if ('data' in command.default && 'execute' in command.default) {
-          this.commands.set(command.default.data.name, command.default);
-          this.commandsData.push(command.default.data.toJSON());
-          debug(`Loaded command: ${command.default.data.name}`);
-        } else {
-          error(`The command at ${file} is missing required "data" or "execute" property.`);
-        }
-      } catch (err) {
-        error(`Error loading command ${file}:`, err);
+    // Load commands from static imports
+    for (const [name, command] of Object.entries(commands)) {
+      if ('data' in command && 'execute' in command) {
+        this.commands.set(command.data.name, command);
+        this.commandsData.push(command.data.toJSON());
+        debug(`Loaded command: ${command.data.name}`);
+      } else {
+        error(`The command ${name} is missing required "data" or "execute" property.`);
       }
     }
   }

@@ -6,10 +6,10 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distPath = path.join(__dirname, '..', 'dist');
-const distIndexPath = path.join(distPath, 'index.js');
+const bundlePath = path.join(distPath, 'bundle.js');
 
-// Check if dist directory and index.js exist
-if (!fs.existsSync(distPath) || !fs.existsSync(distIndexPath)) {
+// Check if dist directory and bundle.js exist
+if (!fs.existsSync(distPath) || !fs.existsSync(bundlePath)) {
   error('Build not found! Please run "npm run build" first');
   info('You can create a production build by running: npm run build');
   process.exit(1);
@@ -17,7 +17,7 @@ if (!fs.existsSync(distPath) || !fs.existsSync(distIndexPath)) {
 
 info('Starting bot in production mode...');
 
-const bot = spawn('node', ['dist/index.js'], {
+const bot = spawn('node', ['-r', 'dotenv/config', 'dist/bundle.js'], {
   stdio: 'inherit'
 });
 
