@@ -14,7 +14,7 @@ const program = new Command();
 program
   .option('-y, --yes', 'Skip prompts and use defaults')
   .option('-o, --output <dir>', 'Output directory', 'dist')
-  .option('--max-optimize', 'Enable maximum optimization (slower build, faster runtime)', false)
+  .option('--max-optimize', 'Enable maximum optimization (slower build, faster runtime)', true)
   .parse(process.argv);
 
 const options = program.opts();
@@ -92,6 +92,8 @@ async function build() {
 
     const config = await getBuildConfig();
 
+    const startTime = Date.now();
+
     // Get original source size before clearing dist
     const srcDir = path.join(process.cwd(), 'src');
     const originalSize = await getFileSizes(srcDir);
@@ -135,7 +137,7 @@ async function build() {
     await displaySizeComparison(originalSize, outputDir);
 
     info(`Output location: ${outputDir}`);
-    success('Build completed successfully.');
+    success('Build completed successfully in ' + (Date.now() - startTime) + 'ms');
   } catch (err) {
     error('Build failed:', err);
     process.exit(1);
@@ -164,7 +166,7 @@ async function getBuildConfig() {
       type: 'confirm',
       name: 'maxOptimize',
       message: 'Enable maximum optimization (slower build, faster runtime)?',
-      default: false,
+      default: true,
       when: answers => answers.minify
     },
     {
