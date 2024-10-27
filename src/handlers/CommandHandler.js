@@ -1,5 +1,5 @@
 import { Collection, REST, Routes } from 'discord.js';
-import { log, error, info, debug } from '../utils/logger.js';
+import { log, error, info, debug, success } from '../utils/logger.js';
 import { token, clientId } from '../config/bot.config.js';
 import { commands } from '../commands/index.js';
 
@@ -45,7 +45,7 @@ export class CommandHandler {
       await this.registerCommands();
       info(`Bot is ready as ${this.client.user.tag}`);
       debug(`Time to register commands: ${Date.now() - this.client.readyTimestamp}ms`);
-      info(`Time to online: ${Date.now() - this.serverStartTime}ms`);
+      success(`Time to online: ${Date.now() - this.serverStartTime}ms`);
     });
   }
 

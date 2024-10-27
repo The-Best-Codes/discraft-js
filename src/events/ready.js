@@ -1,8 +1,8 @@
 import { debug, error } from "../utils/logger.js";
-import { ActivityType } from "discord.js";
+import { ActivityType, Events } from "discord.js";
 
 export default (client) => {
-    client.on('ready', () => {
+    client.on(Events.ClientReady, () => {
         debug('Setting presence...');
         try {
             client.user.setPresence({

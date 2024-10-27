@@ -28,10 +28,11 @@ mon.on('error', (err) => {
 
 // Log restart information
 mon.on('restart', (files) => {
+    const restartTime = Date.now();
     info(`Restarting due to changes in ${files.length} files...`);
     generateCommands();
     generateEvents();
-    success('Restart complete');
+    success(`Restart complete in ${Date.now() - restartTime}ms`);
 });
 
 // Handle process signals

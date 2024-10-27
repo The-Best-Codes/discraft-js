@@ -15,8 +15,12 @@ info('Loading events...');
 try {
   for (const [name, eventHandler] of Object.entries(events)) {
     debug(`Loading event: ${name}`);
-    eventHandler(client);
-    debug(`Loaded event: ${name}`);
+    try {
+      eventHandler(client);
+      debug(`Loaded event: ${name}`);
+    } catch (err) {
+      error(`Error loading event ${name}:`, err);
+    }
   }
   info('Events loaded.');
 } catch (err) {
