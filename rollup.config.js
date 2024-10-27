@@ -3,7 +3,6 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
-import { visualizer } from 'rollup-plugin-visualizer';
 
 const config = {
   input: 'src/index.js',
@@ -46,7 +45,6 @@ const config = {
         }]
       ]
     }),
-    visualizer({ filename: 'dist/stats.html' })
   ],
   treeshake: {
     moduleSideEffects: false,

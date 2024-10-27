@@ -39,8 +39,7 @@
     "dotenv": "^16.4.5",
     "inquirer": "^12.0.1",
     "nodemon": "^3.1.7",
-    "rollup": "^4.24.0",
-    "rollup-plugin-visualizer": "^5.12.0",
+    "rollup": "^4.24.2",
     "terser": "^5.36.0"
   }
 }
