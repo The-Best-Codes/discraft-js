@@ -3,6 +3,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
+import { visualizer } from 'rollup-plugin-visualizer';
 
 const config = {
   input: 'src/index.js',
@@ -11,18 +12,16 @@ const config = {
     format: 'es',
     minifyInternalExports: true,
   },
-  external: [
-    // Keep node built-ins external
-    'fs',
-    'path',
-    'url',
-    'util',
-    'events',
-    // Keep discord.js external as it's a runtime dependency
-    'discord.js',
-    // Keep dotenv external
-    'dotenv',
-  ],
+  external: (id) => {
+    return (
+      !id.startsWith('.') &&
+      !id.startsWith('/') &&
+      !id.startsWith('src/') &&
+      !id.startsWith('../') &&
+      !id.startsWith('./') &&
+      !id.startsWith('@/')
+    )
+  },
   plugins: [
     replace({
       preventAssignment: true,
@@ -46,7 +45,8 @@ const config = {
           exclude: ['transform-typeof-symbol']
         }]
       ]
-    })
+    }),
+    visualizer({ filename: 'dist/stats.html' })
   ],
   treeshake: {
     moduleSideEffects: false,

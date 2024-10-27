@@ -1,4 +1,4 @@
-import { info } from '../../common/utils/logger.js';
+import { info } from '../utils/logger.js';
 import { Client, GatewayIntentBits } from 'discord.js';
 import { token } from '../config/bot.config.js';
 

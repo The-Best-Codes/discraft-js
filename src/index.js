@@ -1,4 +1,4 @@
-import { debug, error, info, success } from '../common/utils/logger.js';
+import { debug, error, info, success } from './utils/logger.js';
 import client from './services/discord.js';
 import { CommandHandler } from './handlers/CommandHandler.js';
 import { events } from './events/index.js';

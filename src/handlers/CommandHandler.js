@@ -1,5 +1,5 @@
 import { Collection, REST, Routes } from 'discord.js';
-import { log, error, info, debug } from '../../common/utils/logger.js';
+import { log, error, info, debug } from '../utils/logger.js';
 import { token, clientId } from '../config/bot.config.js';
 import { commands } from '../commands/index.js';
 

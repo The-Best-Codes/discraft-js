@@ -30,7 +30,7 @@ export async function minifyWithTerser(filePath, config) {
             inline: 3,
             evaluate: true,
             pure_funcs: ['console.log', 'console.debug'],
-            drop_console: config.maxOptimize,
+            drop_console: false,
         },
         mangle: {
             module: true,
