@@ -1,5 +1,5 @@
 import { debug, error } from "../utils/logger.js";
-import { ActivityType } from "../services/discord.js";
+import { ActivityType } from "discord.js";
 
 export default (client) => {
     client.on('ready', () => {
