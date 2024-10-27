@@ -1,5 +1,5 @@
 import './config/env.js';
-import { info, success } from './utils/logger.js';
+import { debug, error, info, success } from './utils/logger.js';
 import client from './services/discord.js';
 import fs from 'fs';
 import path from 'path';
@@ -19,9 +19,17 @@ client.commandHandler = new CommandHandler(client, startTime);
 // Dynamically load user-created events
 const eventsPath = path.join(__dirname, 'events');
 if (fs.existsSync(eventsPath)) {
-  for (const file of fs.readdirSync(eventsPath)) {
-    const eventModule = await import(`./events/${file}`);
-    eventModule.default(client);
+  info('Loading events...');
+  try {
+    for (const file of fs.readdirSync(eventsPath)) {
+      debug(`Loading event: ${file}`);
+      const eventModule = await import(`./events/${file}`);
+      eventModule.default(client);
+      debug(`Loaded event: ${file}`);
+    }
+    info('Events loaded.');
+  } catch (err) {
+    error('Error loading events:', err);
   }
 }
 

@@ -1,5 +1,5 @@
 import { info } from '../utils/logger.js';
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits, ActivityType } from 'discord.js';
 import { token } from '../config/bot.config.js';
 
 const client = new Client({
@@ -15,3 +15,4 @@ client.login(token).then(() => {
 });
 
 export default client;
+export { GatewayIntentBits, ActivityType };
