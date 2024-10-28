@@ -96,6 +96,16 @@ async function build() {
   try {
     info('Starting build process...');
 
+    // Verify source directory exists
+    if (!fs.existsSync(srcDir)) {
+      throw new Error(`Source directory not found at ${srcDir}`);
+    }
+
+    const inputFile = path.join(srcDir, 'index.js');
+    if (!fs.existsSync(inputFile)) {
+      throw new Error(`Entry point not found at ${inputFile}`);
+    }
+
     info('Generating commands and events...');
     await new Promise((resolve) => {
       generateCommands(srcDir);
@@ -122,10 +132,11 @@ async function build() {
 
     // Create rollup config
     const rollupConfig = {
-      input: path.join(srcDir, 'index.js'),
+      input: inputFile,
       output: {
         file: path.join(outputDir, 'bundle.js'),
         format: 'es',
+        exports: 'auto',
         minifyInternalExports: true,
       },
       external: (id) => {
@@ -174,13 +185,19 @@ async function build() {
     // Bundle with Rollup
     info('Running Rollup bundler...');
     const bundle = await rollup(rollupConfig);
-    const { output } = await bundle.write(rollupConfig.output);
+    const output = await bundle.write(rollupConfig.output);
+    await bundle.close();
 
     const bundlePath = path.join(outputDir, 'bundle.js');
 
-    // Analyze dependencies before minification
+    // Verify bundle exists before proceeding
+    if (!fs.existsSync(bundlePath)) {
+      throw new Error(`Bundle file not created at ${bundlePath}`);
+    }
+
+    // Analyze dependencies after bundle is created
     info('Analyzing dependencies...');
-    const minimalPackage = await analyzeDependencies(bundlePath, { output });
+    const minimalPackage = await analyzeDependencies(bundlePath, { output: [output] });
     await fs.promises.writeFile(
       path.join(outputDir, 'package.json'),
       JSON.stringify(minimalPackage, null, 2)
@@ -195,8 +212,6 @@ async function build() {
       }
       await minifyWithTerser(bundlePath, config);
     }
-
-    await bundle.close();
 
     // Display size comparison
     await displaySizeComparison(originalSize, outputDir);
