@@ -33,21 +33,9 @@ program
             {
                 type: 'input',
                 name: 'directory',
-                message: 'Project directory (leave empty for current):',
-                default: '',
+                message: 'Project directory (leave empty for project name):',
+                default: answers => answers.name,
                 filter: input => input.trim()
-            },
-            {
-                type: 'input',
-                name: 'description',
-                message: 'Description:',
-                default: 'A Discord bot built with Discraft'
-            },
-            {
-                type: 'input',
-                name: 'author',
-                message: 'Author:',
-                default: ''
             },
             {
                 type: 'list',
@@ -75,25 +63,16 @@ program
                         name: 'README.md with setup instructions',
                         value: 'readme',
                         checked: true
-                    },
-                    {
-                        name: 'Basic error handling',
-                        value: 'errorHandling',
-                        checked: true
                     }
                 ]
             }
         ]);
 
         // Set up project directory
-        const projectDir = answers.directory 
-            ? path.resolve(process.cwd(), answers.directory)
-            : process.cwd();
+        const projectDir = path.resolve(process.cwd(), answers.directory);
 
-        if (answers.directory) {
-            if (!fs.existsSync(projectDir)) {
-                fs.mkdirSync(projectDir, { recursive: true });
-            }
+        if (!fs.existsSync(projectDir)) {
+            fs.mkdirSync(projectDir, { recursive: true });
         }
 
         // Create src directory
@@ -144,14 +123,14 @@ program
         const pkg = {
             name: answers.name,
             version: '1.0.0',
-            description: answers.description,
+            scripts: {
+                dev: 'discraft dev',
+                build: 'discraft build',
+                start: 'discraft start'
+            },
+            description: 'Bot made with Discraft',
             type: 'module',
-            author: answers.author,
-            license: answers.license === 'None' ? 'UNLICENSED' : answers.license,
-            dependencies: {
-                'discord.js': '^14.16.3',
-                'dotenv': '^16.4.5'
-            }
+            license: answers.license === 'None' ? 'UNLICENSED' : answers.license
         };
 
         fs.writeFileSync(
@@ -171,7 +150,7 @@ program
         // Create README.md if selected
         if (answers.features.includes('readme')) {
             const readme = `# ${answers.name}
-${answers.description}
+Bot made with Discraft
 
 ## Setup
 
@@ -214,14 +193,26 @@ dist/
 `;
         fs.writeFileSync(path.join(projectDir, '.gitignore'), gitignore);
 
-        console.log('\n✨ Discraft project initialized successfully!');
-        console.log('\nNext steps:');
-        if (answers.directory) {
-            console.log(`1. cd ${answers.directory}`);
-        }
-        console.log('1. Run "npm install" to install dependencies');
-        console.log('2. Add your bot token to .env file');
-        console.log('3. Run "discraft dev" to start development');
+        // Install latest dependencies
+        console.log('\n📦 Installing dependencies...');
+        const npmInstall = spawn('npm', ['install', 'discord.js@latest', 'dotenv@latest'], {
+            stdio: 'inherit',
+            cwd: projectDir
+        });
+
+        npmInstall.on('close', (code) => {
+            if (code === 0) {
+                console.log('\n✨ Discraft project initialized successfully!');
+                console.log('\nNext steps:');
+                if (answers.directory !== process.cwd()) {
+                    console.log(`Run \`cd ${answers.directory}\` to enter your project directory.`);
+                }
+                console.log('Add your bot token and client ID to .env file');
+                console.log('Run "discraft dev" to start development');
+            } else {
+                console.error('\n❌ Failed to install dependencies. Please run "npm install" manually.');
+            }
+        });
     });
 
 program
@@ -229,7 +220,7 @@ program
     .description('Start development server')
     .action(() => {
         const scriptPath = path.join(__dirname, '..', 'scripts', 'dev.js');
-        spawn('node', [scriptPath], { 
+        spawn('node', [scriptPath], {
             stdio: 'inherit',
             cwd: process.cwd(),
             env: { ...process.env, DISCRAFT_ROOT: __dirname }
@@ -241,10 +232,14 @@ program
     .description('Build for production')
     .action(() => {
         const scriptPath = path.join(__dirname, '..', 'scripts', 'build.js');
-        spawn('node', [scriptPath], { 
+        spawn('node', [scriptPath], {
             stdio: 'inherit',
             cwd: process.cwd(),
-            env: { ...process.env, DISCRAFT_ROOT: __dirname }
+            env: {
+                ...process.env,
+                DISCRAFT_ROOT: __dirname,
+                BABEL_PRESET_ENV_PATH: path.join(__dirname, '..', 'node_modules', '@babel/preset-env')
+            }
         });
     });
 
@@ -253,7 +248,7 @@ program
     .description('Start production server')
     .action(() => {
         const scriptPath = path.join(__dirname, '..', 'scripts', 'start.js');
-        spawn('node', [scriptPath], { 
+        spawn('node', [scriptPath], {
             stdio: 'inherit',
             cwd: process.cwd(),
             env: { ...process.env, DISCRAFT_ROOT: __dirname }

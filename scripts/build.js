@@ -8,6 +8,11 @@ import { getFileSizes, displaySizeComparison } from './utils/fileSizeUtil.js';
 import { minifyWithTerser } from './utils/minifyUtilTerser.js';
 import generateCommands from './compile/genCommands.js';
 import generateEvents from './compile/genEvents.js';
+import { nodeResolve } from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import json from '@rollup/plugin-json';
+import replace from '@rollup/plugin-replace';
+import babel from '@rollup/plugin-babel';
 
 const program = new Command();
 const projectDir = process.cwd();
@@ -67,7 +72,7 @@ async function analyzeDependencies(bundlePath, rollupBundle) {
     name: "discraft-bot",
     type: "module",
     version: "1.0.0",
-    description: `Bot created with version ${mainPackageJson.version} of discraft-js`,
+    description: `Bot created with Discraft`,
     main: "bundle.js",
     dependencies: {}
   };
@@ -107,14 +112,57 @@ async function build() {
     }
     await fs.promises.mkdir(outputDir, { recursive: true });
 
+    // Create rollup config
+    const rollupConfig = {
+      input: path.join(srcDir, 'index.js'),
+      output: {
+        dir: outputDir,
+        format: 'es',
+        minifyInternalExports: true,
+      },
+      external: (id) => {
+        return (
+          !id.startsWith('.') &&
+          !id.startsWith('/') &&
+          !id.startsWith('src/') &&
+          !id.startsWith('../') &&
+          !id.startsWith('./')
+        );
+      },
+      plugins: [
+        replace({
+          preventAssignment: true,
+          'process.env.NODE_ENV': JSON.stringify('production')
+        }),
+        nodeResolve({
+          preferBuiltins: true,
+          exportConditions: ['node']
+        }),
+        commonjs({
+          ignoreDynamicRequires: false
+        }),
+        json(),
+        babel({
+          babelHelpers: 'bundled',
+          presets: [
+            ['@babel/preset-env', {
+              targets: { node: 'current' },
+              modules: false,
+              loose: true,
+              exclude: ['transform-typeof-symbol']
+            }]
+          ]
+        })
+      ],
+      treeshake: {
+        moduleSideEffects: false,
+        propertyReadSideEffects: false,
+        tryCatchDeoptimization: false
+      }
+    };
+
     // Bundle with Rollup
     info('Running Rollup bundler...');
-    const rollupConfig = (await import('../rollup.config.js')).default;
-    
-    // Update rollup config to use correct paths
-    rollupConfig.input = path.join(srcDir, 'index.js');
-    rollupConfig.output.dir = outputDir;
-
     const bundle = await rollup(rollupConfig);
     const { output } = await bundle.write(rollupConfig.output);
 
