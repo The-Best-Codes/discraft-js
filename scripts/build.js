@@ -13,6 +13,11 @@ import commonjs from '@rollup/plugin-commonjs';
 import json from '@rollup/plugin-json';
 import replace from '@rollup/plugin-replace';
 import babel from '@rollup/plugin-babel';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const discraftDir = path.resolve(__dirname, '..');
 
 const program = new Command();
 const projectDir = process.cwd();
@@ -144,8 +149,10 @@ async function build() {
         json(),
         babel({
           babelHelpers: 'bundled',
+          configFile: false,
+          babelrc: false,
           presets: [
-            ['@babel/preset-env', {
+            [require.resolve('@babel/preset-env', { paths: [discraftDir] }), {
               targets: { node: 'current' },
               modules: false,
               loose: true,
