@@ -2,23 +2,23 @@ import { spawn } from 'child_process';
 import { info, error } from '../common/utils/logger.js';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const distPath = path.join(__dirname, '..', 'dist');
+const projectDir = process.cwd();
+const distPath = path.join(projectDir, 'dist');
 const bundlePath = path.join(distPath, 'bundle.js');
 
 // Check if dist directory and bundle.js exist
 if (!fs.existsSync(distPath) || !fs.existsSync(bundlePath)) {
-  error('Build not found! Please run "npm run build" first');
-  info('You can create a production build by running: npm run build');
+  error('Build not found! Please run "discraft build" first');
+  info('You can create a production build by running: discraft build');
   process.exit(1);
 }
 
 info('Starting bot in production mode...');
 
-const bot = spawn('node', ['-r', 'dotenv/config', 'dist/bundle.js'], {
-  stdio: 'inherit'
+const bot = spawn('node', ['-r', 'dotenv/config', bundlePath], {
+  stdio: 'inherit',
+  cwd: projectDir
 });
 
 bot.on('error', (err) => {

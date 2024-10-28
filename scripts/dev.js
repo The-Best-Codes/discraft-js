@@ -2,15 +2,20 @@ import nodemon from 'nodemon';
 import { info, warn, error, success } from '../common/utils/logger.js';
 import generateCommands from './compile/genCommands.js';
 import generateEvents from './compile/genEvents.js';
+import path from 'path';
+
+// Get the user's project directory
+const projectDir = process.cwd();
+const srcDir = path.join(projectDir, 'src');
 
 // On startup, generate commands and events
-generateCommands();
-generateEvents();
+generateCommands(srcDir);
+generateEvents(srcDir);
 
 const mon = nodemon({
     exec: 'node -r dotenv/config',
-    script: 'src/index.js',
-    watch: ['src'],
+    script: path.join(srcDir, 'index.js'),
+    watch: [srcDir],
     ext: 'js',
     env: { 'NODE_ENV': 'development' }
 });
@@ -30,8 +35,8 @@ mon.on('error', (err) => {
 mon.on('restart', (files) => {
     const restartTime = Date.now();
     info(`Restarting due to changes in ${files.length} files...`);
-    generateCommands();
-    generateEvents();
+    generateCommands(srcDir);
+    generateEvents(srcDir);
     success(`Restart complete in ${Date.now() - restartTime}ms`);
 });
 

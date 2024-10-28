@@ -1,7 +1,7 @@
 import { Collection, REST, Routes } from 'discord.js';
 import { error, info, debug, success } from '../utils/logger.js';
 import { token, clientId } from '../config/bot.config.js';
-import { commands } from '../commands/index.js';
+import { commands } from '../.discraft/commands/index.js';
 
 export class CommandHandler {
   constructor(client, startTime) {

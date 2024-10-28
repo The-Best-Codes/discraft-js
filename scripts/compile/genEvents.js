@@ -1,28 +1,30 @@
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { info, debug, error } from '../../common/utils/logger.js';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-export default function generateEvents() {
+export default function generateEvents(srcDir) {
     try {
-        debug('Generating events/index.js...');
-        const EVENTS_DIR = path.join(__dirname, '../../src/events');
-        const OUTPUT_FILE = path.join(EVENTS_DIR, 'index.js');
+        debug('Generating .discraft/events/index.js...');
+        const EVENTS_DIR = path.join(srcDir, 'events');
+        const OUTPUT_DIR = path.join(srcDir, '.discraft', 'events');
+        const OUTPUT_FILE = path.join(OUTPUT_DIR, 'index.js');
 
-        // Get all event files
+        // Create .discraft directory if it doesn't exist
+        if (!fs.existsSync(OUTPUT_DIR)) {
+            fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+        }
+
+        // Get all event files from the original events directory
         const eventFiles = fs.readdirSync(EVENTS_DIR)
             .filter(file => file.endsWith('.js') && file !== 'index.js');
 
         // Generate the content
         let content = '';
 
-        // Add imports
+        // Add imports (from original events directory)
         eventFiles.forEach(file => {
             const eventName = path.basename(file, '.js');
-            content += `import ${eventName} from './${file}';\n`;
+            content += `import ${eventName} from '../../events/${file}';\n`;
         });
 
         content += '\n// Export all events with their handlers\n';
@@ -36,10 +38,10 @@ export default function generateEvents() {
 
         content += '};';
 
-        // Write the file
+        // Write the file to .discraft directory
         fs.writeFileSync(OUTPUT_FILE, content);
-        info('Generated events/index.js');
+        info('Generated .discraft/events/index.js');
     } catch (err) {
-        error('Error generating events/index.js:', err);
+        error('Error generating .discraft/events/index.js:', err);
     }
 }

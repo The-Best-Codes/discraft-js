@@ -10,6 +10,8 @@ import generateCommands from './compile/genCommands.js';
 import generateEvents from './compile/genEvents.js';
 
 const program = new Command();
+const projectDir = process.cwd();
+const srcDir = path.join(projectDir, 'src');
 
 program
   .option('-y, --yes', 'Skip prompts and use defaults')
@@ -58,7 +60,7 @@ async function analyzeDependencies(bundlePath, rollupBundle) {
     externalDeps.add(packageName);
   }
 
-  const mainPackageJson = JSON.parse(await fs.promises.readFile('package.json', 'utf-8'));
+  const mainPackageJson = JSON.parse(await fs.promises.readFile(path.join(projectDir, 'package.json'), 'utf-8'));
 
   // Create minimal package.json with only runtime dependencies
   const minimalPackage = {
@@ -86,21 +88,20 @@ async function build() {
 
     info('Generating commands and events...');
     await new Promise((resolve) => {
-      generateCommands();
-      generateEvents();
+      generateCommands(srcDir);
+      generateEvents(srcDir);
       resolve();
-    })
+    });
 
     const config = await getBuildConfig();
 
     const startTime = Date.now();
 
     // Get original source size before clearing dist
-    const srcDir = path.join(process.cwd(), 'src');
     const originalSize = await getFileSizes(srcDir);
 
     // Ensure dist directory exists and is empty
-    const outputDir = path.resolve(process.cwd(), options.output);
+    const outputDir = path.resolve(projectDir, options.output);
     if (fs.existsSync(outputDir)) {
       await fs.promises.rm(outputDir, { recursive: true });
     }
@@ -109,6 +110,11 @@ async function build() {
     // Bundle with Rollup
     info('Running Rollup bundler...');
     const rollupConfig = (await import('../rollup.config.js')).default;
+    
+    // Update rollup config to use correct paths
+    rollupConfig.input = path.join(srcDir, 'index.js');
+    rollupConfig.output.dir = outputDir;
+
     const bundle = await rollup(rollupConfig);
     const { output } = await bundle.write(rollupConfig.output);
 
