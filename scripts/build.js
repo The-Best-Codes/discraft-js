@@ -117,11 +117,14 @@ async function build() {
     }
     await fs.promises.mkdir(outputDir, { recursive: true });
 
+    // Resolve babel preset path
+    const presetEnvPath = path.join(discraftDir, 'node_modules', '@babel/preset-env');
+
     // Create rollup config
     const rollupConfig = {
       input: path.join(srcDir, 'index.js'),
       output: {
-        dir: outputDir,
+        file: path.join(outputDir, 'bundle.js'),
         format: 'es',
         minifyInternalExports: true,
       },
@@ -152,7 +155,7 @@ async function build() {
           configFile: false,
           babelrc: false,
           presets: [
-            [require.resolve('@babel/preset-env', { paths: [discraftDir] }), {
+            [presetEnvPath, {
               targets: { node: 'current' },
               modules: false,
               loose: true,
