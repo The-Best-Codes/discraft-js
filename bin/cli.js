@@ -6,12 +6,14 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { spawn } from 'child_process';
 import inquirer from 'inquirer';
+import currentPackage from '../package.json';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const program = new Command();
 
 program
-    .version('1.2.3')
+    .version(currentPackage.version || '1.0.0')
+    .name('discraft')
     .description('Discraft CLI - Best framework for Discord bots');
 
 program
@@ -231,9 +233,12 @@ program
 program
     .command('build')
     .description('Build for production')
-    .action(() => {
+    .option('-y, --yes', 'Skip prompts and use defaults')
+    .option('-o, --output <dir>', 'Output directory', 'dist')
+    .option('--max-optimize', 'Enable maximum optimization (slower build, faster runtime)', true)
+    .action((options) => {
         const scriptPath = path.join(__dirname, '..', 'scripts', 'build.js');
-        spawn('node', [scriptPath], {
+        spawn('node', [scriptPath, ...process.argv.slice(3)], {
             stdio: 'inherit',
             cwd: process.cwd(),
             env: {

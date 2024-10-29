@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import { info, error, success } from '../common/utils/logger.js';
 import inquirer from 'inquirer';
-import { Command } from 'commander';
 import { rollup } from 'rollup';
 import { getFileSizes, displaySizeComparison } from './utils/fileSizeUtil.js';
 import { minifyWithTerser } from './utils/minifyUtilTerser.js';
@@ -19,17 +18,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const discraftDir = path.resolve(__dirname, '..');
 
-const program = new Command();
 const projectDir = process.cwd();
 const srcDir = path.join(projectDir, 'src');
-
-program
-  .option('-y, --yes', 'Skip prompts and use defaults')
-  .option('-o, --output <dir>', 'Output directory', 'dist')
-  .option('--max-optimize', 'Enable maximum optimization (slower build, faster runtime)', true)
-  .parse(process.argv);
-
-const options = program.opts();
 
 async function analyzeDependencies(bundlePath, rollupBundle) {
   // Get external dependencies from rollup metadata
@@ -92,7 +82,7 @@ async function analyzeDependencies(bundlePath, rollupBundle) {
   return minimalPackage;
 }
 
-async function build() {
+async function build(options) {
   try {
     info('Starting build process...');
 
@@ -113,7 +103,7 @@ async function build() {
       resolve();
     });
 
-    const config = await getBuildConfig();
+    const config = await getBuildConfig(options);
 
     const startTime = Date.now();
 
@@ -224,7 +214,7 @@ async function build() {
   }
 }
 
-async function getBuildConfig() {
+async function getBuildConfig(options) {
   if (options.yes) {
     return {
       minify: true,
@@ -273,4 +263,11 @@ async function getBuildConfig() {
   ]);
 }
 
-build();
+// Extract options from process arguments
+const options = {
+  yes: process.argv.includes('-y') || process.argv.includes('--yes'),
+  output: process.argv.includes('-o') ? process.argv[process.argv.indexOf('-o') + 1] : 'dist',
+  maxOptimize: process.argv.includes('--max-optimize')
+};
+
+build(options);
