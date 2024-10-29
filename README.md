@@ -1,6 +1,9 @@
 [![Publish to npm](https://github.com/The-Best-Codes/discraft-js/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/npm-publish.yml)
 [![CodeQL](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/The-Best-Codes/discraft-js/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/dependabot/dependabot-updates)
+[![Discord Server](https://img.shields.io/discord/1170475897174896650)](https://discord.gg/dKeuR9yfBs)
+[![npm version](https://img.shields.io/npm/v/discraft.svg)](https://www.npmjs.com/package/discraft)
+[![npm downloads](https://img.shields.io/npm/dm/discraft.svg)](https://www.npmjs.com/package/discraft)
 
 # Discraft
 
