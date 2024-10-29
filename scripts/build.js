@@ -23,7 +23,7 @@ const srcDir = path.join(projectDir, "src");
 
 async function analyzeDependencies(bundlePath, rollupBundle) {
   // Get external dependencies from rollup metadata
-  // eslint-disable-next-line no-undef
+   
   const externalDeps = new Set();
 
   // Analyze the chunk modules from rollup
@@ -99,7 +99,7 @@ async function build(options) {
     }
 
     info("Generating commands and events...");
-    // eslint-disable-next-line no-undef
+     
     await new Promise((resolve) => {
       generateCommands(srcDir);
       generateEvents(srcDir);
