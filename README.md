@@ -4,12 +4,11 @@ Discraft is a powerful framework for creating Discord bots, offering a robust CL
 
 ## Installation
 
-To install Discraft, clone the repository and install the dependencies:
+To install Discraft, install is via npm:
 
 ```bash
-git clone https://github.com/The-Best-Codes/discraft-js.git
-cd discraft-js
-npm install
+npm install discraft --save-dev # Use for the current project
+npm install discraft -g # May require sudo, globally installs to use CLI
 ```
 
 ## Usage
@@ -17,7 +16,9 @@ npm install
 Discraft provides a CLI tool to manage your Discord bot projects. You can use the following command to start using Discraft:
 
 ```bash
-npx discraft
+npx discraft [command]
+# or
+discraft [command]
 ```
 
 ### CLI Commands
@@ -92,4 +93,4 @@ Contributions are welcome! Please visit the [GitHub repository](https://github.c
 
 ## License
 
-This project is licensed under the MIT License.
+This project is licensed under the GNU General Public License 3.0.
