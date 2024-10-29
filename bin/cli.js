@@ -6,13 +6,22 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
 import inquirer from "inquirer";
-import currentPackage from "../package.json";
+
+let currentPackage = {};
+
+// Ensure the package.json exists
+try {
+    const packagePath = path.resolve(process.cwd(), "package.json");
+    currentPackage = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
+} catch (err) {
+    console.error("Could not access package.json", err);
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const program = new Command();
 
 program
-    .version(currentPackage.version || "1.0.0")
+    .version(currentPackage?.version || "1.0.0")
     .name("discraft")
     .description("Discraft CLI - Best framework for Discord bots");
 
