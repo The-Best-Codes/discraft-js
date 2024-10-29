@@ -1,19 +1,24 @@
+[![Publish to npm](https://github.com/The-Best-Codes/discraft-js/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/npm-publish.yml)
+[![CodeQL](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql)
+[![Dependabot Updates](https://github.com/The-Best-Codes/discraft-js/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/dependabot/dependabot-updates)
+
 # Discraft
 
 Discraft is a powerful framework for creating Discord bots, offering a robust CLI and a set of tools to streamline the development process.
+Think of it like Next.js but for Discord bots.
 
 ## Installation
 
-To install Discraft, install is via npm:
+You can intsall Discraft via npm:
 
 ```bash
-npm install discraft --save-dev # Use for the current project
-npm install discraft -g # May require sudo, globally installs to use CLI
+npm install discraft --save-dev # Use this to install Discraft in the current project
+npm install discraft -g # May require sudo, globally installs Discraft so you can use it from anywhere
 ```
 
 ## Usage
 
-Discraft provides a CLI tool to manage your Discord bot projects. You can use the following command to start using Discraft:
+Discraft provides a CLI interface. You can use Discraft like this:
 
 ```bash
 npx discraft [command]
@@ -36,7 +41,7 @@ The project is organized into several directories:
 - `src/events`: Contains event handlers for the bot.
 - `src/config`: Configuration files.
 - `src/handlers`: Handlers for various bot functionalities.
-- `src/services`: Services used by the bot.
+- `src/services`: Services used by the bot. (Right now, just Discord)
 - `src/utils`: Utility functions.
 
 ## Development
@@ -72,11 +77,13 @@ Ensure that you have built the project before starting it in production mode.
 ## Setup
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Create a `.env` file with your bot token:
+
    ```
    TOKEN=your_bot_token_here
    CLIENT_ID=your_client_id_here
