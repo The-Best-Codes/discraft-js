@@ -7,17 +7,18 @@ import { fileURLToPath } from "url";
 import { spawn } from "child_process";
 import inquirer from "inquirer";
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 let currentPackage = {};
 
 // Ensure the package.json exists
 try {
-    const packagePath = path.resolve(process.cwd(), "package.json");
+    const packagePath = path.resolve(__dirname, "..", "package.json");
     currentPackage = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
 } catch (err) {
     console.error("Could not access package.json", err);
 }
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const program = new Command();
 
 program
