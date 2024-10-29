@@ -1,7 +1,7 @@
-import { Collection, REST, Routes } from 'discord.js';
-import { error, info, debug, success } from '../utils/logger.js';
-import { token, clientId } from '../config/bot.config.js';
-import { commands } from '../.discraft/commands/index.js';
+import { Collection, REST, Routes } from "discord.js";
+import { error, info, debug, success } from "../utils/logger.js";
+import { token, clientId } from "../config/bot.config.js";
+import { commands } from "../.discraft/commands/index.js";
 
 export class CommandHandler {
   constructor(client, startTime) {
@@ -14,7 +14,7 @@ export class CommandHandler {
 
   setupEventListeners() {
     // Handle command interactions
-    this.client.on('interactionCreate', async (interaction) => {
+    this.client.on("interactionCreate", async (interaction) => {
       if (!interaction.isCommand()) return;
 
       const command = this.commands.get(interaction.commandName);
@@ -23,8 +23,8 @@ export class CommandHandler {
       try {
         await command.execute(interaction);
       } catch (err) {
-        error('Error executing command:', err);
-        const content = { content: 'There was an error executing this command!', ephemeral: true };
+        error("Error executing command:", err);
+        const content = { content: "There was an error executing this command!", ephemeral: true };
         try {
           if (interaction.replied || interaction.deferred) {
             await interaction.followUp(content);
@@ -32,20 +32,20 @@ export class CommandHandler {
             await interaction.reply(content);
           }
         } catch (err) {
-          error('Error replying:', err);
+          error("Error replying:", err);
         }
       }
     });
 
     // Handle guild joins
-    this.client.on('guildCreate', async (guild) => {
+    this.client.on("guildCreate", async (guild) => {
       debug(`Bot joined new guild: ${guild.name} (${guild.id})`);
       await this.registerCommands();
     });
 
     // Register commands when bot is ready
-    this.client.once('ready', async () => {
-      debug('Registering commands...');
+    this.client.once("ready", async () => {
+      debug("Registering commands...");
       await this.registerCommands();
       info(`Bot is ready as ${this.client.user.tag}`);
       debug(`Time to register commands: ${Date.now() - this.client.readyTimestamp}ms`);
@@ -60,7 +60,7 @@ export class CommandHandler {
 
     // Load commands from static imports
     for (const [name, command] of Object.entries(commands)) {
-      if ('data' in command && 'execute' in command) {
+      if ("data" in command && "execute" in command) {
         this.commands.set(command.data.name, command);
         this.commandsData.push(command.data.toJSON());
         debug(`Loaded command: ${command.data.name}`);
@@ -86,7 +86,7 @@ export class CommandHandler {
 
       info(`Successfully reloaded ${data.length} application (/) commands.`);
     } catch (err) {
-      error('Error registering commands:', err);
+      error("Error registering commands:", err);
     }
   }
 }

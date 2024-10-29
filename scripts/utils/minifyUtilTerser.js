@@ -1,8 +1,8 @@
-import fs from 'fs';
-import { minify } from 'terser';
+import fs from "fs";
+import { minify } from "terser";
 
 export async function minifyWithTerser(filePath, config) {
-    const code = await fs.promises.readFile(filePath, 'utf8');
+    const code = await fs.promises.readFile(filePath, "utf8");
 
     const terserOptions = {
         module: true,
@@ -29,7 +29,7 @@ export async function minifyWithTerser(filePath, config) {
             collapse_vars: true,
             inline: 3,
             evaluate: true,
-            pure_funcs: ['console.log', 'console.debug'],
+            pure_funcs: ["console.log", "console.debug"],
             drop_console: false,
         },
         mangle: {
@@ -37,7 +37,7 @@ export async function minifyWithTerser(filePath, config) {
             toplevel: true,
             keep_fnames: config.keepFunctionNames,
             properties: config.maxOptimize ? {
-                reserved: ['_events', '_eventsCount', '_maxListeners', 'domain'],
+                reserved: ["_events", "_eventsCount", "_maxListeners", "domain"],
                 regex: /^_/
             } : false
         },
