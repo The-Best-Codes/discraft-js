@@ -28,3 +28,21 @@ try {
 }
 
 success('Bot setup complete.');
+
+process.on('unhandledRejection', (err) => {
+  error('Unhandled rejection:', err);
+});
+
+process.on('uncaughtException', (err) => {
+  error('Uncaught exception:', err);
+});
+
+process.on('uncaughtExceptionMonitor', (err) => {
+  error('Uncaught exception monitor:', err);
+});
+
+process.on('exit', () => {
+  info('Bot exiting...');
+  client.destroy();
+  debug('Bot client logged out, connection terminated.');
+});

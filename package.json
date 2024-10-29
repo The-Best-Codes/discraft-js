@@ -1,6 +1,6 @@
 {
   "name": "discraft",
-  "version": "1.3.3",
+  "version": "1.3.4",
   "description": "Best framework for discord bots",
   "main": "index.js",
   "type": "module",
@@ -15,11 +15,6 @@
     "rollup.config.js",
     ".babelrc"
   ],
-  "scripts": {
-    "dev": "node scripts/dev.js",
-    "build": "node scripts/build.js",
-    "start": "node scripts/start.js"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/The-Best-Codes/discraft-js.git"
@@ -36,7 +31,7 @@
     "url": "https://github.com/The-Best-Codes/discraft-js/issues"
   },
   "homepage": "https://github.com/The-Best-Codes/discraft-js#readme",
-  "dependencies": {
+  "devDependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
     "@rollup/plugin-babel": "^6.0.4",
@@ -45,6 +40,7 @@
     "@rollup/plugin-node-resolve": "^15.3.0",
     "@rollup/plugin-replace": "^6.0.1",
     "commander": "^12.1.0",
+    "dotenv": "^16.4.5",
     "inquirer": "^12.0.1",
     "nodemon": "^3.1.7",
     "rollup": "^4.24.2",

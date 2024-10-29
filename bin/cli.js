@@ -50,7 +50,7 @@ program
                 message: 'Select additional features:',
                 choices: [
                     {
-                        name: 'Example commands (ping, help)',
+                        name: 'Example ping command',
                         value: 'exampleCommands',
                         checked: true
                     },
@@ -104,13 +104,14 @@ program
             'handlers/CommandHandler.js': path.join(__dirname, '..', 'src', 'handlers', 'CommandHandler.js'),
             'services/discord.js': path.join(__dirname, '..', 'src', 'services', 'discord.js'),
             'utils/logger.js': path.join(__dirname, '..', 'src', 'utils', 'logger.js'),
+            'events/ready.js': path.join(__dirname, '..', 'src', 'events', 'ready.js'),
+            'events/error.js': path.join(__dirname, '..', 'src', 'events', 'error.js'),
             'index.js': path.join(__dirname, '..', 'src', 'index.js')
         };
 
         // Add example commands if selected
         if (answers.features.includes('exampleCommands')) {
             templateFiles['commands/ping.js'] = path.join(__dirname, '..', 'src', 'commands', 'ping.js');
-            templateFiles['events/ready.js'] = path.join(__dirname, '..', 'src', 'events', 'ready.js');
         }
 
         Object.entries(templateFiles).forEach(([target, source]) => {

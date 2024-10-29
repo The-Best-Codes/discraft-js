@@ -25,10 +25,14 @@ export class CommandHandler {
       } catch (err) {
         error('Error executing command:', err);
         const content = { content: 'There was an error executing this command!', ephemeral: true };
-        if (interaction.replied || interaction.deferred) {
-          await interaction.followUp(content);
-        } else {
-          await interaction.reply(content);
+        try {
+          if (interaction.replied || interaction.deferred) {
+            await interaction.followUp(content);
+          } else {
+            await interaction.reply(content);
+          }
+        } catch (err) {
+          error('Error replying:', err);
         }
       }
     });
