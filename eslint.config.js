@@ -1,5 +1,8 @@
 import js from '@eslint/js';
 import globals from 'globals';
+import importPlugin from 'eslint-plugin-import';
+import promisePlugin from 'eslint-plugin-promise';
+import nodePlugin from 'eslint-plugin-node';
 
 // Function to trim whitespace from global names
 const trimGlobals = (obj) => {
@@ -19,12 +22,23 @@ export default [
         ...trimGlobals(globals.node)
       },
     },
-    plugins: {},
+    plugins: {
+      ...js.configs.recommended.plugins,
+      import: importPlugin,
+      promise: promisePlugin,
+      node: nodePlugin,
+    },
     rules: {
       ...js.configs.recommended.rules,
+      'import/named': 'error',
+      'promise/always-return': 'error',
+      'promise/no-return-wrap': 'error',
+      'no-unused-vars': 'warn',
+      'consistent-return': 'error',
+      'camelcase': 'warn',
     },
   },
   {
     ignores: ['dist/**', 'node_modules/**'],
   },
-];
+]

@@ -1,3 +1,4 @@
+/* eslint-disable promise/always-return */
 import { info } from "../utils/logger.js";
 import { Client, GatewayIntentBits } from "discord.js";
 import { token } from "../config/bot.config.js";

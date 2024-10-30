@@ -13,7 +13,6 @@ import json from "@rollup/plugin-json";
 import replace from "@rollup/plugin-replace";
 import babel from "@rollup/plugin-babel";
 import { fileURLToPath } from "url";
-import { debug } from "console";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

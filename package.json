@@ -1,6 +1,6 @@
 {
   "name": "discraft",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Best framework for discord bots",
   "main": "index.js",
   "type": "module",
@@ -52,6 +52,9 @@
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "eslint": "^9.13.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^7.1.0",
     "globals": "^15.11.0"
   }
 }
