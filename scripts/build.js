@@ -13,6 +13,7 @@ import json from "@rollup/plugin-json";
 import replace from "@rollup/plugin-replace";
 import babel from "@rollup/plugin-babel";
 import { fileURLToPath } from "url";
+import { debug } from "console";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -22,47 +23,19 @@ const projectDir = process.cwd();
 const srcDir = path.join(projectDir, "src");
 
 async function analyzeDependencies(bundlePath, rollupBundle) {
-  // Get external dependencies from rollup metadata
-   
   const externalDeps = new Set();
 
   // Analyze the chunk modules from rollup
-  for (const chunk of rollupBundle.output) {
-    if (chunk.imports) {
-      chunk.imports.forEach(imp => externalDeps.add(imp));
-    }
-    if (chunk.modules) {
-      Object.keys(chunk.modules).forEach(id => {
-        // Check if the module is from node_modules
-        if (id.includes("node_modules")) {
-          const matches = id.match(/node_modules\/([^/]+)/);
-          if (matches && matches[1]) {
-            // Handle scoped packages
-            if (matches[1].startsWith("@")) {
-              const scopedMatch = id.match(/node_modules\/([@][^/]+\/[^/]+)/);
-              if (scopedMatch) {
-                externalDeps.add(scopedMatch[1]);
-              }
-            } else {
-              externalDeps.add(matches[1]);
-            }
-          }
-        }
-      });
+  for (const item of rollupBundle.output) {
+    // Check if `output` is an array inside each item
+    const chunks = Array.isArray(item.output) ? item.output : [item];
+
+    for (const chunk of chunks) {
+      if (chunk.imports) {
+        chunk.imports.forEach(imp => externalDeps.add(imp));
+      }
     }
   }
-
-  // Also analyze the pre-minified bundle content as backup
-  const content = await fs.promises.readFile(bundlePath, "utf-8");
-  // eslint-disable-next-line no-useless-escape
-  const requirePattern = /(?:require|import)[\s\(]['"]([^./@][^'"]+)['"]\)?/g;
-  let match;
-  while ((match = requirePattern.exec(content)) !== null) {
-    const packageName = match[1].split("/")[0];
-    externalDeps.add(packageName);
-  }
-
-  const mainPackageJson = JSON.parse(await fs.promises.readFile(path.join(projectDir, "package.json"), "utf-8"));
 
   // Create minimal package.json with only runtime dependencies
   const minimalPackage = {
@@ -74,12 +47,12 @@ async function analyzeDependencies(bundlePath, rollupBundle) {
     dependencies: {}
   };
 
-  // Add found packages with their versions from main package.json
-  for (const pkg of externalDeps) {
-    if (mainPackageJson.dependencies?.[pkg]) {
-      minimalPackage.dependencies[pkg] = mainPackageJson.dependencies[pkg];
-    }
-  }
+  // Add external dependencies to package.json dependencies
+  externalDeps.forEach(dep => {
+    minimalPackage.dependencies[dep] = "latest";
+  });
+
+  info(`Found ${externalDeps.size} external dependencies.`);
 
   return minimalPackage;
 }
@@ -99,7 +72,7 @@ async function build(options) {
     }
 
     info("Generating commands and events...");
-     
+
     await new Promise((resolve) => {
       generateCommands(srcDir);
       generateEvents(srcDir);
