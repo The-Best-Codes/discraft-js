@@ -88,7 +88,7 @@ Ensure that you have built the project before starting it in production mode.
 2. Create a `.env` file with your bot token:
 
    ```
-   TOKEN=your_bot_token_here
+   BOT_TOKEN=your_bot_token_here
    CLIENT_ID=your_client_id_here
    ```
 

@@ -1,6 +1,6 @@
 /* eslint-disable promise/always-return */
 import { Client } from 'discord.js';
-import { error, success } from '../common/utils/logger';
+import { error, success } from '../common/utils/logger.js';
 
 const token = process.env.BOT_TOKEN;
 
