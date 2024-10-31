@@ -271,4 +271,16 @@ program
         });
     });
 
+program.
+    command("check-token")
+    .description("Check if the bot token is valid")
+    .action(() => {
+        const scriptPath = path.join(__dirname, "..", "scripts", "tokenTest.js");
+        spawn("node", [scriptPath], {
+            stdio: "inherit",
+            cwd: process.cwd(),
+            env: { ...process.env, DISCRAFT_ROOT: __dirname }
+        });
+    })
+
 program.parse(process.argv);
