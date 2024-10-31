@@ -5,7 +5,7 @@ import { error, success } from '../common/utils/logger';
 const token = process.env.BOT_TOKEN;
 
 if (!token) {
-    error('Error: BOT_TOKEN is not set in the environment variables.');
+    error('BOT_TOKEN is not set in the environment variables.');
     process.exit(1);
 }
 
@@ -17,6 +17,6 @@ client.login(token)
         client.destroy();
     })
     .catch(() => {
-        error('Error: Invalid bot token.');
+        error('Invalid bot token.');
         process.exit(1);
     });
