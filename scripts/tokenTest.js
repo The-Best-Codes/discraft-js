@@ -1,5 +1,5 @@
 /* eslint-disable promise/always-return */
-import { Client } from 'discord.js';
+import { Client, GatewayIntentBits } from 'discord.js';
 import { error, success } from '../common/utils/logger.js';
 import dotenv from 'dotenv';
 
@@ -12,7 +12,11 @@ if (!token) {
     process.exit(1);
 }
 
-const client = new Client();
+const client = new Client({
+    intents: [
+        GatewayIntentBits.Guilds
+    ]
+});
 
 client.login(token)
     .then(() => {

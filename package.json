@@ -1,6 +1,6 @@
 {
   "name": "discraft",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "description": "Best framework for discord bots",
   "main": "index.js",
   "type": "module",
