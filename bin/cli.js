@@ -7,6 +7,9 @@ import { fileURLToPath } from "url";
 import { spawn } from "child_process";
 import inquirer from "inquirer";
 
+// Functions for colorizing text (dim grey)
+const tColorGray = (str) => `\x1b[38;2;170;170;170m${str}\x1b[0m`;
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let currentPackage = {};
@@ -47,9 +50,12 @@ program
                 name: "directory",
                 message: "Project directory (leave empty for current):",
                 default: "",
-                filter: input => input.trim(),
+                filter: input => input.trim() === "(current)" ? "" : input.trim(),
                 transformer: (input) => {
-                    return input.trim() === "" ? "(current)" : input;
+                    if (input.trim() === '' || input.trim() === "(current)") {
+                        return tColorGray('(current)')
+                    }
+                    return input;
                 }
             },
             {
