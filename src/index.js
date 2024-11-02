@@ -1,7 +1,7 @@
 import { debug, error, info, success } from "./utils/logger.js";
 import client from "./services/discord.js";
-import { CommandHandler } from "./.discraft/commands/handler.js";
-import { eventHandler } from "./.discraft/events/handler.js";
+import { CommandHandler } from "./discraft/commands/handler.js";
+import { eventHandler } from "./discraft/events/handler.js";
 
 const startTime = Date.now();
 

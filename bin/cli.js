@@ -45,9 +45,12 @@ program
             {
                 type: "input",
                 name: "directory",
-                message: "Project directory (leave empty for project name):",
-                default: answers => answers.name,
-                filter: input => input.trim()
+                message: "Project directory (leave empty for current):",
+                default: "",
+                filter: input => input.trim(),
+                transformer: (input) => {
+                    return input.trim() === "" ? "(current)" : input;
+                }
             },
             {
                 type: "list",
@@ -95,7 +98,7 @@ program
 
         // Create project structure
         const dirs = [
-            ".discraft",
+            "discraft",
             "commands",
             "events",
             "config",
@@ -113,8 +116,8 @@ program
         // Copy template files
         const templateFiles = {
             "config/bot.config.js": path.join(__dirname, "..", "src", "config", "bot.config.js"),
-            ".discraft/commands/handler.js": path.join(__dirname, "..", "src", ".discraft", "commands", "handler.js"),
-            ".discraft/events/handler.js": path.join(__dirname, "..", "src", ".discraft", "events", "handler.js"),
+            "discraft/commands/handler.js": path.join(__dirname, "..", "src", "discraft", "commands", "handler.js"),
+            "discraft/events/handler.js": path.join(__dirname, "..", "src", "discraft", "events", "handler.js"),
             "services/discord.js": path.join(__dirname, "..", "src", "services", "discord.js"),
             "utils/logger.js": path.join(__dirname, "..", "src", "utils", "logger.js"),
             "events/ready.js": path.join(__dirname, "..", "src", "events", "ready.js"),

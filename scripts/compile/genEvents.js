@@ -4,12 +4,12 @@ import { info, debug, error } from "../../common/utils/logger.js";
 
 export default function generateEvents(srcDir) {
     try {
-        debug("Generating .discraft/events/index.js...");
+        debug("Generating discraft/events/index.js...");
         const EVENTS_DIR = path.join(srcDir, "events");
-        const OUTPUT_DIR = path.join(srcDir, ".discraft", "events");
+        const OUTPUT_DIR = path.join(srcDir, "discraft", "events");
         const OUTPUT_FILE = path.join(OUTPUT_DIR, "index.js");
 
-        // Create .discraft directory if it doesn't exist
+        // Create discraft directory if it doesn't exist
         if (!fs.existsSync(OUTPUT_DIR)) {
             fs.mkdirSync(OUTPUT_DIR, { recursive: true });
         }
@@ -38,10 +38,10 @@ export default function generateEvents(srcDir) {
 
         content += "};";
 
-        // Write the file to .discraft directory
+        // Write the file to discraft directory
         fs.writeFileSync(OUTPUT_FILE, content);
-        info("Generated .discraft/events/index.js");
+        info("Generated discraft/events/index.js");
     } catch (err) {
-        error("Error generating .discraft/events/index.js:", err);
+        error("Error generating discraft/events/index.js:", err);
     }
 }
