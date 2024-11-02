@@ -95,10 +95,10 @@ program
 
         // Create project structure
         const dirs = [
+            ".discraft",
             "commands",
             "events",
             "config",
-            "handlers",
             "services",
             "utils"
         ];
