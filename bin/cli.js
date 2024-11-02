@@ -49,7 +49,7 @@ program
                 type: "input",
                 name: "directory",
                 message: "Project directory:",
-                default: "(current)",
+                default: "",
                 filter: input => input.trim() === "(current)" ? "" : input.trim(),
                 transformer: (input) => {
                     if (input.trim() === "" || input.trim() === "(current)") {
