@@ -48,12 +48,12 @@ program
             {
                 type: "input",
                 name: "directory",
-                message: "Project directory (leave empty for current):",
-                default: "",
+                message: "Project directory:",
+                default: "(current)",
                 filter: input => input.trim() === "(current)" ? "" : input.trim(),
                 transformer: (input) => {
-                    if (input.trim() === '' || input.trim() === "(current)") {
-                        return tColorGray('(current)')
+                    if (input.trim() === "" || input.trim() === "(current)") {
+                        return tColorGray("(current)");
                     }
                     return input;
                 }
