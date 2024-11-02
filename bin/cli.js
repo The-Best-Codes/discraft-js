@@ -113,7 +113,8 @@ program
         // Copy template files
         const templateFiles = {
             "config/bot.config.js": path.join(__dirname, "..", "src", "config", "bot.config.js"),
-            "handlers/CommandHandler.js": path.join(__dirname, "..", "src", "handlers", "CommandHandler.js"),
+            ".discraft/commands/handler.js": path.join(__dirname, "..", "src", ".discraft", "commands", "handler.js"),
+            ".discraft/events/handler.js": path.join(__dirname, "..", "src", ".discraft", "events", "handler.js"),
             "services/discord.js": path.join(__dirname, "..", "src", "services", "discord.js"),
             "utils/logger.js": path.join(__dirname, "..", "src", "utils", "logger.js"),
             "events/ready.js": path.join(__dirname, "..", "src", "events", "ready.js"),
