@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "lint": "eslint . --fix"
+    "lint": "eslint . --fix",
+    "build": "cd editing && sh export.sh"
   },
   "bin": {
     "discraft": "./bin/cli.js"
