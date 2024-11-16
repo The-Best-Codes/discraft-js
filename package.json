@@ -1,7 +1,7 @@
 {
   "name": "discraft",
-  "version": "1.5.0",
-  "description": "Best framework for discord bots",
+  "version": "1.5.1",
+  "description": "Like Next.js, but for Discord bots",
   "main": "index.js",
   "type": "module",
   "scripts": {
