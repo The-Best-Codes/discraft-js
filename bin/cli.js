@@ -11,13 +11,11 @@ const n=path.resolve(process.cwd(),e.directory);if(!fs.existsSync(n)){fs.mkdirSy
 // Create src directory
 const t=path.join(n,"src");if(!fs.existsSync(t)){fs.mkdirSync(t,{recursive:true})}
 // Create project structure
-const s=["discraft","commands","events","config","services","utils"];s.forEach((e=>{const n=path.join(t,e);if(!fs.existsSync(n)){fs.mkdirSync(n,{recursive:true})}}));
+const s=["discraft","discraft/commands","discraft/events","commands","events","config","services","utils"];s.forEach((e=>{const n=path.join(t,e);if(!fs.existsSync(n)){fs.mkdirSync(n,{recursive:true})}}));
 // Copy template files
 const r={"config/bot.config.js":path.join(__dirname,"..","src","config","bot.config.js"),"discraft/commands/handler.js":path.join(__dirname,"..","src","discraft","commands","handler.js"),"discraft/events/handler.js":path.join(__dirname,"..","src","discraft","events","handler.js"),"services/discord.js":path.join(__dirname,"..","src","services","discord.js"),"utils/logger.js":path.join(__dirname,"..","src","utils","logger.js"),"events/ready.js":path.join(__dirname,"..","src","events","ready.js"),"events/error.js":path.join(__dirname,"..","src","events","error.js"),"index.js":path.join(__dirname,"..","src","index.js")};
 // Add example commands if selected
-if(e.features.includes("exampleCommands")){r["commands/ping.js"]=path.join(__dirname,"..","src","commands","ping.js")}Object.entries(r).forEach((([e,n])=>{if(fs.existsSync(n)){
-// Recursively create directories if needed
-const s=path.join(t,e);if(!fs.existsSync(s)){fs.mkdirSync(s,{recursive:true})}fs.copyFileSync(n,s)}}));
+if(e.features.includes("exampleCommands")){r["commands/ping.js"]=path.join(__dirname,"..","src","commands","ping.js")}Object.entries(r).forEach((([e,n])=>{if(fs.existsSync(n)){const s=path.join(t,e);fs.copyFileSync(n,s)}}));
 // Create package.json
 const i={name:e.name,version:"1.0.0",scripts:{dev:"discraft dev",build:"discraft build",start:"discraft start"},description:"Bot made with Discraft",type:"module",license:e.license==="None"?"UNLICENSED":e.license};fs.writeFileSync(path.join(n,"package.json"),JSON.stringify(i,null,2));
 // Create .env and .env.example if selected

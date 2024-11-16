@@ -105,6 +105,8 @@ program
     // Create project structure
     const dirs = [
       "discraft",
+      "discraft/commands",
+      "discraft/events",
       "commands",
       "events",
       "config",
@@ -188,11 +190,7 @@ program
 
     Object.entries(templateFiles).forEach(([target, source]) => {
       if (fs.existsSync(source)) {
-        // Recursively create directories if needed
         const copyTo = path.join(srcDir, target);
-        if (!fs.existsSync(copyTo)) {
-          fs.mkdirSync(copyTo, { recursive: true });
-        }
         fs.copyFileSync(source, copyTo);
       }
     });
