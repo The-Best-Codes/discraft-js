@@ -50,4 +50,9 @@ if [ -d "./bin" ]; then
     process_files "bin" "--mangle --format comments=true,beautify=false"
 fi
 
+# Process src/ with preserved comments but still mangled
+if [ -d "./src" ]; then
+    process_files "src" "--mangle --format comments=true,beautify=false"
+fi
+
 echo "Done exporting."
