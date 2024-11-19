@@ -71,7 +71,7 @@ program
         message: "Select additional features:",
         choices: [
           {
-            name: "Example ping command",
+            name: "Example commands",
             value: "exampleCommands",
             checked: true,
           },
@@ -186,6 +186,20 @@ program
         "commands",
         "ping.js"
       );
+      templateFiles["commands/random.js"] = path.join(
+        __dirname,
+        "..",
+        "src",
+        "commands",
+        "random.js"
+      );
+      templateFiles["commands/status.js"] = path.join(
+        __dirname,
+        "..",
+        "src",
+        "commands",
+        "status.js"
+      );
     }
 
     Object.entries(templateFiles).forEach(([target, source]) => {
@@ -256,7 +270,7 @@ Development:
 
 ${
   answers.features.includes("exampleCommands")
-    ? "\nBot Commands:\n- `/ping`: Check bot latency"
+    ? "\nBot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
     : ""
 }
 
