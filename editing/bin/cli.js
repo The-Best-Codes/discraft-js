@@ -414,49 +414,67 @@ program
   });
 
 program
-  .command("check-token")
-  .description("Check if the bot token is valid")
-  .action(() => {
-    const scriptPath = path.join(__dirname, "..", "scripts", "tokenTest.js");
-    activeProcess = spawn("node", [scriptPath], {
-      stdio: "inherit",
-      cwd: process.cwd(),
-      env: { ...process.env, DISCRAFT_ROOT: __dirname },
-    });
-    activeProcess.on("close", (code) => {
-      activeProcess = null;
-      if (code !== 0 && code !== null) {
-        console.error(`Token check process exited with code ${code}`);
-      }
-    });
-  });
+  .command("test")
+  .description("Test your bot's configuration")
+  .addCommand(
+    new Command("token")
+      .description("Check if the bot token is valid")
+      .action(() => {
+        const scriptPath = path.join(
+          __dirname,
+          "..",
+          "scripts",
+          "test-token.js"
+        );
+        activeProcess = spawn("node", [scriptPath], {
+          stdio: "inherit",
+          cwd: process.cwd(),
+          env: { ...process.env, DISCRAFT_ROOT: __dirname },
+        });
+        activeProcess.on("close", (code) => {
+          activeProcess = null;
+          if (code !== 0 && code !== null) {
+            console.error(`Token check process exited with code ${code}`);
+          }
+        });
+      })
+  );
 
 program
-  .command("new-command")
-  .description("Create a new Discord bot command")
-  .action(async () => {
-    const scriptPath = path.join(__dirname, "..", "scripts", "new-command.js");
-    try {
-      const child = spawn("node", [scriptPath], {
-        stdio: "inherit",
-        shell: true,
-      });
+  .command("add")
+  .description("Add new components to your bot")
+  .addCommand(
+    new Command("command")
+      .description("Create a new Discord bot command")
+      .action(async () => {
+        const scriptPath = path.join(
+          __dirname,
+          "..",
+          "scripts",
+          "add-command.js"
+        );
+        try {
+          const child = spawn("node", [scriptPath], {
+            stdio: "inherit",
+            shell: true,
+          });
 
-      child.on("error", (err) => {
-        console.error("Failed to start command generator:", err);
-        process.exit(1);
-      });
+          child.on("error", (err) => {
+            console.error("Failed to start command generator:", err);
+            process.exit(1);
+          });
 
-      child.on("exit", (code) => {
-        if (code !== 0) {
-          console.error(`Command generator exited with code ${code}`);
-          process.exit(code);
+          child.on("exit", (code) => {
+            if (code !== 0) {
+              console.error(`Command generator exited with code ${code}`);
+              process.exit(code);
+            }
+          });
+        } catch (err) {
+          console.error("Error executing command generator:", err);
+          process.exit(1);
         }
-      });
-    } catch (err) {
-      console.error("Error executing command generator:", err);
-      process.exit(1);
-    }
-  });
+      })
+  );
 
 program.parse(process.argv);
