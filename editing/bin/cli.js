@@ -431,4 +431,32 @@ program
     });
   });
 
+program
+  .command("new-command")
+  .description("Create a new Discord bot command")
+  .action(async () => {
+    const scriptPath = path.join(__dirname, "..", "scripts", "new-command.js");
+    try {
+      const child = spawn("node", [scriptPath], {
+        stdio: "inherit",
+        shell: true,
+      });
+
+      child.on("error", (err) => {
+        console.error("Failed to start command generator:", err);
+        process.exit(1);
+      });
+
+      child.on("exit", (code) => {
+        if (code !== 0) {
+          console.error(`Command generator exited with code ${code}`);
+          process.exit(code);
+        }
+      });
+    } catch (err) {
+      console.error("Error executing command generator:", err);
+      process.exit(1);
+    }
+  });
+
 program.parse(process.argv);
