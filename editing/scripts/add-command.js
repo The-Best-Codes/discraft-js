@@ -4,6 +4,24 @@ import inquirer from "inquirer";
 import { success, error } from "../common/utils/logger.js";
 
 async function generateCommand() {
+  // Throw error if src/ directory doesn't exist
+  const doesSrcDirExist = fs.existsSync(path.join(process.cwd(), "src"));
+  // Check if the user is in the src/ directory (that may be the issue)
+  const isSrcDir = process.cwd().endsWith("src");
+  if (!doesSrcDirExist) {
+    if (isSrcDir) {
+      error(
+        'You are in the "src/" directory. You should be in the root of your Discraft project.'
+      );
+      process.exit(1);
+    } else {
+      error(
+        'The "src/" directory does not exist. Please run "discraft init" to initialize a project, or ensure you are in the root of your Discraft project.'
+      );
+      process.exit(1);
+    }
+  }
+
   // Initial command setup questions
   const answers = await inquirer.prompt([
     {
