@@ -61,12 +61,12 @@ async function generateCommand() {
         message: "Select command features:",
         choices: [
           {
-            name: "Enable response caching (improves performance for expensive operations)",
+            name: "Enable command response caching",
             value: "cacheable",
             checked: false,
           },
           {
-            name: "Use deferred response (for commands that take longer than 3 seconds)",
+            name: "Use deferred responses",
             value: "deferred",
             checked: false,
           },
@@ -102,7 +102,7 @@ async function generateCommand() {
         type: "confirm",
         name: "hasOptions",
         message:
-          "Would you like to add command options/arguments? (e.g., /command <user> <reason>)",
+          "Would you like to add command options? (e.g., /command <option>)",
         default: false,
       },
     ]);
@@ -119,11 +119,11 @@ async function generateCommand() {
   const commandOptions = [];
   if (hasOptionsAnswer.hasOptions) {
     console.log(
-      "\nLet's add some options to your command. For each option, you'll need to specify:"
+      "\nAdding options to your command... For each option, you'll need to specify:"
     );
-    console.log("1. The type of data it accepts (string, number, user, etc.)");
-    console.log('2. The name of the option (e.g., "user" in /ban <user>)');
-    console.log("3. A description of what the option does\n");
+    console.log("- The type of data it accepts (text, number, etc.)");
+    console.log('- The name of the option (e.g., "user" in /ban <user>)');
+    console.log("- A description of what the option does\n");
 
     let addingOptions = true;
     while (addingOptions) {
@@ -149,7 +149,7 @@ async function generateCommand() {
           {
             type: "input",
             name: "name",
-            message: 'Option name (e.g., "user", "reason", "amount"):',
+            message: 'Option name (e.g., "user"):',
             validate: (input) => {
               if (/^[a-z0-9-]+$/.test(input)) return true;
               return "Option name must be lowercase and may only contain letters, numbers, and dashes";
@@ -158,8 +158,7 @@ async function generateCommand() {
           {
             type: "input",
             name: "description",
-            message:
-              'Option description (e.g., "The user to ban", "Reason for the action"):',
+            message: 'Option description (e.g., "The user to ban"):',
             validate: (input) => input.length > 0,
           },
           {
@@ -213,9 +212,6 @@ async function generateCommand() {
   let permissions = [];
   if (answers.features.includes("permissions")) {
     console.log("\nSelect the permissions required to use this command:");
-    console.log(
-      "(Use space to select/deselect, arrow keys to move, enter to confirm)\n"
-    );
 
     const permissionAnswers = await inquirer
       .prompt([
@@ -225,44 +221,44 @@ async function generateCommand() {
           message: "Required permissions:",
           choices: [
             {
-              name: "Administrator - Full access to all commands",
+              name: "Administrator",
               value: "Administrator",
             },
             {
-              name: "Manage Server - Edit server settings",
+              name: "Manage Server",
               value: "ManageGuild",
             },
             {
-              name: "Manage Messages - Delete/pin messages",
+              name: "Manage Messages",
               value: "ManageMessages",
             },
             {
-              name: "Manage Channels - Edit channel settings",
+              name: "Manage Channels",
               value: "ManageChannels",
             },
             {
-              name: "Kick Members - Remove members from server",
+              name: "Kick Members",
               value: "KickMembers",
             },
             {
-              name: "Ban Members - Permanently remove members",
+              name: "Ban Members",
               value: "BanMembers",
             },
             {
-              name: "Send Messages - Write in text channels",
+              name: "Send Messages",
               value: "SendMessages",
             },
             {
-              name: "Embed Links - Send embedded content",
+              name: "Embed Links",
               value: "EmbedLinks",
             },
-            { name: "Attach Files - Upload files", value: "AttachFiles" },
+            { name: "Attach Files", value: "AttachFiles" },
             {
-              name: "Read Message History - View old messages",
+              name: "Read Message History",
               value: "ReadMessageHistory",
             },
             {
-              name: "Mention Everyone - Use @everyone/@here",
+              name: "Mention Everyone",
               value: "MentionEveryone",
             },
           ],
