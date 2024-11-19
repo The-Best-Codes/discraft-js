@@ -14,7 +14,29 @@ jobs:
         with:
           node-version: "20.x"
           registry-url: "https://registry.npmjs.org"
+
+      # Install dependencies
       - run: npm install
-      - run: npm publish
+
+      # Determine if this is a pre-release
+      - name: Check pre-release status
+        id: prerelease
+        run: |
+          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
+            echo "tag=beta" >> $GITHUB_OUTPUT
+          else
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          fi
+
+      # Publish with appropriate tag based on pre-release status
+      - name: Publish to NPM
+        run: |
+          if [[ "${{ steps.prerelease.outputs.tag }}" == "beta" ]]; then
+            echo "Publishing as beta..."
+            npm publish --tag beta
+          else
+            echo "Publishing as latest..."
+            npm publish
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

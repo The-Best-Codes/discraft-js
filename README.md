@@ -10,13 +10,25 @@
 Discraft is a powerful framework for creating Discord bots, offering a robust CLI and a set of tools to streamline the development process.
 Think of it like Next.js but for Discord bots.
 
+## Features
+
+- **Command Caching**: Built-in LRU cache system for commands with configurable TTL and memory limits
+- **Multi-step Commands**: Support for commands that require follow-up responses or editing
+- **Robust CLI**: Comprehensive command-line interface for development and deployment
+- **Modern Build System**: Bundling with Rollup and Babel transformations
+- **Type-safe**: Written in TypeScript for better development experience
+- **Hot Reload**: Automatic server restart on code changes during development
+
 ## Installation
 
-You can intsall Discraft via npm:
+You can install Discraft via npm:
 
 ```bash
 npm install discraft --save-dev # Use this to install Discraft in the current project
 npm install discraft -g # May require sudo, globally installs Discraft so you can use it from anywhere
+
+# For beta releases
+npm install discraft@beta # Install the latest beta version
 ```
 
 ## Usage
@@ -45,7 +57,63 @@ The project is organized into several directories:
 - `src/config`: Configuration files.
 - `src/handlers`: Handlers for various bot functionalities.
 - `src/services`: Services used by the bot. (Right now, just Discord)
-- `src/utils`: Utility functions.
+- `src/utils`: Utility functions and helpers (including caching).
+
+## Command Caching
+
+Discraft includes a powerful command caching system to improve performance and reduce API calls:
+
+```javascript
+import { SlashCommandBuilder } from "discord.js";
+import { commandCache } from "../utils/commandCache.js";
+
+// Set command-specific cache settings
+commandCache.setCommandSettings("ping", {
+  ttl: 5000, // Cache ping results for 5 seconds
+});
+
+export default {
+  data: new SlashCommandBuilder()
+    .setName("ping")
+    .setDescription("Replies with Pong"),
+  cacheable: true,
+  async execute(interaction) {
+    const response = `Pong! Latency: ${Math.round(
+      interaction.client.ws.ping
+    )}ms`;
+    await interaction.reply(response);
+    return { content: response }; // Return in a format that can be used by interaction.reply()
+  },
+};
+```
+
+The caching system supports both simple responses and multi-step interactions. For multi-step commands, you can return an array of steps:
+
+```javascript
+export default {
+  data: new SlashCommandBuilder()
+    .setName("complex-status")
+    .setDescription("Complex status check with updates"),
+  cacheable: true,
+  execute: async (interaction) => {
+    return {
+      steps: [
+        { content: "Initial response..." },
+        { type: "edit", content: "Updated status..." },
+        { type: "followUp", content: "Additional info..." },
+      ],
+    };
+  },
+};
+```
+
+The cache system automatically handles:
+
+- Storing command results based on command name and options
+- Multi-step responses with edits and follow-ups
+- Command-specific TTL (Time To Live) settings
+- LRU (Least Recently Used) eviction strategy
+- Memory management
 
 ## Development
 
@@ -96,6 +164,14 @@ Ensure that you have built the project before starting it in production mode.
    ```bash
    discraft dev
    ```
+
+## Beta Releases
+
+Beta versions are available for testing new features. To install the latest beta:
+
+```bash
+npm install discraft@beta
+```
 
 ## Contributing
 
