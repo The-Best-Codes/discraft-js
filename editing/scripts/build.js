@@ -226,7 +226,13 @@ async function build(options) {
       "Build completed successfully in " + (Date.now() - startTime) + "ms"
     );
   } catch (err) {
-    error("Build failed:", err);
+    if (err.name === "ExitPromptError") {
+      error("Build cancelled");
+    } else if (err instanceof Error) {
+      error("Build failed or cancelled:", err?.message || err);
+    } else {
+      error("Build failed or cancelled:", err);
+    }
     process.exit(1);
   } finally {
     buildInProgress = false;
@@ -235,53 +241,62 @@ async function build(options) {
 }
 
 async function getBuildConfig(options) {
-  if (options.yes) {
-    return {
-      minify: true,
-      keepFunctionNames: false,
-      removeComments: true,
-      sourceMaps: false,
-      maxOptimize: options.maxOptimize,
-    };
-  }
+  try {
+    if (options.yes) {
+      return {
+        minify: true,
+        keepFunctionNames: false,
+        removeComments: true,
+        sourceMaps: false,
+        maxOptimize: options.maxOptimize,
+      };
+    }
 
-  return inquirer.prompt([
-    {
-      type: "confirm",
-      name: "minify",
-      message: "Do you want to minify the code?",
-      default: true,
-    },
-    {
-      type: "confirm",
-      name: "maxOptimize",
-      message: "Enable maximum optimization (slower build, faster runtime)?",
-      default: true,
-      when: (answers) => answers.minify,
-    },
-    {
-      type: "confirm",
-      name: "keepFunctionNames",
-      message:
-        "Keep function names for better error traces? (disable for smaller size)",
-      default: false,
-      when: (answers) => answers.minify,
-    },
-    {
-      type: "confirm",
-      name: "removeComments",
-      message: "Remove comments from the output?",
-      default: true,
-      when: (answers) => answers.minify,
-    },
-    {
-      type: "confirm",
-      name: "sourceMaps",
-      message: "Generate source maps?",
-      default: false,
-      when: (answers) => answers.minify,
-    },
-  ]);
+    return inquirer.prompt([
+      {
+        type: "confirm",
+        name: "minify",
+        message: "Do you want to minify the code?",
+        default: true,
+      },
+      {
+        type: "confirm",
+        name: "maxOptimize",
+        message: "Enable maximum optimization (slower build, faster runtime)?",
+        default: true,
+        when: (answers) => answers.minify,
+      },
+      {
+        type: "confirm",
+        name: "keepFunctionNames",
+        message:
+          "Keep function names for better error traces? (disable for smaller size)",
+        default: false,
+        when: (answers) => answers.minify,
+      },
+      {
+        type: "confirm",
+        name: "removeComments",
+        message: "Remove comments from the output?",
+        default: true,
+        when: (answers) => answers.minify,
+      },
+      {
+        type: "confirm",
+        name: "sourceMaps",
+        message: "Generate source maps?",
+        default: false,
+        when: (answers) => answers.minify,
+      },
+    ]);
+  } catch (err) {
+    if (err.name === "ExitPromptError") {
+      error("Build cancelled by user.");
+      return process.exit(0);
+    }
+    error("Error while getting build config:", err);
+    return process.exit(1);
+  }
 }
 
 // Extract options from process arguments

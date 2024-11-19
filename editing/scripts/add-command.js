@@ -23,66 +23,97 @@ async function generateCommand() {
   }
 
   // Initial command setup questions
-  const answers = await inquirer.prompt([
-    {
-      type: "input",
-      name: "name",
-      message: "Command name:",
-      validate: (input) => {
-        if (/^[a-z0-9-]+$/.test(input)) return true;
-        return "Command name must be lowercase and may only contain letters, numbers, and dashes";
+  let answers = {};
+  try {
+    answers = await inquirer.prompt([
+      {
+        type: "input",
+        name: "name",
+        message: "Command name:",
+        validate: (input) => {
+          if (/^[a-z]+(-[a-z]+)*$/.test(input)) return true;
+          return "Must be lowercase with single dashes only.";
+        },
       },
-    },
-    {
-      type: "input",
-      name: "description",
-      message: "Command description:",
-      validate: (input) => input.length > 0,
-    },
-  ]);
+      {
+        type: "input",
+        name: "description",
+        message: "Command description:",
+        validate: (input) => input.length > 0,
+      },
+    ]);
+  } catch (err) {
+    if (err.name === "ExitPromptError") {
+      error("Cancelled by user.");
+      return process.exit(0);
+    }
+    error("Error:", err);
+    return process.exit(1);
+  }
 
-  // Feature selection with better descriptions
-  const featureAnswers = await inquirer.prompt([
-    {
-      type: "checkbox",
-      name: "features",
-      message: "Select command features:",
-      choices: [
-        {
-          name: "Enable response caching (improves performance for expensive operations)",
-          value: "cacheable",
-          checked: false,
-        },
-        {
-          name: "Use deferred response (for commands that take longer than 3 seconds)",
-          value: "deferred",
-          checked: false,
-        },
-        {
-          name: "Make responses ephemeral (only visible to the command user)",
-          value: "ephemeral",
-          checked: false,
-        },
-        {
-          name: "Add permission requirements",
-          value: "permissions",
-          checked: false,
-        },
-      ],
-    },
-  ]);
+  // Feature selection
+  let featureAnswers = {};
+  try {
+    featureAnswers = await inquirer.prompt([
+      {
+        type: "checkbox",
+        name: "features",
+        message: "Select command features:",
+        choices: [
+          {
+            name: "Enable response caching (improves performance for expensive operations)",
+            value: "cacheable",
+            checked: false,
+          },
+          {
+            name: "Use deferred response (for commands that take longer than 3 seconds)",
+            value: "deferred",
+            checked: false,
+          },
+          {
+            name: "Make responses ephemeral (only visible to the command user)",
+            value: "ephemeral",
+            checked: false,
+          },
+          {
+            name: "Add permission requirements",
+            value: "permissions",
+            checked: false,
+          },
+        ],
+      },
+    ]);
+  } catch (err) {
+    if (err.name === "ExitPromptError") {
+      error("Cancelled by user.");
+      return process.exit(0);
+    }
+    error("Error:", err);
+    return process.exit(1);
+  }
+
   answers.features = featureAnswers.features;
 
   // Ask about command options
-  const hasOptionsAnswer = await inquirer.prompt([
-    {
-      type: "confirm",
-      name: "hasOptions",
-      message:
-        "Would you like to add command options/arguments? (e.g., /command <user> <reason>)",
-      default: false,
-    },
-  ]);
+  let hasOptionsAnswer = {};
+  try {
+    hasOptionsAnswer = await inquirer.prompt([
+      {
+        type: "confirm",
+        name: "hasOptions",
+        message:
+          "Would you like to add command options/arguments? (e.g., /command <user> <reason>)",
+        default: false,
+      },
+    ]);
+  } catch (err) {
+    if (err.name === "ExitPromptError") {
+      error("Cancelled by user.");
+      return process.exit(0);
+    }
+    error("Error:", err);
+    return process.exit(1);
+  }
 
   // If command needs options, guide through the process
   const commandOptions = [];
@@ -96,46 +127,56 @@ async function generateCommand() {
 
     let addingOptions = true;
     while (addingOptions) {
-      const optionAnswers = await inquirer.prompt([
-        {
-          type: "list",
-          name: "type",
-          message: "What type of data should this option accept?",
-          choices: [
-            { name: "String (text)", value: "String" },
-            { name: "Integer (whole number)", value: "Integer" },
-            { name: "Number (decimal number)", value: "Number" },
-            { name: "Boolean (true/false)", value: "Boolean" },
-            { name: "User (Discord user)", value: "User" },
-            { name: "Channel (Discord channel)", value: "Channel" },
-            { name: "Role (Discord role)", value: "Role" },
-            { name: "Mentionable (user or role)", value: "Mentionable" },
-            { name: "Attachment (file)", value: "Attachment" },
-          ],
-        },
-        {
-          type: "input",
-          name: "name",
-          message: 'Option name (e.g., "user", "reason", "amount"):',
-          validate: (input) => {
-            if (/^[a-z0-9-]+$/.test(input)) return true;
-            return "Option name must be lowercase and may only contain letters, numbers, and dashes";
+      let optionAnswers;
+      try {
+        optionAnswers = await inquirer.prompt([
+          {
+            type: "list",
+            name: "type",
+            message: "What type of data should this option accept?",
+            choices: [
+              { name: "String (text)", value: "String" },
+              { name: "Integer (whole number)", value: "Integer" },
+              { name: "Number (decimal number)", value: "Number" },
+              { name: "Boolean (true/false)", value: "Boolean" },
+              { name: "User (Discord user)", value: "User" },
+              { name: "Channel (Discord channel)", value: "Channel" },
+              { name: "Role (Discord role)", value: "Role" },
+              { name: "Mentionable (user or role)", value: "Mentionable" },
+              { name: "Attachment (file)", value: "Attachment" },
+            ],
           },
-        },
-        {
-          type: "input",
-          name: "description",
-          message:
-            'Option description (e.g., "The user to ban", "Reason for the action"):',
-          validate: (input) => input.length > 0,
-        },
-        {
-          type: "confirm",
-          name: "required",
-          message: "Is this option required?",
-          default: false,
-        },
-      ]);
+          {
+            type: "input",
+            name: "name",
+            message: 'Option name (e.g., "user", "reason", "amount"):',
+            validate: (input) => {
+              if (/^[a-z0-9-]+$/.test(input)) return true;
+              return "Option name must be lowercase and may only contain letters, numbers, and dashes";
+            },
+          },
+          {
+            type: "input",
+            name: "description",
+            message:
+              'Option description (e.g., "The user to ban", "Reason for the action"):',
+            validate: (input) => input.length > 0,
+          },
+          {
+            type: "confirm",
+            name: "required",
+            message: "Is this option required?",
+            default: false,
+          },
+        ]);
+      } catch (err) {
+        if (err.name === "ExitPromptError") {
+          error("Cancelled by user.");
+          return process.exit(0);
+        }
+        error("Error:", err);
+        return process.exit(1);
+      }
 
       commandOptions.push({
         type: optionAnswers.type.toLowerCase(),
@@ -144,14 +185,23 @@ async function generateCommand() {
         required: optionAnswers.required,
       });
 
-      const { addAnother } = await inquirer.prompt([
-        {
-          type: "confirm",
-          name: "addAnother",
-          message: "Would you like to add another option?",
-          default: false,
-        },
-      ]);
+      const { addAnother } = await inquirer
+        .prompt([
+          {
+            type: "confirm",
+            name: "addAnother",
+            message: "Would you like to add another option?",
+            default: false,
+          },
+        ])
+        .catch((err) => {
+          if (err.name === "ExitPromptError") {
+            error("Cancelled by user.");
+            return process.exit(0);
+          }
+          error("Error:", err);
+          return process.exit(1);
+        });
 
       if (!addAnother) {
         addingOptions = false;
@@ -167,53 +217,65 @@ async function generateCommand() {
       "(Use space to select/deselect, arrow keys to move, enter to confirm)\n"
     );
 
-    const permissionAnswers = await inquirer.prompt([
-      {
-        type: "checkbox",
-        name: "permissions",
-        message: "Required permissions:",
-        choices: [
-          {
-            name: "Administrator - Full access to all commands",
-            value: "Administrator",
-          },
-          {
-            name: "Manage Server - Edit server settings",
-            value: "ManageGuild",
-          },
-          {
-            name: "Manage Messages - Delete/pin messages",
-            value: "ManageMessages",
-          },
-          {
-            name: "Manage Channels - Edit channel settings",
-            value: "ManageChannels",
-          },
-          {
-            name: "Kick Members - Remove members from server",
-            value: "KickMembers",
-          },
-          {
-            name: "Ban Members - Permanently remove members",
-            value: "BanMembers",
-          },
-          {
-            name: "Send Messages - Write in text channels",
-            value: "SendMessages",
-          },
-          { name: "Embed Links - Send embedded content", value: "EmbedLinks" },
-          { name: "Attach Files - Upload files", value: "AttachFiles" },
-          {
-            name: "Read Message History - View old messages",
-            value: "ReadMessageHistory",
-          },
-          {
-            name: "Mention Everyone - Use @everyone/@here",
-            value: "MentionEveryone",
-          },
-        ],
-      },
-    ]);
+    const permissionAnswers = await inquirer
+      .prompt([
+        {
+          type: "checkbox",
+          name: "permissions",
+          message: "Required permissions:",
+          choices: [
+            {
+              name: "Administrator - Full access to all commands",
+              value: "Administrator",
+            },
+            {
+              name: "Manage Server - Edit server settings",
+              value: "ManageGuild",
+            },
+            {
+              name: "Manage Messages - Delete/pin messages",
+              value: "ManageMessages",
+            },
+            {
+              name: "Manage Channels - Edit channel settings",
+              value: "ManageChannels",
+            },
+            {
+              name: "Kick Members - Remove members from server",
+              value: "KickMembers",
+            },
+            {
+              name: "Ban Members - Permanently remove members",
+              value: "BanMembers",
+            },
+            {
+              name: "Send Messages - Write in text channels",
+              value: "SendMessages",
+            },
+            {
+              name: "Embed Links - Send embedded content",
+              value: "EmbedLinks",
+            },
+            { name: "Attach Files - Upload files", value: "AttachFiles" },
+            {
+              name: "Read Message History - View old messages",
+              value: "ReadMessageHistory",
+            },
+            {
+              name: "Mention Everyone - Use @everyone/@here",
+              value: "MentionEveryone",
+            },
+          ],
+        },
+      ])
+      .catch((err) => {
+        if (err.name === "ExitPromptError") {
+          error("Cancelled by user.");
+          return process.exit(0);
+        }
+        error("Error:", err);
+        return process.exit(1);
+      });
     permissions = permissionAnswers.permissions;
   }
 

@@ -7,7 +7,9 @@ dotenv.config();
 const token = process.env.BOT_TOKEN;
 
 if (!token) {
-  error("BOT_TOKEN is not set in the environment variables.");
+  error(
+    "BOT_TOKEN is not set in the environment variables. Make sure you are in the root of your project and have an environment file (like .env) with the bot token."
+  );
   process.exit(1);
 }
 
@@ -29,7 +31,7 @@ client
 
 // Handle Ctrl+C gracefully
 process.on("SIGINT", () => {
-  console.log("\nCancelling token check...");
+  error("\nCancelling token check...");
   if (client) {
     client.destroy();
   }

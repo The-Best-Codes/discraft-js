@@ -55,4 +55,12 @@ if [ -d "./src" ]; then
     process_files "src" "--mangle --format comments=true,beautify=false"
 fi
 
+echo "Removing minified directory..."
+rm -rf ./minified
+
+# Remove the src/discraft/commands/index.js file and src/discraft/events/index.js files
+echo "Removing src/discraft/commands/index.js and src/discraft/events/index.js..."
+rm -f ../src/discraft/commands/index.js
+rm -f ../src/discraft/events/index.js
+
 echo "Done exporting."
