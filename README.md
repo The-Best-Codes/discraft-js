@@ -46,6 +46,7 @@ discraft [command]
 - `discraft dev`: Start the development server.
 - `discraft build`: Build the project for production.
 - `discraft start`: Start the production server.
+- `discraft check-token`: Test your bot token and client ID.
 
 ## Project Structure
 
