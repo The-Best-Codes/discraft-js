@@ -21,6 +21,34 @@ const discraftDir = path.resolve(__dirname, "..");
 const projectDir = process.cwd();
 const srcDir = path.join(projectDir, "src");
 
+// Track if build is in progress
+let buildInProgress = false;
+let currentBundle = null;
+
+// Handle Ctrl+C gracefully
+process.on("SIGINT", async () => {
+  if (buildInProgress) {
+    info("\nGracefully cancelling build process...");
+    try {
+      // Clean up rollup bundle if it exists
+      if (currentBundle) {
+        await currentBundle.close();
+      }
+
+      // Clean up output directory if it exists
+      const outputDir = path.resolve(projectDir, "dist");
+      if (fs.existsSync(outputDir)) {
+        await fs.promises.rm(outputDir, { recursive: true });
+      }
+
+      info("Build cancelled and cleaned up successfully.");
+    } catch (err) {
+      error("Error while cleaning up:", err);
+    }
+  }
+  process.exit(0);
+});
+
 async function analyzeDependencies(bundlePath, rollupBundle) {
   const externalDeps = new Set();
 
@@ -31,7 +59,7 @@ async function analyzeDependencies(bundlePath, rollupBundle) {
 
     for (const chunk of chunks) {
       if (chunk.imports) {
-        chunk.imports.forEach(imp => externalDeps.add(imp));
+        chunk.imports.forEach((imp) => externalDeps.add(imp));
       }
     }
   }
@@ -43,11 +71,11 @@ async function analyzeDependencies(bundlePath, rollupBundle) {
     version: "1.0.0",
     description: "Bot created with Discraft",
     main: "bundle.js",
-    dependencies: {}
+    dependencies: {},
   };
 
   // Add external dependencies to package.json dependencies
-  externalDeps.forEach(dep => {
+  externalDeps.forEach((dep) => {
     minimalPackage.dependencies[dep] = "latest";
   });
 
@@ -57,6 +85,7 @@ async function analyzeDependencies(bundlePath, rollupBundle) {
 }
 
 async function build(options) {
+  buildInProgress = true;
   try {
     info("Starting build process...");
 
@@ -93,7 +122,11 @@ async function build(options) {
     await fs.promises.mkdir(outputDir, { recursive: true });
 
     // Resolve babel preset path
-    const presetEnvPath = path.join(discraftDir, "node_modules", "@babel/preset-env");
+    const presetEnvPath = path.join(
+      discraftDir,
+      "node_modules",
+      "@babel/preset-env"
+    );
 
     // Create rollup config
     const rollupConfig = {
@@ -116,14 +149,14 @@ async function build(options) {
       plugins: [
         replace({
           preventAssignment: true,
-          "process.env.NODE_ENV": JSON.stringify("production")
+          "process.env.NODE_ENV": JSON.stringify("production"),
         }),
         nodeResolve({
           preferBuiltins: true,
-          exportConditions: ["node"]
+          exportConditions: ["node"],
         }),
         commonjs({
-          ignoreDynamicRequires: false
+          ignoreDynamicRequires: false,
         }),
         json(),
         babel({
@@ -131,27 +164,32 @@ async function build(options) {
           configFile: false,
           babelrc: false,
           presets: [
-            [presetEnvPath, {
-              targets: { node: "current" },
-              modules: false,
-              loose: true,
-              exclude: ["transform-typeof-symbol"]
-            }]
-          ]
-        })
+            [
+              presetEnvPath,
+              {
+                targets: { node: "current" },
+                modules: false,
+                loose: true,
+                exclude: ["transform-typeof-symbol"],
+              },
+            ],
+          ],
+        }),
       ],
       treeshake: {
         moduleSideEffects: false,
         propertyReadSideEffects: false,
-        tryCatchDeoptimization: false
-      }
+        tryCatchDeoptimization: false,
+      },
     };
 
     // Bundle with Rollup
     info("Running Rollup bundler...");
     const bundle = await rollup(rollupConfig);
+    currentBundle = bundle;
     const output = await bundle.write(rollupConfig.output);
     await bundle.close();
+    currentBundle = null;
 
     const bundlePath = path.join(outputDir, "bundle.js");
 
@@ -162,7 +200,9 @@ async function build(options) {
 
     // Analyze dependencies after bundle is created
     info("Analyzing dependencies...");
-    const minimalPackage = await analyzeDependencies(bundlePath, { output: [output] });
+    const minimalPackage = await analyzeDependencies(bundlePath, {
+      output: [output],
+    });
     await fs.promises.writeFile(
       path.join(outputDir, "package.json"),
       JSON.stringify(minimalPackage, null, 2)
@@ -182,10 +222,15 @@ async function build(options) {
     await displaySizeComparison(originalSize, outputDir);
 
     info(`Output location: ${outputDir}`);
-    success("Build completed successfully in " + (Date.now() - startTime) + "ms");
+    success(
+      "Build completed successfully in " + (Date.now() - startTime) + "ms"
+    );
   } catch (err) {
     error("Build failed:", err);
     process.exit(1);
+  } finally {
+    buildInProgress = false;
+    currentBundle = null;
   }
 }
 
@@ -196,7 +241,7 @@ async function getBuildConfig(options) {
       keepFunctionNames: false,
       removeComments: true,
       sourceMaps: false,
-      maxOptimize: options.maxOptimize
+      maxOptimize: options.maxOptimize,
     };
   }
 
@@ -205,44 +250,47 @@ async function getBuildConfig(options) {
       type: "confirm",
       name: "minify",
       message: "Do you want to minify the code?",
-      default: true
+      default: true,
     },
     {
       type: "confirm",
       name: "maxOptimize",
       message: "Enable maximum optimization (slower build, faster runtime)?",
       default: true,
-      when: answers => answers.minify
+      when: (answers) => answers.minify,
     },
     {
       type: "confirm",
       name: "keepFunctionNames",
-      message: "Keep function names for better error traces? (disable for smaller size)",
+      message:
+        "Keep function names for better error traces? (disable for smaller size)",
       default: false,
-      when: answers => answers.minify
+      when: (answers) => answers.minify,
     },
     {
       type: "confirm",
       name: "removeComments",
       message: "Remove comments from the output?",
       default: true,
-      when: answers => answers.minify
+      when: (answers) => answers.minify,
     },
     {
       type: "confirm",
       name: "sourceMaps",
       message: "Generate source maps?",
       default: false,
-      when: answers => answers.minify
-    }
+      when: (answers) => answers.minify,
+    },
   ]);
 }
 
 // Extract options from process arguments
 const options = {
   yes: process.argv.includes("-y") || process.argv.includes("--yes"),
-  output: process.argv.includes("-o") ? process.argv[process.argv.indexOf("-o") + 1] : "dist",
-  maxOptimize: process.argv.includes("--max-optimize")
+  output: process.argv.includes("-o")
+    ? process.argv[process.argv.indexOf("-o") + 1]
+    : "dist",
+  maxOptimize: process.argv.includes("--max-optimize"),
 };
 
 build(options);

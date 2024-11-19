@@ -1,15 +1,15 @@
 {
   "name": "discraft",
-  "version": "1.5.3-beta.0",
+  "version": "1.5.3-beta.1",
   "description": "Like Next.js, but for Discord bots",
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "lint": "eslint . --fix",
+    "lint": "eslint .",
     "build": "cd editing && sh export.sh"
   },
   "bin": {
-    "discraft": "./bin/cli.js"
+    "discraft": "bin/cli.js"
   },
   "files": [
     "bin/",

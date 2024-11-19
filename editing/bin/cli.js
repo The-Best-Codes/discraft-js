@@ -33,214 +33,215 @@ program
   .command("init")
   .description("Initialize a new Discraft project")
   .action(async () => {
-    // Get project details
-    const answers = await inquirer.prompt([
-      {
-        type: "input",
-        name: "name",
-        message: "Project name:",
-        default: path.basename(process.cwd()),
-        validate: (input) => {
-          if (/^[a-zA-Z0-9-_]+$/.test(input)) return true;
-          return "Project name may only include letters, numbers, dashes and underscores";
+    try {
+      // Get project details
+      const answers = await inquirer.prompt([
+        {
+          type: "input",
+          name: "name",
+          message: "Project name:",
+          default: path.basename(process.cwd()),
+          validate: (input) => {
+            if (/^[a-zA-Z0-9-_]+$/.test(input)) return true;
+            return "Project name may only include letters, numbers, dashes and underscores";
+          },
         },
-      },
-      {
-        type: "input",
-        name: "directory",
-        message: "Project directory:",
-        default: "",
-        filter: (input) => (input.trim() === "(current)" ? "" : input.trim()),
-        transformer: (input) => {
-          if (input.trim() === "" || input.trim() === "(current)") {
-            return tColorGray("(current)");
-          }
-          return input;
+        {
+          type: "input",
+          name: "directory",
+          message: "Project directory:",
+          default: "",
+          filter: (input) => (input.trim() === "(current)" ? "" : input.trim()),
+          transformer: (input) => {
+            if (input.trim() === "" || input.trim() === "(current)") {
+              return tColorGray("(current)");
+            }
+            return input;
+          },
         },
-      },
-      {
-        type: "list",
-        name: "license",
-        message: "License:",
-        choices: ["MIT", "ISC", "Apache-2.0", "GPL-3.0", "None"],
-        default: "MIT",
-      },
-      {
-        type: "checkbox",
-        name: "features",
-        message: "Select additional features:",
-        choices: [
-          {
-            name: "Example commands",
-            value: "exampleCommands",
-            checked: true,
-          },
-          {
-            name: "Environment setup (.env.example)",
-            value: "envSetup",
-            checked: true,
-          },
-          {
-            name: "README.md with setup instructions",
-            value: "readme",
-            checked: true,
-          },
-        ],
-      },
-    ]);
+        {
+          type: "list",
+          name: "license",
+          message: "License:",
+          choices: ["MIT", "ISC", "Apache-2.0", "GPL-3.0", "None"],
+          default: "MIT",
+        },
+        {
+          type: "checkbox",
+          name: "features",
+          message: "Select additional features:",
+          choices: [
+            {
+              name: "Example commands",
+              value: "exampleCommands",
+              checked: true,
+            },
+            {
+              name: "Environment setup (.env.example)",
+              value: "envSetup",
+              checked: true,
+            },
+            {
+              name: "README.md with setup instructions",
+              value: "readme",
+              checked: true,
+            },
+          ],
+        },
+      ]);
 
-    // Set up project directory
-    const projectDir = path.resolve(process.cwd(), answers.directory);
+      // Set up project directory
+      const projectDir = path.resolve(process.cwd(), answers.directory);
 
-    if (!fs.existsSync(projectDir)) {
-      fs.mkdirSync(projectDir, { recursive: true });
-    }
-
-    // Create src directory
-    const srcDir = path.join(projectDir, "src");
-    if (!fs.existsSync(srcDir)) {
-      fs.mkdirSync(srcDir, { recursive: true });
-    }
-
-    // Create project structure
-    const dirs = [
-      "discraft",
-      "discraft/commands",
-      "discraft/events",
-      "commands",
-      "events",
-      "config",
-      "services",
-      "utils",
-    ];
-
-    dirs.forEach((dir) => {
-      const dirPath = path.join(srcDir, dir);
-      if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, { recursive: true });
+      if (!fs.existsSync(projectDir)) {
+        fs.mkdirSync(projectDir, { recursive: true });
       }
-    });
 
-    // Copy template files
-    const templateFiles = {
-      "config/bot.config.js": path.join(
-        __dirname,
-        "..",
-        "src",
+      // Create src directory
+      const srcDir = path.join(projectDir, "src");
+      if (!fs.existsSync(srcDir)) {
+        fs.mkdirSync(srcDir, { recursive: true });
+      }
+
+      // Create project structure
+      const dirs = [
+        "discraft",
+        "discraft/commands",
+        "discraft/events",
+        "commands",
+        "events",
         "config",
-        "bot.config.js"
-      ),
-      "discraft/commands/handler.js": path.join(
-        __dirname,
-        "..",
-        "src",
-        "discraft",
-        "commands",
-        "handler.js"
-      ),
-      "discraft/events/handler.js": path.join(
-        __dirname,
-        "..",
-        "src",
-        "discraft",
-        "events",
-        "handler.js"
-      ),
-      "services/discord.js": path.join(
-        __dirname,
-        "..",
-        "src",
         "services",
-        "discord.js"
-      ),
-      "utils/logger.js": path.join(
-        __dirname,
-        "..",
-        "src",
         "utils",
-        "logger.js"
-      ),
-      "events/ready.js": path.join(
-        __dirname,
-        "..",
-        "src",
-        "events",
-        "ready.js"
-      ),
-      "events/error.js": path.join(
-        __dirname,
-        "..",
-        "src",
-        "events",
-        "error.js"
-      ),
-      "index.js": path.join(__dirname, "..", "src", "index.js"),
-    };
+      ];
 
-    // Add example commands if selected
-    if (answers.features.includes("exampleCommands")) {
-      templateFiles["commands/ping.js"] = path.join(
-        __dirname,
-        "..",
-        "src",
-        "commands",
-        "ping.js"
-      );
-      templateFiles["commands/random.js"] = path.join(
-        __dirname,
-        "..",
-        "src",
-        "commands",
-        "random.js"
-      );
-      templateFiles["commands/status.js"] = path.join(
-        __dirname,
-        "..",
-        "src",
-        "commands",
-        "status.js"
-      );
-    }
+      dirs.forEach((dir) => {
+        const dirPath = path.join(srcDir, dir);
+        if (!fs.existsSync(dirPath)) {
+          fs.mkdirSync(dirPath, { recursive: true });
+        }
+      });
 
-    Object.entries(templateFiles).forEach(([target, source]) => {
-      if (fs.existsSync(source)) {
-        const copyTo = path.join(srcDir, target);
-        fs.copyFileSync(source, copyTo);
+      // Copy template files
+      const templateFiles = {
+        "config/bot.config.js": path.join(
+          __dirname,
+          "..",
+          "src",
+          "config",
+          "bot.config.js"
+        ),
+        "discraft/commands/handler.js": path.join(
+          __dirname,
+          "..",
+          "src",
+          "discraft",
+          "commands",
+          "handler.js"
+        ),
+        "discraft/events/handler.js": path.join(
+          __dirname,
+          "..",
+          "src",
+          "discraft",
+          "events",
+          "handler.js"
+        ),
+        "services/discord.js": path.join(
+          __dirname,
+          "..",
+          "src",
+          "services",
+          "discord.js"
+        ),
+        "utils/logger.js": path.join(
+          __dirname,
+          "..",
+          "src",
+          "utils",
+          "logger.js"
+        ),
+        "events/ready.js": path.join(
+          __dirname,
+          "..",
+          "src",
+          "events",
+          "ready.js"
+        ),
+        "events/error.js": path.join(
+          __dirname,
+          "..",
+          "src",
+          "events",
+          "error.js"
+        ),
+        "index.js": path.join(__dirname, "..", "src", "index.js"),
+      };
+
+      // Add example commands if selected
+      if (answers.features.includes("exampleCommands")) {
+        templateFiles["commands/ping.js"] = path.join(
+          __dirname,
+          "..",
+          "src",
+          "commands",
+          "ping.js"
+        );
+        templateFiles["commands/random.js"] = path.join(
+          __dirname,
+          "..",
+          "src",
+          "commands",
+          "random.js"
+        );
+        templateFiles["commands/status.js"] = path.join(
+          __dirname,
+          "..",
+          "src",
+          "commands",
+          "status.js"
+        );
       }
-    });
 
-    // Create package.json
-    const pkg = {
-      name: answers.name,
-      version: "1.0.0",
-      scripts: {
-        dev: "discraft dev",
-        build: "discraft build",
-        start: "discraft start",
-      },
-      description: "Bot made with Discraft",
-      type: "module",
-      license: answers.license === "None" ? "UNLICENSED" : answers.license,
-    };
+      Object.entries(templateFiles).forEach(([target, source]) => {
+        if (fs.existsSync(source)) {
+          const copyTo = path.join(srcDir, target);
+          fs.copyFileSync(source, copyTo);
+        }
+      });
 
-    fs.writeFileSync(
-      path.join(projectDir, "package.json"),
-      JSON.stringify(pkg, null, 2)
-    );
+      // Create package.json
+      const pkg = {
+        name: answers.name,
+        version: "1.0.0",
+        scripts: {
+          dev: "discraft dev",
+          build: "discraft build",
+          start: "discraft start",
+        },
+        description: "Bot made with Discraft",
+        type: "module",
+        license: answers.license === "None" ? "UNLICENSED" : answers.license,
+      };
 
-    // Create .env and .env.example if selected
-    if (answers.features.includes("envSetup")) {
-      const envExample =
-        "TOKEN=your_bot_token_here\nCLIENT_ID=your_client_id_here\n";
-      fs.writeFileSync(path.join(projectDir, ".env.example"), envExample);
-      if (!fs.existsSync(path.join(projectDir, ".env"))) {
-        fs.writeFileSync(path.join(projectDir, ".env"), envExample);
+      fs.writeFileSync(
+        path.join(projectDir, "package.json"),
+        JSON.stringify(pkg, null, 2)
+      );
+
+      // Create .env and .env.example if selected
+      if (answers.features.includes("envSetup")) {
+        const envExample =
+          "TOKEN=your_bot_token_here\nCLIENT_ID=your_client_id_here\n";
+        fs.writeFileSync(path.join(projectDir, ".env.example"), envExample);
+        if (!fs.existsSync(path.join(projectDir, ".env"))) {
+          fs.writeFileSync(path.join(projectDir, ".env"), envExample);
+        }
       }
-    }
 
-    // Create README.md if selected
-    if (answers.features.includes("readme")) {
-      const readme = `# ${answers.name}
+      // Create README.md if selected
+      if (answers.features.includes("readme")) {
+        const readme = `# ${answers.name}
 Bot made with Discraft
 
 ## Setup
@@ -282,55 +283,81 @@ ${
     : `This project is licensed under the ${answers.license} License.`
 }
 `;
-      fs.writeFileSync(path.join(projectDir, "README.md"), readme);
-    }
+        fs.writeFileSync(path.join(projectDir, "README.md"), readme);
+      }
 
-    // Create .gitignore
-    const gitignore = `.env
+      // Create .gitignore
+      const gitignore = `.env
 node_modules/
 dist/
 `;
-    fs.writeFileSync(path.join(projectDir, ".gitignore"), gitignore);
+      fs.writeFileSync(path.join(projectDir, ".gitignore"), gitignore);
 
-    // Install latest dependencies
-    console.log("\n📦 Installing dependencies...");
-    const npmInstall = spawn(
-      "npm",
-      ["install", "discord.js@latest", "dotenv@latest"],
-      {
-        stdio: "inherit",
-        cwd: projectDir,
-      }
-    );
+      // Install latest dependencies
+      console.log("\n📦 Installing dependencies...");
+      const npmInstall = spawn(
+        "npm",
+        ["install", "discord.js@latest", "dotenv@latest"],
+        {
+          stdio: "inherit",
+          cwd: projectDir,
+        }
+      );
 
-    npmInstall.on("close", (code) => {
-      if (code === 0) {
-        console.log("\n✨ Discraft project initialized successfully!");
-        console.log("\nNext steps:");
-        if (answers.directory !== process.cwd()) {
-          console.log(
-            `Run \`cd ${answers.directory}\` to enter your project directory.`
+      npmInstall.on("close", (code) => {
+        if (code === 0) {
+          console.log("\n✨ Discraft project initialized successfully!");
+          console.log("\nNext steps:");
+          if (answers.directory !== process.cwd()) {
+            console.log(
+              `Run \`cd ${answers.directory}\` to enter your project directory.`
+            );
+          }
+          console.log("Add your bot token and client ID to .env file");
+          console.log('Run "discraft dev" to start development');
+        } else {
+          console.error(
+            '\n❌ Failed to install dependencies. Please run "npm install" manually.'
           );
         }
-        console.log("Add your bot token and client ID to .env file");
-        console.log('Run "discraft dev" to start development');
+      });
+    } catch (err) {
+      if (err.isTtyError) {
+        console.error("Prompt couldn't be rendered in the current environment");
+      } else if (err.message === "Aborted") {
+        console.log("\nProject initialization cancelled.");
       } else {
-        console.error(
-          '\n❌ Failed to install dependencies. Please run "npm install" manually.'
-        );
+        console.error("Error during initialization:", err);
       }
-    });
+      process.exit(1);
+    }
   });
+
+let activeProcess = null;
+
+process.on("SIGINT", () => {
+  console.log("\nGracefully shutting down...");
+  if (activeProcess) {
+    activeProcess.kill("SIGINT");
+  }
+  process.exit(0);
+});
 
 program
   .command("dev")
   .description("Start development server")
   .action(() => {
     const scriptPath = path.join(__dirname, "..", "scripts", "dev.js");
-    spawn("node", [scriptPath], {
+    activeProcess = spawn("node", [scriptPath], {
       stdio: "inherit",
       cwd: process.cwd(),
       env: { ...process.env, DISCRAFT_ROOT: __dirname },
+    });
+    activeProcess.on("close", (code) => {
+      activeProcess = null;
+      if (code !== 0 && code !== null) {
+        console.error(`Dev process exited with code ${code}`);
+      }
     });
   });
 
@@ -346,7 +373,7 @@ program
   )
   .action(() => {
     const scriptPath = path.join(__dirname, "..", "scripts", "build.js");
-    spawn("node", [scriptPath, ...process.argv.slice(3)], {
+    activeProcess = spawn("node", [scriptPath, ...process.argv.slice(3)], {
       stdio: "inherit",
       cwd: process.cwd(),
       env: {
@@ -360,6 +387,12 @@ program
         ),
       },
     });
+    activeProcess.on("close", (code) => {
+      activeProcess = null;
+      if (code !== 0 && code !== null) {
+        console.error(`Build process exited with code ${code}`);
+      }
+    });
   });
 
 program
@@ -367,10 +400,16 @@ program
   .description("Start production server")
   .action(() => {
     const scriptPath = path.join(__dirname, "..", "scripts", "start.js");
-    spawn("node", [scriptPath], {
+    activeProcess = spawn("node", [scriptPath], {
       stdio: "inherit",
       cwd: process.cwd(),
       env: { ...process.env, DISCRAFT_ROOT: __dirname },
+    });
+    activeProcess.on("close", (code) => {
+      activeProcess = null;
+      if (code !== 0 && code !== null) {
+        console.error(`Start process exited with code ${code}`);
+      }
     });
   });
 
@@ -379,10 +418,16 @@ program
   .description("Check if the bot token is valid")
   .action(() => {
     const scriptPath = path.join(__dirname, "..", "scripts", "tokenTest.js");
-    spawn("node", [scriptPath], {
+    activeProcess = spawn("node", [scriptPath], {
       stdio: "inherit",
       cwd: process.cwd(),
       env: { ...process.env, DISCRAFT_ROOT: __dirname },
+    });
+    activeProcess.on("close", (code) => {
+      activeProcess = null;
+      if (code !== 0 && code !== null) {
+        console.error(`Token check process exited with code ${code}`);
+      }
     });
   });
 
