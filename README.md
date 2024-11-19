@@ -16,7 +16,6 @@ Think of it like Next.js but for Discord bots.
 - **Multi-step Commands**: Support for commands that require follow-up responses or editing
 - **Robust CLI**: Comprehensive command-line interface for development and deployment
 - **Modern Build System**: Bundling with Rollup and Babel transformations
-- **Type-safe**: Written in TypeScript for better development experience
 - **Hot Reload**: Automatic server restart on code changes during development
 
 ## Installation
