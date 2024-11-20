@@ -12,7 +12,7 @@ export async function minifyWithTerser(filePath, config) {
             ecma: 2020,
             module: true,
             toplevel: true,
-            passes: config.standalone ? 1 : (config.maxOptimize ? 3 : 1),
+            passes: (config.maxOptimize ? 3 : 1),
             keep_fnames: config.standalone ? true : config.keepFunctionNames,
             pure_getters: true,
             dead_code: true,
@@ -28,7 +28,7 @@ export async function minifyWithTerser(filePath, config) {
             negate_iife: !config.standalone,
             reduce_vars: true,
             collapse_vars: !config.standalone,
-            inline: config.standalone ? 0 : 3,
+            inline: config.standalone ? 1 : 3,
             evaluate: true,
             pure_funcs: ["console.log", "console.debug"],
             drop_console: false,
@@ -55,15 +55,15 @@ export async function minifyWithTerser(filePath, config) {
         },
         format: {
             ecma: 2020,
-            comments: config.standalone ? true : !config.removeComments,
+            comments: !config.removeComments,
             ascii_only: true,
-            beautify: config.standalone,
-            indent_level: config.standalone ? 2 : 0,
+            beautify: false,
+            indent_level: 0,
             wrap_iife: false,
             preserve_annotations: true,
-            max_line_len: config.standalone ? 120 : false
+            max_line_len: false
         },
-        sourceMap: config.standalone ? true : config.sourceMaps,
+        sourceMap: config.sourceMaps,
         ie8: false,
         safari10: false
     };
@@ -74,7 +74,7 @@ export async function minifyWithTerser(filePath, config) {
     }
 
     await fs.promises.writeFile(filePath, result.code);
-    if (result.map && (config.standalone || config.sourceMaps)) {
+    if (result.map && (config.sourceMaps)) {
         await fs.promises.writeFile(filePath + ".map", result.map);
     }
 }
