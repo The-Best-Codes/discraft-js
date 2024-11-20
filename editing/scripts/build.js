@@ -137,7 +137,7 @@ async function build(options) {
         exports: "auto",
         minifyInternalExports: true,
       },
-      external: (id) => {
+      external: config.standalone ? [] : (id) => {
         return (
           !id.startsWith(".") &&
           !id.startsWith("/") &&
@@ -185,10 +185,9 @@ async function build(options) {
 
     // Bundle with Rollup
     info("Running Rollup bundler...");
-    const bundle = await rollup(rollupConfig);
-    currentBundle = bundle;
-    const output = await bundle.write(rollupConfig.output);
-    await bundle.close();
+    currentBundle = await rollup(rollupConfig);
+    const bundle = await currentBundle.write(rollupConfig.output);
+    await currentBundle.close();
     currentBundle = null;
 
     const bundlePath = path.join(outputDir, "bundle.js");
@@ -198,16 +197,19 @@ async function build(options) {
       throw new Error(`Bundle file not created at ${bundlePath}`);
     }
 
-    // Analyze dependencies after bundle is created
-    info("Analyzing dependencies...");
-    const minimalPackage = await analyzeDependencies(bundlePath, {
-      output: [output],
-    });
-    await fs.promises.writeFile(
-      path.join(outputDir, "package.json"),
-      JSON.stringify(minimalPackage, null, 2)
-    );
-    info("Generated minimal package.json in dist directory");
+    // Only generate package.json if not in standalone mode
+    if (!config.standalone) {
+      const packageJson = await analyzeDependencies(bundlePath, {
+        output: [bundle],
+      });
+      await fs.promises.writeFile(
+        path.join(outputDir, "package.json"),
+        JSON.stringify(packageJson, null, 2)
+      );
+      info("Generated package.json with dependencies");
+    } else {
+      info("Skipping package.json generation (standalone mode)");
+    }
 
     // Minify the bundle if enabled
     if (config.minify) {
@@ -219,7 +221,9 @@ async function build(options) {
     }
 
     // Display size comparison
-    await displaySizeComparison(originalSize, outputDir);
+    if (!config.standalone) {
+      await displaySizeComparison(originalSize, outputDir);
+    }
 
     info(`Output location: ${outputDir}`);
     success(
@@ -249,6 +253,7 @@ async function getBuildConfig(options) {
         removeComments: true,
         sourceMaps: false,
         maxOptimize: options.maxOptimize,
+        standalone: options.standalone,
       };
     }
 
@@ -262,7 +267,7 @@ async function getBuildConfig(options) {
       {
         type: "confirm",
         name: "maxOptimize",
-        message: "Enable maximum optimization (slower build, faster runtime)?",
+        message: "Enable maximum optimization?",
         default: true,
         when: (answers) => answers.minify,
       },
@@ -270,7 +275,7 @@ async function getBuildConfig(options) {
         type: "confirm",
         name: "keepFunctionNames",
         message:
-          "Keep function names for better error traces? (disable for smaller size)",
+          "Keep function names for better error traces?",
         default: false,
         when: (answers) => answers.minify,
       },
@@ -287,6 +292,12 @@ async function getBuildConfig(options) {
         message: "Generate source maps?",
         default: false,
         when: (answers) => answers.minify,
+      },
+      {
+        type: "confirm",
+        name: "standalone",
+        message: "Create standalone bundle with all dependencies included?",
+        default: false,
       },
     ]);
   } catch (err) {
@@ -306,6 +317,7 @@ const options = {
     ? process.argv[process.argv.indexOf("-o") + 1]
     : "dist",
   maxOptimize: process.argv.includes("--max-optimize"),
+  standalone: process.argv.includes("--standalone"),
 };
 
 build(options);
