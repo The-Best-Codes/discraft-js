@@ -49,6 +49,7 @@ discraft [command]
 - `discraft start`: Start the production server.
 - `discraft test token`: Test your bot token and client ID.
 - `discraft add command`: Create a new command file.
+- `discraft add event`: Create a new event handler file.
 - `discraft help`: Display available commands and help options.
 
 ## Project Structure
