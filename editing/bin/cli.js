@@ -269,19 +269,17 @@ Development:
 - \`discraft build\`: Build for production
 - \`discraft start\`: Start production server
 
-${
-  answers.features.includes("exampleCommands")
-    ? "\nBot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
-    : ""
-}
+${answers.features.includes("exampleCommands")
+            ? "\nBot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
+            : ""
+          }
 
 ## License
 
-${
-  answers.license === "None"
-    ? "This project is not licensed."
-    : `This project is licensed under the ${answers.license} License.`
-}
+${answers.license === "None"
+            ? "This project is not licensed."
+            : `This project is licensed under the ${answers.license} License.`
+          }
 `;
         fs.writeFileSync(path.join(projectDir, "README.md"), readme);
       }
@@ -472,6 +470,39 @@ program
           });
         } catch (err) {
           console.error("Error executing command generator:", err);
+          process.exit(1);
+        }
+      })
+  )
+  .addCommand(
+    new Command("event")
+      .description("Create a new Discord event handler")
+      .action(async () => {
+        const scriptPath = path.join(
+          __dirname,
+          "..",
+          "scripts",
+          "add-event.js"
+        );
+        try {
+          const child = spawn("node", [scriptPath], {
+            stdio: "inherit",
+            shell: true,
+          });
+
+          child.on("error", (err) => {
+            console.error("Failed to start event generator:", err);
+            process.exit(1);
+          });
+
+          child.on("exit", (code) => {
+            if (code !== 0) {
+              console.error(`Event generator exited with code ${code}`);
+              process.exit(code);
+            }
+          });
+        } catch (err) {
+          console.error("Error executing event generator:", err);
           process.exit(1);
         }
       })
