@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { info, error, success } from "../common/utils/logger.js";
+import { info, error, success, log } from "../common/utils/logger.js";
 import inquirer from "inquirer";
 import { rollup } from "rollup";
 import { getFileSizes, displaySizeComparison } from "./utils/fileSizeUtil.js";
@@ -13,6 +13,7 @@ import json from "@rollup/plugin-json";
 import replace from "@rollup/plugin-replace";
 import babel from "@rollup/plugin-babel";
 import { fileURLToPath } from "url";
+import { exec } from "child_process";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -182,6 +183,37 @@ async function build(options) {
         tryCatchDeoptimization: false,
       },
     };
+
+    if (config.standalone) {
+      async function npmCleanModules(timeout = 60000) {
+        return new Promise((resolve, reject) => {
+          const process = exec("npx --yes clean-modules -y", (error, stdout, stderr) => {
+            if (error) {
+              reject(error || stderr);
+            } else {
+              resolve(stdout);
+            }
+          });
+
+          // Set a timeout to reject the promise if it takes too long
+          const timeoutId = setTimeout(() => {
+            process.kill(); // Kill the exec process if it times out
+            reject(new Error(`Process timed out after ${timeout}ms`));
+          }, timeout);
+
+          // Clear the timeout if the process finishes successfully
+          process.on("close", () => clearTimeout(timeoutId));
+        });
+      }
+
+      try {
+        info("Simplifying dependencies (this may take a while)...");
+        const result = await npmCleanModules(60000);
+        log(result);
+      } catch (err) {
+        error("Failed to simplify dependencies:", err);
+      }
+    }
 
     // Bundle with Rollup
     info("Running Rollup bundler...");
