@@ -41,10 +41,10 @@ There are only **two folders** in the project that you should need to edit:
 
 1. `editing/` - Contains the editing (un-minified) version of what you find in:
 
-- `bin/` - Contains the CLI
-- `scripts/` - Contains the scripts
-- `common/` - Contains the common files (like logger utils)
-  When you want to minify and output the editing scripts (before a commit, for example), run `bun run build`
+   - `bin/` - Contains the CLI
+   - `scripts/` - Contains the scripts
+   - `common/` - Contains the common files (like logger utils)
+     When you want to minify and output the editing scripts (before a commit, for example), run `bun run build`
 
 2. `src/` - This is **not the source of the project**, it's a template directory that Discraft generates Discord bot projects from.
 
