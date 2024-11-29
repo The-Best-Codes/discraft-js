@@ -57,7 +57,7 @@ We use Bun for bundling and building the project. The build process is handled t
 bun run build
 ```
 
-You should run this before commiting changes in `editing/` to see them in the other folders as well.
+You should run this before commiting changes in the `editing/` folder so that the output folders' minified contents are updated.
 
 ## Pull Request Process
 
