@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { info, error, success, log } from "../common/utils/logger.js";
-import inquirer from "inquirer";
+import { checkbox , confirm } from "@inquirer/prompts";
 import { rollup } from "rollup";
 import { getFileSizes, displaySizeComparison } from "./utils/fileSizeUtil.js";
 import { minifyWithTerser } from "./utils/minifyUtilTerser.js";
@@ -289,49 +289,54 @@ async function getBuildConfig(options) {
       };
     }
 
-    return inquirer.prompt([
+// Check if "minify" is selected
+console.log("\n")
+const minify = await confirm({ message: 'Do you want to minify the code?' });
+
+// If minify is selected, ask about additional options
+let additionalOptions = [];
+if (minify) {
+  additionalOptions = await checkbox({
+    message: "Configure Additional Build Options:",
+    choices: [
       {
-        type: "confirm",
-        name: "minify",
-        message: "Do you want to minify the code?",
-        default: true,
+        value: "maxOptimize",
+        name: "Enable maximum optimization",
+        checked: true,
       },
       {
-        type: "confirm",
-        name: "maxOptimize",
-        message: "Enable maximum optimization?",
-        default: true,
-        when: (answers) => answers.minify,
+        value: "keepFunctionNames",
+        name: "Keep function names for better error traces",
+        checked: false,
       },
       {
-        type: "confirm",
-        name: "keepFunctionNames",
-        message:
-          "Keep function names for better error traces?",
-        default: false,
-        when: (answers) => answers.minify,
+        value: "removeComments",
+        name: "Remove comments from the output",
+        checked: true,
       },
       {
-        type: "confirm",
-        name: "removeComments",
-        message: "Remove comments from the output?",
-        default: true,
-        when: (answers) => answers.minify,
+        value: "sourceMaps",
+        name: "Generate source maps",
+        checked: false,
       },
       {
-        type: "confirm",
-        name: "sourceMaps",
-        message: "Generate source maps?",
-        default: false,
-        when: (answers) => answers.minify,
-      },
-      {
-        type: "confirm",
-        name: "standalone",
-        message: "Create standalone bundle with all dependencies included?",
-        default: false,
-      },
-    ]);
+        value: "standalone",
+        name: "Create standalone bundle with all dependencies included",
+        checked: false,
+      }
+    ]
+  });
+}
+
+// Return the final configuration
+return{
+  minify: minify,
+  keepFunctionNames: additionalOptions.includes('keepFunctionNames'),
+  removeComments: additionalOptions.includes('removeComments'),
+  sourceMaps: additionalOptions.includes('sourceMaps'),
+  maxOptimize: additionalOptions.includes('maxOptimize'),
+  standalone: additionalOptions.includes('standalone')
+};
   } catch (err) {
     if (err.name === "ExitPromptError") {
       error("Build cancelled by user.");
@@ -346,8 +351,10 @@ async function getBuildConfig(options) {
 const options = {
   yes: process.argv.includes("-y") || process.argv.includes("--yes"),
   output: process.argv.includes("-o")
-    ? process.argv[process.argv.indexOf("-o") + 1]
-    : "dist",
+  ? process.argv[process.argv.indexOf("-o") + 1]
+  : process.argv.includes("--output")
+  ? process.argv[process.argv.indexOf("--output") + 1]
+  : "dist",
   maxOptimize: process.argv.includes("--max-optimize"),
   standalone: process.argv.includes("--standalone"),
 };

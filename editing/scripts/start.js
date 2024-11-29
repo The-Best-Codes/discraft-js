@@ -4,7 +4,8 @@ import fs from "fs";
 import path from "path";
 
 const projectDir = process.cwd();
-const distPath = path.join(projectDir, "dist");
+const distDir =  process.argv[process.argv.length-1];
+const distPath =  path.join(projectDir, distDir);
 const bundlePath = path.join(distPath, "bundle.js");
 
 // Check if dist directory and bundle.js exist

@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import inquirer from "inquirer";
+import { input, confirm, search, checkbox} from "@inquirer/prompts";
 import { success, error } from "../common/utils/logger.js";
 
 async function generateCommand() {
@@ -23,25 +23,59 @@ async function generateCommand() {
   }
 
   // Initial command setup questions
-  let answers = {};
+  let commandConfig = {
+    permissions: [],
+    features: [],
+    options: []
+  };
   try {
-    answers = await inquirer.prompt([
-      {
-        type: "input",
-        name: "name",
-        message: "Command name:",
-        validate: (input) => {
-          if (/^[a-z]+(-[a-z]+)*$/.test(input)) return true;
-          return "Must be lowercase with single dashes only.";
+    commandConfig["name"] = await input({
+      message: `Command name:`,required: true,
+      validate: (input) => {
+        if (/^[a-z]+(-[a-z]+)*$/.test(input)) return true;
+        return "Must be lowercase with single dashes only.";
+      },
+    }) 
+    commandConfig["description"] = await input({
+      message: `Command description:`,
+      default: "A Discraft-js Bot Command...",
+      validate: (input) => input.length > 0
+    })
+  } catch (err) {
+    if (err.name === "ExitPromptError") {
+      error("Cancelled by user.");
+      return process.exit(0);
+    }
+    error("Error:", err);
+    return process.exit(1);
+  }
+  try {
+    const featuresAnswers = await checkbox({
+      message: 'Select command features:',
+      choices: [
+        {
+          name: 'Enable command response caching',
+          value: 'cacheable',
+          checked: false,
         },
-      },
-      {
-        type: "input",
-        name: "description",
-        message: "Command description:",
-        validate: (input) => input.length > 0,
-      },
-    ]);
+        {
+          name: 'Use deferred responses',
+          value: 'deferred',
+          checked: false,
+        },
+        {
+          name: 'Make responses ephemeral (only visible to the command user)',
+          value: 'ephemeral',
+          checked: false,
+        },
+        {
+          name: 'Add permission requirements',
+          value: 'permissions',
+          checked: false,
+        },
+      ],
+    });
+    commandConfig["features"] = featuresAnswers
   } catch (err) {
     if (err.name === "ExitPromptError") {
       error("Cancelled by user.");
@@ -50,74 +84,26 @@ async function generateCommand() {
     error("Error:", err);
     return process.exit(1);
   }
-
-  // Feature selection
-  let featureAnswers = {};
-  try {
-    featureAnswers = await inquirer.prompt([
-      {
-        type: "checkbox",
-        name: "features",
-        message: "Select command features:",
-        choices: [
-          {
-            name: "Enable command response caching",
-            value: "cacheable",
-            checked: false,
-          },
-          {
-            name: "Use deferred responses",
-            value: "deferred",
-            checked: false,
-          },
-          {
-            name: "Make responses ephemeral (only visible to the command user)",
-            value: "ephemeral",
-            checked: false,
-          },
-          {
-            name: "Add permission requirements",
-            value: "permissions",
-            checked: false,
-          },
-        ],
-      },
-    ]);
-  } catch (err) {
-    if (err.name === "ExitPromptError") {
-      error("Cancelled by user.");
-      return process.exit(0);
-    }
-    error("Error:", err);
-    return process.exit(1);
-  }
-
-  answers.features = featureAnswers.features;
 
   // Ask about command options
-  let hasOptionsAnswer = {};
-  try {
-    hasOptionsAnswer = await inquirer.prompt([
+  const addCmdOptions = await confirm(
       {
-        type: "confirm",
-        name: "hasOptions",
         message:
           "Would you like to add command options? (e.g., /command <option>)",
         default: false,
       },
-    ]);
-  } catch (err) {
-    if (err.name === "ExitPromptError") {
-      error("Cancelled by user.");
-      return process.exit(0);
-    }
-    error("Error:", err);
-    return process.exit(1);
-  }
+    ).catch((err) =>{
+      if (err.name === "ExitPromptError") {
+        error("Cancelled by user.");
+        return process.exit(0);
+      }
+      error("Error:", err);
+      return process.exit(1);
+    });
 
   // If command needs options, guide through the process
-  const commandOptions = [];
-  if (hasOptionsAnswer.hasOptions) {
+  
+  if (addCmdOptions) {
     console.log(
       "\nAdding options to your command... For each option, you'll need to specify:"
     );
@@ -127,47 +113,99 @@ async function generateCommand() {
 
     let addingOptions = true;
     while (addingOptions) {
-      let optionAnswers;
+      let optionAnswers = {};
       try {
-        optionAnswers = await inquirer.prompt([
-          {
-            type: "list",
-            name: "type",
-            message: "What type of data should this option accept?",
-            choices: [
-              { name: "String (text)", value: "String" },
-              { name: "Integer (whole number)", value: "Integer" },
-              { name: "Number (decimal number)", value: "Number" },
-              { name: "Boolean (true/false)", value: "Boolean" },
-              { name: "User (Discord user)", value: "User" },
-              { name: "Channel (Discord channel)", value: "Channel" },
-              { name: "Role (Discord role)", value: "Role" },
-              { name: "Mentionable (user or role)", value: "Mentionable" },
-              { name: "Attachment (file)", value: "Attachment" },
-            ],
-          },
-          {
-            type: "input",
-            name: "name",
-            message: 'Option name (e.g., "user"):',
-            validate: (input) => {
-              if (/^[a-z0-9-]+$/.test(input)) return true;
-              return "Option name must be lowercase and may only contain letters, numbers, and dashes";
-            },
-          },
-          {
-            type: "input",
-            name: "description",
-            message: 'Option description (e.g., "The user to ban"):',
-            validate: (input) => input.length > 0,
-          },
-          {
-            type: "confirm",
-            name: "required",
-            message: "Is this option required?",
-            default: false,
-          },
-        ]);
+
+const commandOptionType = await search({
+  message: 'What type of data should this option accept?',
+  source: async (input, { signal }) => {
+    const options = [
+      {
+        name: 'String (text)',
+        value: 'String',
+        description: 'A sequence of characters, typically text.',
+      },
+      {
+        name: 'Integer (whole number)',
+        value: 'Integer',
+        description: 'A whole number (no decimal places).',
+      },
+      {
+        name: 'Number (decimal number)',
+        value: 'Number',
+        description: 'A number that can include decimals.',
+      },
+      {
+        name: 'Boolean (true/false)',
+        value: 'Boolean',
+        description: 'A value that can be either true or false.',
+      },
+      {
+        name: 'User (Discord user)',
+        value: 'User',
+        description: 'A Discord user (mentionable or not).',
+      },
+      {
+        name: 'Channel (Discord channel)',
+        value: 'Channel',
+        description: 'A Discord channel (text, voice, etc.).',
+      },
+      {
+        name: 'Role (Discord role)',
+        value: 'Role',
+        description: 'A Discord role that can be assigned to users.',
+      },
+      {
+        name: 'Mentionable (user or role)',
+        value: 'Mentionable',
+        description: 'A mentionable user or role.',
+      },
+      {
+        name: 'Attachment (file)',
+        value: 'Attachment',
+        description: 'A file attachment (image, document, etc.).',
+      },
+    ];
+
+    if (!input) {
+      return options;  // Return all options if no input is given
+    }
+
+    // Filter options based on input
+    return options
+      .filter(option => 
+        option.name.toLowerCase().includes(input.toLowerCase()) || 
+        option.description.toLowerCase().includes(input.toLowerCase())
+      )
+      .map(option => ({
+        name: `${option.name} - ${option.description}`,  // Show both name and description
+        value: option.value,
+        description: option.description,
+      }));
+  },
+});
+const commandOptionName = await input({
+  message: 'Option name (e.g., "user"):',
+  validate: (input) => {
+    if (/^[a-z0-9-]+$/.test(input)) return true;
+    return "Option name must be lowercase and may only contain letters, numbers, and dashes";
+  },
+  required: true
+})
+const commandOptionDecription = await input({
+  message: 'Option description (e.g., "The user to ban"):',
+  validate: (input) => input.length > 0,
+  required: false,
+  default: `Command option accepts ${commandOptionType}`
+})
+
+const commandOptionRequired = await confirm({ message: 'Is this option required?' , default: false});
+      
+optionAnswers["type"] = commandOptionName
+optionAnswers["name"] = commandOptionName
+optionAnswers["description"] = commandOptionDecription
+optionAnswers["required"] = commandOptionRequired
+
       } catch (err) {
         if (err.name === "ExitPromptError") {
           error("Cancelled by user.");
@@ -177,23 +215,14 @@ async function generateCommand() {
         return process.exit(1);
       }
 
-      commandOptions.push({
+      commandConfig["options"].push({
         type: optionAnswers.type.toLowerCase(),
         name: optionAnswers.name,
         description: optionAnswers.description,
         required: optionAnswers.required,
       });
-
-      const { addAnother } = await inquirer
-        .prompt([
-          {
-            type: "confirm",
-            name: "addAnother",
-            message: "Would you like to add another option?",
-            default: false,
-          },
-        ])
-        .catch((err) => {
+console.log("\n")
+      const addAnother  = await confirm({ message: "Would you like to add another option?" }).catch((err) => {
           if (err.name === "ExitPromptError") {
             error("Cancelled by user.");
             return process.exit(0);
@@ -207,17 +236,11 @@ async function generateCommand() {
       }
     }
   }
-
   // If permissions are required, guide through permission selection
-  let permissions = [];
-  if (answers.features.includes("permissions")) {
+  if (commandConfig.features.includes("permissions")) {
     console.log("\nSelect the permissions required to use this command:");
 
-    const permissionAnswers = await inquirer
-      .prompt([
-        {
-          type: "checkbox",
-          name: "permissions",
+    const commandPerms = await checkbox(  {
           message: "Required permissions:",
           choices: [
             {
@@ -263,7 +286,7 @@ async function generateCommand() {
             },
           ],
         },
-      ])
+      )
       .catch((err) => {
         if (err.name === "ExitPromptError") {
           error("Cancelled by user.");
@@ -272,29 +295,29 @@ async function generateCommand() {
         error("Error:", err);
         return process.exit(1);
       });
-    permissions = permissionAnswers.permissions;
+    commandConfig["permissions"] = commandPerms;
   }
 
   // Generate the command file content with proper imports
   let commandContent = `import { SlashCommandBuilder`;
 
-  if (permissions.length > 0) {
+  if (commandConfig["permissions"].length > 0) {
     commandContent += `, PermissionFlagsBits`;
   }
   commandContent += ` } from 'discord.js';\n`;
 
-  if (answers.features.includes("cacheable")) {
+  if (commandConfig["features"].includes("cacheable")) {
     commandContent += `import { commandCache } from '../utils/commandCache.js';\n\n`;
-    commandContent += `// Set command-specific cache settings\ncommandCache.setCommandSettings('${answers.name}', {\n  ttl: 60000, // Cache results for 1 minute\n});\n\n`;
+    commandContent += `// Set command-specific cache settings\ncommandCache.setCommandSettings('${commandConfig["name"]}', {\n  ttl: 60000, // Cache results for 1 minute\n});\n\n`;
   }
 
   commandContent += `export default {\n`;
   commandContent += `  data: new SlashCommandBuilder()\n`;
-  commandContent += `    .setName('${answers.name}')\n`;
-  commandContent += `    .setDescription('${answers.description}')\n`;
+  commandContent += `    .setName('${commandConfig["name"]}')\n`;
+  commandContent += `    .setDescription('${commandConfig["description"]}')\n`;
 
   // Add options if any
-  if (commandOptions.length > 0) {
+  if (commandConfig["options"].length > 0) {
     commandOptions.forEach((opt) => {
       commandContent += `    .add${
         opt.type.charAt(0).toUpperCase() + opt.type.slice(1)
@@ -308,8 +331,8 @@ async function generateCommand() {
   }
 
   // Add permissions if any
-  if (permissions.length > 0) {
-    permissions.forEach((perm) => {
+  if (commandConfig["permissions"].length > 0) {
+    commandConfig["permissions"].forEach((perm) => {
       commandContent += `    .setDefaultMemberPermissions(PermissionFlagsBits.${perm})\n`;
     });
   }
@@ -317,23 +340,23 @@ async function generateCommand() {
   commandContent += `  ,\n\n`;
 
   // Add cacheable property if selected
-  if (answers.features.includes("cacheable")) {
+  if (commandConfig["features"].includes("cacheable")) {
     commandContent += `  cacheable: true,\n\n`;
   }
 
   // Generate execute function
   commandContent += `  async execute(interaction) {\n`;
 
-  if (answers.features.includes("deferred")) {
+  if (commandConfig["features"].includes("deferred")) {
     commandContent += `    await interaction.deferReply(${
-      answers.features.includes("ephemeral") ? "{ ephemeral: true }" : ""
+      commandConfig["features"].includes("ephemeral") ? "{ ephemeral: true }" : ""
     });\n\n`;
   }
 
   // Add option handling if any
-  if (commandOptions.length > 0) {
+  if (commandConfig["options"].length > 0) {
     commandContent += `    // Get command options\n`;
-    commandOptions.forEach((opt) => {
+    commandConfig["options"].forEach((opt) => {
       commandContent += `    const ${opt.name} = interaction.options.get${
         opt.type.charAt(0).toUpperCase() + opt.type.slice(1)
       }('${opt.name}');\n`;
@@ -343,13 +366,13 @@ async function generateCommand() {
 
   commandContent += `    // TODO: Add your command logic here\n\n`;
 
-  if (answers.features.includes("deferred")) {
+  if (commandConfig["features"].includes("deferred")) {
     commandContent += `    await interaction.editReply({ content: 'Command executed!' ${
-      answers.features.includes("ephemeral") ? ", ephemeral: true" : ""
+      commandConfig["features"].includes("ephemeral") ? ", ephemeral: true" : ""
     } });\n`;
   } else {
     commandContent += `    await interaction.reply({ content: 'Command executed!' ${
-      answers.features.includes("ephemeral") ? ", ephemeral: true" : ""
+      commandConfig["features"].includes("ephemeral") ? ", ephemeral: true" : ""
     } });\n`;
   }
 
@@ -366,17 +389,17 @@ async function generateCommand() {
   }
 
   // Write the command file
-  const filePath = path.join(commandsDir, `${answers.name}.js`);
+  const filePath = path.join(commandsDir, `${commandConfig["name"]}.js`);
   fs.writeFileSync(filePath, commandContent);
 
-  success(`Command ${answers.name} created successfully at ${filePath}`);
+  success(`Command ${commandConfig["name"]} created successfully at ${filePath}`);
 
   // Return the command details for potential further use
   return {
-    name: answers.name,
+    name: commandConfig["name"],
     path: filePath,
-    features: answers.features,
-    options: commandOptions,
+    features: commandConfig["features"],
+    options: commandConfig["options"],
   };
 }
 

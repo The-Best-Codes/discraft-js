@@ -39,6 +39,7 @@
   "dependencies": {
     "@babel/core": "^7.26.0",
     "@babel/preset-env": "^7.26.0",
+    "@inquirer/prompts": "^7.1.0",
     "@rollup/plugin-babel": "^6.0.4",
     "@rollup/plugin-commonjs": "^28.0.1",
     "@rollup/plugin-json": "^6.1.0",
@@ -47,10 +48,11 @@
     "commander": "^12.1.0",
     "discord.js": "^14.16.3",
     "dotenv": "^16.4.5",
-    "inquirer": "^12.1.0",
+    "figlet": "^1.8.0",
     "nodemon": "^3.1.7",
     "rollup": "^4.27.4",
-    "terser": "^5.36.0"
+    "terser": "^5.36.0",
+    "inquirer": "^12.1.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.15.0",
