@@ -45,8 +45,9 @@ There are only **two folders** in the project that you should need to edit:
    - `scripts/` - Contains the scripts
    - `common/` - Contains the common files (like logger utils)
      When you want to minify and output the editing scripts (before a commit, for example), run `bun run build`
+   - `src/` - The minified parts of the template directory (src/discraft and src/utils).
 
-2. `src/` - This is **not the source of the project**, it's a template directory that Discraft generates Discord bot projects from.
+2. `src/` - This is **not the source of the project**, it's a template directory that Discraft generates Discord bot projects from. You should not update the commandCache, logger, command, or event handler in this folder. You should update them in the `editing/` folder instead.
 
 ## Build Process
 
