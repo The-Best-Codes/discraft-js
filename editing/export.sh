@@ -38,21 +38,21 @@ process_files() {
 
 # Process scripts/ and common/ with aggressive minification
 if [ -d "./scripts" ]; then
-    process_files "scripts" "--compress sequences=true,dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=false comments=false"
+    process_files "scripts" "--compress sequences=true,dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=false --mangle --format comments=false"
 fi
 
 if [ -d "./common" ]; then
-    process_files "common" "--compress sequences=true,dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=false comments=false"
+    process_files "common" "--compress sequences=true,dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=false --mangle --format comments=false"
 fi
 
 # Process bin/ with preserved comments but still mangled
 if [ -d "./bin" ]; then
-    process_files "bin" "  comments=true,beautify=false"
+    process_files "bin" "--mangle --format comments=true,beautify=false"
 fi
 
 # Process src/ with preserved comments but still mangled
 if [ -d "./src" ]; then
-    process_files "src" "  comments=true,beautify=false"
+    process_files "src" "--mangle --format comments=true,beautify=false"
 fi
 
 echo "Removing minified directory..."

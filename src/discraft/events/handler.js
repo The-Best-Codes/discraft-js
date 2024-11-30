@@ -1,1 +1,3 @@
-import{debug,error,info}from"../../utils/logger.js";import{events}from"./index.js";export async function eventHandler(client){info("Loading events...");try{for(const[name,eventHandler]of Object.entries(events)){debug(`Loading event: ${name}`);try{eventHandler(client);debug(`Loaded event: ${name}`)}catch(err){error(`Error loading event ${name}:`,err)}}info("Events loaded.")}catch(err){error("Error loading events:",err)}}
+import{debug,error,info}from"../../utils/logger.js";import{events}from"./index.js";export async function eventHandler(e){
+// Load events from static imports
+info("Loading events...");try{for(const[r,o]of Object.entries(events)){debug(`Loading event: ${r}`);try{o(e);debug(`Loaded event: ${r}`)}catch(e){error(`Error loading event ${r}:`,e)}}info("Events loaded.")}catch(e){error("Error loading events:",e)}}
