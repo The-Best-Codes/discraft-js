@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { info, error, success, log } from "../common/utils/logger.js";
-import { checkbox , confirm } from "@inquirer/prompts";
+import { checkbox, confirm } from "@inquirer/prompts";
 import { rollup } from "rollup";
 import { getFileSizes, displaySizeComparison } from "./utils/fileSizeUtil.js";
 import { minifyWithTerser } from "./utils/minifyUtilTerser.js";
@@ -289,54 +289,54 @@ async function getBuildConfig(options) {
       };
     }
 
-// Check if "minify" is selected
-console.log("\n")
-const minify = await confirm({ message: 'Do you want to minify the code?' });
+    // Check if "minify" is selected
+    console.log("\n")
+    const minify = await confirm({ message: 'Do you want to minify the code?' });
 
-// If minify is selected, ask about additional options
-let additionalOptions = [];
-if (minify) {
-  additionalOptions = await checkbox({
-    message: "Configure Additional Build Options:",
-    choices: [
-      {
-        value: "maxOptimize",
-        name: "Enable maximum optimization",
-        checked: true,
-      },
-      {
-        value: "keepFunctionNames",
-        name: "Keep function names for better error traces",
-        checked: false,
-      },
-      {
-        value: "removeComments",
-        name: "Remove comments from the output",
-        checked: true,
-      },
-      {
-        value: "sourceMaps",
-        name: "Generate source maps",
-        checked: false,
-      },
-      {
-        value: "standalone",
-        name: "Create standalone bundle with all dependencies included",
-        checked: false,
-      }
-    ]
-  });
-}
+    // If minify is selected, ask about additional options
+    let additionalOptions = [];
+    if (minify) {
+      additionalOptions = await checkbox({
+        message: "Configure Additional Build Options:",
+        choices: [
+          {
+            value: "maxOptimize",
+            name: "Enable maximum optimization",
+            checked: true,
+          },
+          {
+            value: "keepFunctionNames",
+            name: "Keep function names for better error traces",
+            checked: false,
+          },
+          {
+            value: "removeComments",
+            name: "Remove comments from the output",
+            checked: true,
+          },
+          {
+            value: "sourceMaps",
+            name: "Generate source maps",
+            checked: false,
+          },
+          {
+            value: "standalone",
+            name: "Create standalone bundle with all dependencies included",
+            checked: false,
+          }
+        ]
+      });
+    }
 
-// Return the final configuration
-return{
-  minify: minify,
-  keepFunctionNames: additionalOptions.includes('keepFunctionNames'),
-  removeComments: additionalOptions.includes('removeComments'),
-  sourceMaps: additionalOptions.includes('sourceMaps'),
-  maxOptimize: additionalOptions.includes('maxOptimize'),
-  standalone: additionalOptions.includes('standalone')
-};
+    // Return the final configuration
+    return {
+      minify: minify,
+      keepFunctionNames: additionalOptions.includes('keepFunctionNames'),
+      removeComments: additionalOptions.includes('removeComments'),
+      sourceMaps: additionalOptions.includes('sourceMaps'),
+      maxOptimize: additionalOptions.includes('maxOptimize'),
+      standalone: additionalOptions.includes('standalone')
+    };
   } catch (err) {
     if (err.name === "ExitPromptError") {
       error("Build cancelled by user.");
@@ -351,10 +351,10 @@ return{
 const options = {
   yes: process.argv.includes("-y") || process.argv.includes("--yes"),
   output: process.argv.includes("-o")
-  ? process.argv[process.argv.indexOf("-o") + 1]
-  : process.argv.includes("--output")
-  ? process.argv[process.argv.indexOf("--output") + 1]
-  : "dist",
+    ? process.argv[process.argv.indexOf("-o") + 1]
+    : process.argv.includes("--output")
+      ? process.argv[process.argv.indexOf("--output") + 1]
+      : "dist",
   maxOptimize: process.argv.includes("--max-optimize"),
   standalone: process.argv.includes("--standalone"),
 };

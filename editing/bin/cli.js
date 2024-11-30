@@ -642,9 +642,9 @@ function invalidCmdHandler(...cmd) {
   console.log(
     tFmt.red,
     tFmt.bold +
-      ` Sorry, the command \`${cmd
-        .join(" ")
-        .trim()}\` is not recognized. Please use a valid command.`
+    ` Sorry, the command \`${cmd
+      .join(" ")
+      .trim()}\` is not recognized. Please use a valid command.`
   );
 
   // Collect all commands including subcommands, formatted with parent-child hierarchy
