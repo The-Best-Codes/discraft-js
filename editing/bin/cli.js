@@ -6,7 +6,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
 import { input, checkbox, select } from "@inquirer/prompts";
-import figlet from 'figlet';
+import figlet from "figlet";
 
 // Functions for colorizing text (dim grey)
 const tColor = (color, text) => color.replace("%s", text);
@@ -16,13 +16,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 let currentPackage = {};
 
 const tFmt = {
-  cyan: '\x1b[36m%s\x1b[0m',
-  green: '\x1b[32m%s\x1b[0m',
-  grey: '\x1b[2m%s\x1b[0m',
+  cyan: "\x1b[36m%s\x1b[0m",
+  green: "\x1b[32m%s\x1b[0m",
+  grey: "\x1b[2m%s\x1b[0m",
   bold: `\x1b[1m`,
-  blue: '\x1b[34m%s\x1b[0m',
-  red: '\x1b[31m%s\x1b[0m'
-}
+  blue: "\x1b[34m%s\x1b[0m",
+  red: "\x1b[31m%s\x1b[0m",
+  yellow: "\x1b[33m%s\x1b[0m",
+};
 
 const availableLicenses = ["MIT", "ISC", "Apache-2.0", "GPL-3.0", "None"];
 
@@ -36,17 +37,22 @@ try {
 
 const showBranding = (color = tFmt.cyan, txt = "Discraft-js") => {
   try {
-    console.log(color,
-      figlet.textSync(txt, {
-        font: "Small",
-        horizontalLayout: "default",
-        verticalLayout: "default",
-        width: 80,
-        whitespaceBreak: true,
-      }, "\n")
+    console.log(
+      color,
+      figlet.textSync(
+        txt,
+        {
+          font: "Small",
+          horizontalLayout: "default",
+          verticalLayout: "default",
+          width: 80,
+          whitespaceBreak: true,
+        },
+        "\n"
+      )
     );
   } catch {}
-}
+};
 
 const program = new Command();
 
@@ -57,46 +63,53 @@ program
 
 program
   .command("init")
-  .argument('[project name]', 'project name')
-  .argument('[project directory]', 'project directory')
-  .addOption(new Option('-li, --license <license>', 'project license').choices(availableLicenses))
-  .addOption(new Option('-ni, --no-install', 'skip deps installation'))
-  .addOption(new Option('-af, --all-features', 'allow all features'))
+  .argument("[project name]", "project name")
+  .argument("[project directory]", "project directory")
+  .addOption(
+    new Option("-li, --license <license>", "project license").choices(
+      availableLicenses
+    )
+  )
+  .addOption(new Option("-ni, --no-install", "skip deps installation"))
+  .addOption(new Option("-af, --all-features", "allow all features"))
   .description("Initialize a new Discraft project")
   .action(async (projectName, projectDirectory, cmdOptions) => {
-    showBranding()
+    showBranding();
     try {
       // Get project details
       const projectConfig = {
         name: projectName,
         directory: projectDirectory,
         additionalFeatures: ["exampleCommands", "envSetup", "readme"],
-        license: cmdOptions.license
+        license: cmdOptions.license,
       };
 
-      if (!projectConfig["name"] || !(/^[a-zA-Z0-9-_]+$/.test(projectConfig.name))) {
+      if (
+        !projectConfig["name"] ||
+        !/^[a-zA-Z0-9-_]+$/.test(projectConfig.name)
+      ) {
         projectConfig["name"] = await input({
           message: `Project name:`,
           default: path.basename(process.cwd()),
           validate: (input) => {
             if (/^[a-zA-Z0-9-_]+$/.test(input)) return true;
             return "Project name may only include letters, numbers, dashes and underscores";
-          }
-        })
-      };
+          },
+        });
+      }
 
       if (!projectConfig.directory) {
         const dir = await input({
           message: `Project directory:`,
           default: projectConfig.name,
-        })
+        });
         projectConfig["directory"] = path.join(process.cwd(), dir);
       }
 
       if (!availableLicenses.includes(projectConfig.license)) {
         projectConfig["license"] = await select({
-          message: 'Project License:',
-          choices: availableLicenses
+          message: "Project License:",
+          choices: availableLicenses,
         });
       }
 
@@ -170,7 +183,7 @@ program
           "src",
           "utils",
           "logger.js"
-        ),        
+        ),
         "utils/commandCache.js": path.join(
           __dirname,
           "..",
@@ -195,30 +208,29 @@ program
         "index.js": path.join(__dirname, "..", "src", "index.js"),
       };
 
-      // Asking for featurers 
-      if(!cmdOptions.allFeatures) {
-       
-      projectConfig["additionalFeatures"] = await checkbox({
-        message: "Select additional features:",
-        choices: [
-          {
-            name: "Example commands",
-            value: "exampleCommands",
-            checked: true,
-          },
-          {
-            name: "Environment setup (.env.example)",
-            value: "envSetup",
-            checked: true,
-          },
-          {
-            name: "README.md with setup instructions",
-            value: "readme",
-            checked: true,
-          },
-        ],
-      });
-    }
+      // Asking for featurers
+      if (!cmdOptions.allFeatures) {
+        projectConfig["additionalFeatures"] = await checkbox({
+          message: "Select additional features:",
+          choices: [
+            {
+              name: "Example commands",
+              value: "exampleCommands",
+              checked: true,
+            },
+            {
+              name: "Environment setup (.env.example)",
+              value: "envSetup",
+              checked: true,
+            },
+            {
+              name: "README.md with setup instructions",
+              value: "readme",
+              checked: true,
+            },
+          ],
+        });
+      }
 
       // Add example commands if selected
       if (projectConfig["additionalFeatures"].includes("exampleCommands")) {
@@ -263,7 +275,10 @@ program
         },
         description: "Bot made with Discraft",
         type: "module",
-        license: projectConfig.license === "None" ? "UNLICENSED" : projectConfig.license,
+        license:
+          projectConfig.license === "None"
+            ? "UNLICENSED"
+            : projectConfig.license,
       };
 
       fs.writeFileSync(
@@ -311,17 +326,19 @@ Bot made with Discraft
 - \`discraft build\`: Build for production
 - \`discraft start\`: Start production server
 
-${projectConfig.additionalFeatures.includes("exampleCommands")
-            ? "\n### Bot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
-            : ""
-          }
+${
+  projectConfig.additionalFeatures.includes("exampleCommands")
+    ? "\n### Bot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
+    : ""
+}
 
 ## License
 
-${projectConfig.license === "None"
-            ? "This project is not licensed."
-            : `This project is licensed under the ${projectConfig.license} License.`
-          }
+${
+  projectConfig.license === "None"
+    ? "This project is not licensed."
+    : `This project is licensed under the ${projectConfig.license} License.`
+}
 `;
         fs.writeFileSync(path.join(projectDir, "README.md"), readme);
       }
@@ -330,19 +347,38 @@ ${projectConfig.license === "None"
       const gitignore = `.env\nnode_modules/\ndist/\n`;
       fs.writeFileSync(path.join(projectDir, ".gitignore"), gitignore);
 
-      // Welcome 
+      // Welcome
       const welcomeUser = () => {
-        console.log(tFmt.green, (tFmt.bold+"\n✨ Discraft project initialized successfully!"));
+        console.log(
+          tFmt.green,
+          tFmt.bold + "\n✨ Discraft project initialized successfully!"
+        );
         console.log(tFmt.grey, "\nNext steps:");
         if (projectConfig.directory !== process.cwd()) {
           console.log(
-            `\tRun ${tColor(tFmt.cyan, `cd ${projectConfig.directory.replace(process.cwd()+"/", "")}`)} to enter your project directory.`
-          );        
+            `\tRun ${tColor(
+              tFmt.cyan,
+              `cd ${projectConfig.directory.replace(process.cwd() + "/", "")}`
+            )} to enter your project directory.`
+          );
         }
-        console.log(`\tAdd your bot token and client ID to ${tColor(tFmt.cyan, ".env")} file`);
-        if (cmdOptions.install == false) console.log(`\tRun ${tColor(tFmt.cyan, "npm install discord.js@latest dotenv@latest discraft@latest")} to install dependencies`);        ;
-        console.log(`\tRun ${tColor(tFmt.cyan, 'npm run dev')} to start development\n`);
-      }
+        console.log(
+          `\tAdd your bot token and client ID to ${tColor(
+            tFmt.cyan,
+            ".env"
+          )} file`
+        );
+        if (cmdOptions.install == false)
+          console.log(
+            `\tRun ${tColor(
+              tFmt.cyan,
+              "npm install discord.js@latest dotenv@latest discraft@latest"
+            )} to install dependencies`
+          );
+        console.log(
+          `\tRun ${tColor(tFmt.cyan, "npm run dev")} to start development\n`
+        );
+      };
 
       // Install latest dependencies
       if (cmdOptions.install !== false) {
@@ -358,19 +394,23 @@ ${projectConfig.license === "None"
 
         npmInstall.on("close", (code) => {
           if (code === 0) {
-            welcomeUser()
+            welcomeUser();
           } else {
-            console.error(tFmt.red,
+            console.error(
+              tFmt.red,
               '\n❌ Failed to install dependencies. Please run "npm install" manually.'
             );
           }
         });
       } else {
-        welcomeUser()
+        welcomeUser();
       }
     } catch (err) {
       if (err.isTtyError) {
-        console.error(tFmt.red, "Prompt couldn't be rendered in the current environment");
+        console.error(
+          tFmt.red,
+          "Prompt couldn't be rendered in the current environment"
+        );
       } else if (err.message === "Aborted") {
         console.log(tFmt.red, "\nProject initialization cancelled.");
       } else {
@@ -394,7 +434,7 @@ program
   .command("dev")
   .description("Start development server")
   .action(() => {
-    showBranding(tFmt.blue)
+    showBranding(tFmt.blue);
     const scriptPath = path.join(__dirname, "..", "scripts", "dev.js");
     activeProcess = spawn("node", [scriptPath], {
       stdio: "inherit",
@@ -420,8 +460,8 @@ program
     true
   )
   .action(() => {
-    showBranding(tFmt.blue, "Building  Discraft-js")
-    console.log("\n")
+    showBranding(tFmt.blue, "Building  Discraft-js");
+    console.log("\n");
     const scriptPath = path.join(__dirname, "..", "scripts", "build.js");
     activeProcess = spawn("node", [scriptPath, ...process.argv.slice(3)], {
       stdio: "inherit",
@@ -449,9 +489,9 @@ program
   .command("start")
   .description("Start production server")
   .option("-d, --dir <dir>", "Build directory", "dist")
-  .action(({dir}) => {
-    showBranding(tFmt.blue, "Starting  Discraft-js")
-    console.log("\n")
+  .action(({ dir }) => {
+    showBranding(tFmt.blue, "Starting  Discraft-js");
+    console.log("\n");
     const scriptPath = path.join(__dirname, "..", "scripts", "start.js");
     activeProcess = spawn("node", [scriptPath, dir], {
       stdio: "inherit",
@@ -500,6 +540,7 @@ program
     new Command("command")
       .description("Create a new Discord bot command")
       .action(async () => {
+        showBranding(tFmt.blue);
         const scriptPath = path.join(
           __dirname,
           "..",
@@ -533,6 +574,7 @@ program
     new Command("event")
       .description("Create a new Discord event handler")
       .action(async () => {
+        showBranding(tFmt.blue);
         const scriptPath = path.join(
           __dirname,
           "..",
@@ -563,11 +605,48 @@ program
       })
   );
 
-  // program.on('command:*', (err) => {
-  //   console.log(err)
-  //   console.log(`Sorry, the command '${err[0]}' is not recognized. Please use a valid command.`);
-  //   process.exit(1);
-  // });
+program.on("command:*", (...cmd) => {
+  showBranding(tFmt.red);
+  console.log(
+    tFmt.red,
+    tFmt.bold +
+      ` Sorry, the command \`${cmd.join(
+        " "
+      )}\` is not recognized. Please use a valid command.`
+  );
+  console.log(
+    tFmt.red,
+    ` Available commands: ${program.commands
+      .map((cmd) => cmd._name || "")
+      .join(", ")}\n`
+  );
+  process.exit(1);
+});
 
+program.addHelpText(
+  "beforeAll",
+  tColor(
+    tFmt.blue,
+    figlet.textSync(
+      "Discraft-js",
+      {
+        font: "Standard",
+        horizontalLayout: "default",
+        verticalLayout: "default",
+        width: 80,
+        whitespaceBreak: true,
+      },
+      "\n"
+    )
+  )
+);
+program.addHelpText("before", tFmt.blue.split("%s")[1]);
+program.addHelpText(
+  "afterAll",
+  `${tColor(
+    tFmt.yellow,
+    "\n⭐ Support Us by Starring Our Repo: https://github.com/The-Best-Codes/discraft-js"
+  )}`
+);
 
 program.parse(process.argv);
