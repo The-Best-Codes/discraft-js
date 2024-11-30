@@ -1,0 +1,38 @@
+name: Build and format codebase
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ["*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Format project
+        run: bun run format
+
+      - name: Build project
+        run: bun run build
+
+      - name: Commit and push changes
+        continue-on-error: true
+        run: |
+          git config --global user.name "discraft-js-ci"
+          git add . 
+          git commit -m "chore: build & format"
+          git push
+
+      - name: Continue
+        run: exit 0

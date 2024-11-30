@@ -1,0 +1,5 @@
+# Ignore everything
+/*
+
+# Allow files inside the 'editing' folder
+!editing/

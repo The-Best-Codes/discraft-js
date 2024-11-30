@@ -7,7 +7,8 @@
   "packageManager": "bun@1.1.36",
   "scripts": {
     "lint": "eslint .",
-    "build": "cd editing && sh export.sh"
+    "build": "cd editing && sh export.sh",
+    "format": "prettier -w editing"
   },
   "bin": {
     "discraft": "bin/cli.js"
@@ -60,6 +61,7 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^7.2.1",
-    "globals": "^15.12.0"
+    "globals": "^15.12.0",
+    "prettier": "3.4.1"
   }
 }
