@@ -1,8 +1,8 @@
-import { Collection, REST, Routes } from "discord.js";
-import { error, info, debug, success } from "../../utils/logger.js";
-import { token, clientId } from "../../config/bot.config.js";
-import { commands } from "./index.js";
-import { commandCache } from "../../utils/commandCache.js";
+import { Collection, REST, Routes } from 'discord.js';
+import { error, info, debug, success } from '../../utils/logger.js';
+import { token, clientId } from '../../config/bot.config.js';
+import { commands } from './index.js';
+import { commandCache } from '../../utils/commandCache.js';
 
 export class CommandHandler {
   constructor(client, startTime) {
@@ -15,7 +15,7 @@ export class CommandHandler {
 
   setupEventListeners() {
     // Handle command interactions
-    this.client.on("interactionCreate", async (interaction) => {
+    this.client.on('interactionCreate', async (interaction) => {
       if (!interaction.isCommand()) return;
 
       const command = this.commands.get(interaction.commandName);
@@ -26,7 +26,7 @@ export class CommandHandler {
         if (command.cacheable) {
           const cachedResult = commandCache.get(
             interaction.commandName,
-            interaction.options.data
+            interaction.options.data,
           );
 
           if (cachedResult) {
@@ -38,14 +38,14 @@ export class CommandHandler {
               // Process subsequent steps
               for (let i = 1; i < cachedResult.steps.length; i++) {
                 const step = cachedResult.steps[i];
-                if (step.type === "edit") {
+                if (step.type === 'edit') {
                   await interaction.editReply(step.content);
-                } else if (step.type === "followUp") {
+                } else if (step.type === 'followUp') {
                   await interaction.followUp(step.content);
                 }
 
                 if (i > 100) {
-                  error("Too many steps in cached response!");
+                  error('Too many steps in cached response!');
                   break;
                 }
               }
@@ -66,13 +66,13 @@ export class CommandHandler {
           commandCache.set(
             interaction.commandName,
             interaction.options.data,
-            result
+            result,
           );
         }
       } catch (err) {
-        error("Error executing command:", err);
+        error('Error executing command:', err);
         const content = {
-          content: "There was an error executing this command!",
+          content: 'There was an error executing this command!',
           ephemeral: true,
         };
         try {
@@ -82,26 +82,26 @@ export class CommandHandler {
             await interaction.reply(content);
           }
         } catch (err) {
-          error("Error replying:", err);
+          error('Error replying:', err);
         }
       }
     });
 
     // Handle guild joins
-    this.client.on("guildCreate", async (guild) => {
+    this.client.on('guildCreate', async (guild) => {
       debug(`Bot joined new guild: ${guild.name} (${guild.id})`);
       await this.registerCommands();
     });
 
     // Register commands when bot is ready
-    this.client.once("ready", async () => {
-      debug("Registering commands...");
+    this.client.once('ready', async () => {
+      debug('Registering commands...');
       await this.registerCommands();
       info(`Bot is ready as ${this.client.user.tag}`);
       debug(
         `Time to register commands: ${
           Date.now() - this.client.readyTimestamp
-        }ms`
+        }ms`,
       );
       success(`Time to online: ${Date.now() - this.serverStartTime}ms`);
     });
@@ -114,13 +114,13 @@ export class CommandHandler {
 
     // Load commands from static imports
     for (const [name, command] of Object.entries(commands)) {
-      if ("data" in command && "execute" in command) {
+      if ('data' in command && 'execute' in command) {
         this.commands.set(command.data.name, command);
         this.commandsData.push(command.data.toJSON());
         debug(`Loaded command: ${command.data.name}`);
       } else {
         error(
-          `The command ${name} is missing required "data" or "execute" property.`
+          `The command ${name} is missing required "data" or "execute" property.`,
         );
       }
     }
@@ -133,7 +133,7 @@ export class CommandHandler {
     const rest = new REST().setToken(token);
     try {
       debug(
-        `Started refreshing ${this.commandsData.length} application (/) commands.`
+        `Started refreshing ${this.commandsData.length} application (/) commands.`,
       );
 
       // Register commands globally
@@ -143,7 +143,7 @@ export class CommandHandler {
 
       info(`Successfully reloaded ${data.length} application (/) commands.`);
     } catch (err) {
-      error("Error registering commands:", err);
+      error('Error registering commands:', err);
     }
   }
 }
