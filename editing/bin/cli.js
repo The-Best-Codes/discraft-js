@@ -33,7 +33,6 @@ try {
   currentPackage = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
 } catch {
   // No need, since user could run discraft init directly from npx, so this err log would be baseless
-  // console.error("Could not access package.json", err);
 }
 
 const showBranding = (color = tFmt.cyan, txt = "Discraft-js") => {
@@ -52,7 +51,9 @@ const showBranding = (color = tFmt.cyan, txt = "Discraft-js") => {
         "\n"
       )
     );
-  } catch {}
+  } catch {
+    console.error("Failed to show branding");
+  }
 };
 
 const program = new Command();
@@ -327,19 +328,17 @@ Bot made with Discraft
 - \`discraft build\`: Build for production
 - \`discraft start\`: Start production server
 
-${
-  projectConfig.additionalFeatures.includes("exampleCommands")
-    ? "\n### Bot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
-    : ""
-}
+${projectConfig.additionalFeatures.includes("exampleCommands")
+            ? "\n### Bot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
+            : ""
+          }
 
 ## License
 
-${
-  projectConfig.license === "None"
-    ? "This project is not licensed."
-    : `This project is licensed under the ${projectConfig.license} License.`
-}
+${projectConfig.license === "None"
+            ? "This project is not licensed."
+            : `This project is licensed under the ${projectConfig.license} License.`
+          }
 `;
         fs.writeFileSync(path.join(projectDir, "README.md"), readme);
       }
