@@ -1,26 +1,58 @@
 #!/usr/bin/env node
 
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import { spawn } from "child_process";
-import inquirer from "inquirer";
+import { input, checkbox, select } from "@inquirer/prompts";
+import figlet from "figlet";
 
 // Functions for colorizing text (dim grey)
-const tColorGray = (str) => `\x1b[38;2;170;170;170m${str}\x1b[0m`;
+const tColor = (color, text) => color.replace("%s", text);
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let currentPackage = {};
+
+const tFmt = {
+  cyan: "\x1b[36m%s\x1b[0m",
+  green: "\x1b[32m%s\x1b[0m",
+  grey: "\x1b[2m%s\x1b[0m",
+  bold: `\x1b[1m`,
+  blue: "\x1b[34m%s\x1b[0m",
+  red: "\x1b[31m%s\x1b[0m",
+  yellow: "\x1b[33m%s\x1b[0m",
+};
+
+const availableLicenses = ["MIT", "ISC", "Apache-2.0", "GPL-3.0", "None"];
 
 // Ensure the package.json exists
 try {
   const packagePath = path.resolve(__dirname, "..", "package.json");
   currentPackage = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
 } catch (err) {
-  console.error("Could not access package.json", err);
+  // console.error("Could not access package.json", err);
 }
+
+const showBranding = (color = tFmt.cyan, txt = "Discraft-js") => {
+  try {
+    console.log(
+      color,
+      figlet.textSync(
+        txt,
+        {
+          font: "Small",
+          horizontalLayout: "default",
+          verticalLayout: "default",
+          width: 80,
+          whitespaceBreak: true,
+        },
+        "\n"
+      )
+    );
+  } catch {}
+};
 
 const program = new Command();
 
@@ -31,67 +63,58 @@ program
 
 program
   .command("init")
+  .argument("[project name]", "project name")
+  .argument("[project directory]", "project directory")
+  .addOption(
+    new Option("-li, --license <license>", "project license").choices(
+      availableLicenses
+    )
+  )
+  .addOption(new Option("-ni, --no-install", "skip deps installation"))
+  .addOption(new Option("-af, --all-features", "allow all features"))
   .description("Initialize a new Discraft project")
-  .action(async () => {
+  .action(async (projectName, projectDirectory, cmdOptions) => {
+    showBranding();
     try {
       // Get project details
-      const answers = await inquirer.prompt([
-        {
-          type: "input",
-          name: "name",
-          message: "Project name:",
+      const projectConfig = {
+        name: projectName,
+        directory: projectDirectory,
+        additionalFeatures: ["exampleCommands", "envSetup", "readme"],
+        license: cmdOptions.license,
+      };
+
+      if (
+        !projectConfig["name"] ||
+        !/^[a-zA-Z0-9-_]+$/.test(projectConfig.name)
+      ) {
+        projectConfig["name"] = await input({
+          message: `Project name:`,
           default: path.basename(process.cwd()),
           validate: (input) => {
             if (/^[a-zA-Z0-9-_]+$/.test(input)) return true;
             return "Project name may only include letters, numbers, dashes and underscores";
           },
-        },
-        {
-          type: "input",
-          name: "directory",
-          message: "Project directory:",
-          default: "",
-          filter: (input) => (input.trim() === "(current)" ? "" : input.trim()),
-          transformer: (input) => {
-            if (input.trim() === "" || input.trim() === "(current)") {
-              return tColorGray("(current)");
-            }
-            return input;
-          },
-        },
-        {
-          type: "list",
-          name: "license",
-          message: "License:",
-          choices: ["MIT", "ISC", "Apache-2.0", "GPL-3.0", "None"],
-          default: "MIT",
-        },
-        {
-          type: "checkbox",
-          name: "features",
-          message: "Select additional features:",
-          choices: [
-            {
-              name: "Example commands",
-              value: "exampleCommands",
-              checked: true,
-            },
-            {
-              name: "Environment setup (.env.example)",
-              value: "envSetup",
-              checked: true,
-            },
-            {
-              name: "README.md with setup instructions",
-              value: "readme",
-              checked: true,
-            },
-          ],
-        },
-      ]);
+        });
+      }
+
+      if (!projectConfig.directory) {
+        const dir = await input({
+          message: `Project directory:`,
+          default: projectConfig.name,
+        });
+        projectConfig["directory"] = path.join(process.cwd(), dir);
+      }
+
+      if (!availableLicenses.includes(projectConfig.license)) {
+        projectConfig["license"] = await select({
+          message: "Project License:",
+          choices: availableLicenses,
+        });
+      }
 
       // Set up project directory
-      const projectDir = path.resolve(process.cwd(), answers.directory);
+      const projectDir = path.resolve(process.cwd(), projectConfig.directory);
 
       if (!fs.existsSync(projectDir)) {
         fs.mkdirSync(projectDir, { recursive: true });
@@ -161,6 +184,13 @@ program
           "utils",
           "logger.js"
         ),
+        "utils/commandCache.js": path.join(
+          __dirname,
+          "..",
+          "src",
+          "utils",
+          "commandCache.js"
+        ),
         "events/ready.js": path.join(
           __dirname,
           "..",
@@ -178,8 +208,32 @@ program
         "index.js": path.join(__dirname, "..", "src", "index.js"),
       };
 
+      // Asking for featurers
+      if (!cmdOptions.allFeatures) {
+        projectConfig["additionalFeatures"] = await checkbox({
+          message: "Select additional features:",
+          choices: [
+            {
+              name: "Example commands",
+              value: "exampleCommands",
+              checked: true,
+            },
+            {
+              name: "Environment setup (.env.example)",
+              value: "envSetup",
+              checked: true,
+            },
+            {
+              name: "README.md with setup instructions",
+              value: "readme",
+              checked: true,
+            },
+          ],
+        });
+      }
+
       // Add example commands if selected
-      if (answers.features.includes("exampleCommands")) {
+      if (projectConfig["additionalFeatures"].includes("exampleCommands")) {
         templateFiles["commands/ping.js"] = path.join(
           __dirname,
           "..",
@@ -212,7 +266,7 @@ program
 
       // Create package.json
       const pkg = {
-        name: answers.name,
+        name: projectConfig.name,
         version: "1.0.0",
         scripts: {
           dev: "discraft dev",
@@ -221,7 +275,10 @@ program
         },
         description: "Bot made with Discraft",
         type: "module",
-        license: answers.license === "None" ? "UNLICENSED" : answers.license,
+        license:
+          projectConfig.license === "None"
+            ? "UNLICENSED"
+            : projectConfig.license,
       };
 
       fs.writeFileSync(
@@ -230,18 +287,18 @@ program
       );
 
       // Create .env and .env.example if selected
-      if (answers.features.includes("envSetup")) {
-        const envExample =
-          "TOKEN=your_bot_token_here\nCLIENT_ID=your_client_id_here\n";
-        fs.writeFileSync(path.join(projectDir, ".env.example"), envExample);
+      if (projectConfig["additionalFeatures"].includes("envSetup")) {
+        const envFileContnet =
+          "# Environment Variables for your Discraft bot\nTOKEN=<your_bot_token_here>\nCLIENT_ID=<your_client_id_here>\n";
+        fs.writeFileSync(path.join(projectDir, ".env.example"), envFileContnet);
         if (!fs.existsSync(path.join(projectDir, ".env"))) {
-          fs.writeFileSync(path.join(projectDir, ".env"), envExample);
+          fs.writeFileSync(path.join(projectDir, ".env"), envFileContnet);
         }
       }
 
       // Create README.md if selected
-      if (answers.features.includes("readme")) {
-        const readme = `# ${answers.name}
+      if (projectConfig["additionalFeatures"].includes("readme")) {
+        const readme = `# ${projectConfig.name}
 Bot made with Discraft
 
 ## Setup
@@ -259,73 +316,105 @@ Bot made with Discraft
 
 3. Start development:
    \`\`\`bash
-   discraft dev
+   npm run dev
    \`\`\`
 
 ## Commands
 
-Development:
+### Development:
 - \`discraft dev\`: Start development server
 - \`discraft build\`: Build for production
 - \`discraft start\`: Start production server
 
-${answers.features.includes("exampleCommands")
-            ? "\nBot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
-            : ""
-          }
+${
+  projectConfig.additionalFeatures.includes("exampleCommands")
+    ? "\n### Bot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
+    : ""
+}
 
 ## License
 
-${answers.license === "None"
-            ? "This project is not licensed."
-            : `This project is licensed under the ${answers.license} License.`
-          }
+${
+  projectConfig.license === "None"
+    ? "This project is not licensed."
+    : `This project is licensed under the ${projectConfig.license} License.`
+}
 `;
         fs.writeFileSync(path.join(projectDir, "README.md"), readme);
       }
 
       // Create .gitignore
-      const gitignore = `.env
-node_modules/
-dist/
-`;
+      const gitignore = `.env\nnode_modules/\ndist/\n`;
       fs.writeFileSync(path.join(projectDir, ".gitignore"), gitignore);
 
-      // Install latest dependencies
-      console.log("\n📦 Installing dependencies...");
-      const npmInstall = spawn(
-        "npm",
-        ["install", "discord.js@latest", "dotenv@latest"],
-        {
-          stdio: "inherit",
-          cwd: projectDir,
-        }
-      );
-
-      npmInstall.on("close", (code) => {
-        if (code === 0) {
-          console.log("\n✨ Discraft project initialized successfully!");
-          console.log("\nNext steps:");
-          if (answers.directory !== process.cwd()) {
-            console.log(
-              `Run \`cd ${answers.directory}\` to enter your project directory.`
-            );
-          }
-          console.log("Add your bot token and client ID to .env file");
-          console.log('Run "discraft dev" to start development');
-        } else {
-          console.error(
-            '\n❌ Failed to install dependencies. Please run "npm install" manually.'
+      // Welcome
+      const welcomeUser = () => {
+        console.log(
+          tFmt.green,
+          tFmt.bold + "\n✨ Discraft project initialized successfully!"
+        );
+        console.log(tFmt.grey, "\nNext steps:");
+        if (projectConfig.directory !== process.cwd()) {
+          console.log(
+            `\tRun ${tColor(
+              tFmt.cyan,
+              `cd ${projectConfig.directory.replace(process.cwd() + "/", "")}`
+            )} to enter your project directory.`
           );
         }
-      });
+        console.log(
+          `\tAdd your bot token and client ID to ${tColor(
+            tFmt.cyan,
+            ".env"
+          )} file`
+        );
+        if (cmdOptions.install == false)
+          console.log(
+            `\tRun ${tColor(
+              tFmt.cyan,
+              "npm install discord.js@latest dotenv@latest discraft@latest"
+            )} to install dependencies`
+          );
+        console.log(
+          `\tRun ${tColor(tFmt.cyan, "npm run dev")} to start development\n`
+        );
+      };
+
+      // Install latest dependencies
+      if (cmdOptions.install !== false) {
+        console.log(tColor(tFmt.blue, "\n📦  Installing dependencies..."));
+        const npmInstall = spawn(
+          "npm",
+          ["install", "discord.js@latest", "dotenv@latest", "discraft@latest"],
+          {
+            stdio: "inherit",
+            cwd: projectDir,
+          }
+        );
+
+        npmInstall.on("close", (code) => {
+          if (code === 0) {
+            welcomeUser();
+          } else {
+            console.error(
+              tFmt.red,
+              '\n❌ Failed to install dependencies. Please run "npm install" manually.'
+            );
+          }
+        });
+      } else {
+        welcomeUser();
+      }
     } catch (err) {
       if (err.isTtyError) {
-        console.error("Prompt couldn't be rendered in the current environment");
+        console.error(
+          tFmt.red,
+          "Prompt couldn't be rendered in the current environment"
+        );
       } else if (err.message === "Aborted") {
-        console.log("\nProject initialization cancelled.");
+        console.log(tFmt.red, "\nProject initialization cancelled.");
       } else {
-        console.error("Error during initialization:", err);
+        console.error(tFmt.red, "Error during initialization:\n", err);
       }
       process.exit(1);
     }
@@ -345,6 +434,7 @@ program
   .command("dev")
   .description("Start development server")
   .action(() => {
+    showBranding(tFmt.blue);
     const scriptPath = path.join(__dirname, "..", "scripts", "dev.js");
     activeProcess = spawn("node", [scriptPath], {
       stdio: "inherit",
@@ -370,6 +460,8 @@ program
     true
   )
   .action(() => {
+    showBranding(tFmt.blue, "Building  Discraft-js");
+    console.log("\n");
     const scriptPath = path.join(__dirname, "..", "scripts", "build.js");
     activeProcess = spawn("node", [scriptPath, ...process.argv.slice(3)], {
       stdio: "inherit",
@@ -396,9 +488,12 @@ program
 program
   .command("start")
   .description("Start production server")
-  .action(() => {
+  .option("-d, --dir <dir>", "Build directory", "dist")
+  .action(({ dir }) => {
+    showBranding(tFmt.blue, "Starting  Discraft-js");
+    console.log("\n");
     const scriptPath = path.join(__dirname, "..", "scripts", "start.js");
-    activeProcess = spawn("node", [scriptPath], {
+    activeProcess = spawn("node", [scriptPath, dir], {
       stdio: "inherit",
       cwd: process.cwd(),
       env: { ...process.env, DISCRAFT_ROOT: __dirname },
@@ -445,6 +540,7 @@ program
     new Command("command")
       .description("Create a new Discord bot command")
       .action(async () => {
+        showBranding(tFmt.blue);
         const scriptPath = path.join(
           __dirname,
           "..",
@@ -478,6 +574,7 @@ program
     new Command("event")
       .description("Create a new Discord event handler")
       .action(async () => {
+        showBranding(tFmt.blue);
         const scriptPath = path.join(
           __dirname,
           "..",
@@ -507,5 +604,49 @@ program
         }
       })
   );
+
+program.on("command:*", (...cmd) => {
+  showBranding(tFmt.red);
+  console.log(
+    tFmt.red,
+    tFmt.bold +
+      ` Sorry, the command \`${cmd.join(
+        " "
+      )}\` is not recognized. Please use a valid command.`
+  );
+  console.log(
+    tFmt.red,
+    ` Available commands: ${program.commands
+      .map((cmd) => cmd._name || "")
+      .join(", ")}\n`
+  );
+  process.exit(1);
+});
+
+program.addHelpText(
+  "beforeAll",
+  tColor(
+    tFmt.blue,
+    figlet.textSync(
+      "Discraft-js",
+      {
+        font: "Standard",
+        horizontalLayout: "default",
+        verticalLayout: "default",
+        width: 80,
+        whitespaceBreak: true,
+      },
+      "\n"
+    )
+  )
+);
+program.addHelpText("before", tFmt.blue.split("%s")[1]);
+program.addHelpText(
+  "afterAll",
+  `${tColor(
+    tFmt.yellow,
+    "\n⭐ Support Us by Starring Our Repo: https://github.com/The-Best-Codes/discraft-js"
+  )}`
+);
 
 program.parse(process.argv);
