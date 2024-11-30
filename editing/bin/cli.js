@@ -31,7 +31,8 @@ const availableLicenses = ["MIT", "ISC", "Apache-2.0", "GPL-3.0", "None"];
 try {
   const packagePath = path.resolve(__dirname, "..", "package.json");
   currentPackage = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
-} catch (err) {
+} catch {
+  // No need, since user could run discraft init directly from npx, so this err log would be baseless
   // console.error("Could not access package.json", err);
 }
 
@@ -535,6 +536,7 @@ program
 
 program
   .command("add")
+  .on("command:*", invalidCmdHandler)
   .description("Add new components to your bot")
   .addCommand(
     new Command("command")
@@ -605,23 +607,7 @@ program
       })
   );
 
-program.on("command:*", (...cmd) => {
-  showBranding(tFmt.red);
-  console.log(
-    tFmt.red,
-    tFmt.bold +
-      ` Sorry, the command \`${cmd.join(
-        " "
-      )}\` is not recognized. Please use a valid command.`
-  );
-  console.log(
-    tFmt.red,
-    ` Available commands: ${program.commands
-      .map((cmd) => cmd._name || "")
-      .join(", ")}\n`
-  );
-  process.exit(1);
-});
+program.on("command:*", invalidCmdHandler);
 
 program.addHelpText(
   "beforeAll",
@@ -650,3 +636,36 @@ program.addHelpText(
 );
 
 program.parse(process.argv);
+
+function invalidCmdHandler(...cmd) {
+  showBranding(tFmt.red);
+
+  console.log(
+    tFmt.red,
+    tFmt.bold +
+      ` Sorry, the command \`${cmd
+        .join(" ")
+        .trim()}\` is not recognized. Please use a valid command.`
+  );
+
+  // Collect all commands including subcommands, formatted with parent-child hierarchy
+  const allCommands = [];
+
+  program.commands.forEach((command) => {
+    let parentCmd = command._name || "";
+    let subcommands = command.commands || [];
+
+    // Add the parent command itself
+    allCommands.push(parentCmd);
+
+    // Add subcommands under the parent command
+    subcommands.forEach((subcommand) => {
+      allCommands.push(`${parentCmd} ${subcommand._name}`);
+    });
+  });
+
+  // Print available commands (parent commands and their subcommands)
+  console.log(tFmt.red, ` Available commands: ${allCommands.join(", ")}`);
+
+  process.exit(1);
+}

@@ -42,7 +42,7 @@ async function generateEvent() {
     eventConfig["type"] = await search({
       message: "Event type:",
       required: true,
-      source: async (input, { signal }) => {
+      source: async (input) => {
         const options = Object.keys(Events).map((key) => ({
           name: key,
           value: key,

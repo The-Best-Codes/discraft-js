@@ -115,7 +115,7 @@ async function generateCommand() {
       try {
         const commandOptionType = await search({
           message: "What type of data should this option accept?",
-          source: async (input, { signal }) => {
+          source: async (input) => {
             const options = [
               {
                 name: "String (text)",
