@@ -31,6 +31,7 @@ const availableLicenses = ["MIT", "ISC", "Apache-2.0", "GPL-3.0", "None"];
 try {
   const packagePath = path.resolve(__dirname, "..", "package.json");
   currentPackage = JSON.parse(fs.readFileSync(packagePath, "utf-8"));
+  // eslint-disable-next-line no-unused-vars
 } catch (err) {
   // console.error("Could not access package.json", err);
 }
@@ -51,7 +52,9 @@ const showBranding = (color = tFmt.cyan, txt = "Discraft-js") => {
         "\n"
       )
     );
-  } catch {}
+  } catch {
+    console.error("Failed to show branding");
+  }
 };
 
 const program = new Command();
@@ -326,19 +329,17 @@ Bot made with Discraft
 - \`discraft build\`: Build for production
 - \`discraft start\`: Start production server
 
-${
-  projectConfig.additionalFeatures.includes("exampleCommands")
-    ? "\n### Bot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
-    : ""
-}
+${projectConfig.additionalFeatures.includes("exampleCommands")
+            ? "\n### Bot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
+            : ""
+          }
 
 ## License
 
-${
-  projectConfig.license === "None"
-    ? "This project is not licensed."
-    : `This project is licensed under the ${projectConfig.license} License.`
-}
+${projectConfig.license === "None"
+            ? "This project is not licensed."
+            : `This project is licensed under the ${projectConfig.license} License.`
+          }
 `;
         fs.writeFileSync(path.join(projectDir, "README.md"), readme);
       }
@@ -610,9 +611,9 @@ program.on("command:*", (...cmd) => {
   console.log(
     tFmt.red,
     tFmt.bold +
-      ` Sorry, the command \`${cmd.join(
-        " "
-      )}\` is not recognized. Please use a valid command.`
+    ` Sorry, the command \`${cmd.join(
+      " "
+    )}\` is not recognized. Please use a valid command.`
   );
   console.log(
     tFmt.red,
