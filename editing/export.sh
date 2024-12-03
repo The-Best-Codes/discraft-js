@@ -1,66 +1,88 @@
-#!/bin/bash
+#!/bin/sh
 
-# IMPORTANT: This script should always be run from the directory it is in
+# Set color codes
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+BOLD='\033[1m'
 
-echo "IMPORTANT: This script should always be run from the directory it is in"
-echo "Exporting..."
+# Function to print styled messages
+print_status() {
+    printf "${BLUE}${BOLD}[STATUS]${NC} %s\n" "$1"
+}
+
+print_success() {
+    printf "${GREEN}${BOLD}[SUCCESS]${NC} %s\n" "$1"
+}
+
+print_error() {
+    printf "${RED}${BOLD}[ERROR]${NC} %s\n" "$1"
+}
+
+# Check if running from correct directory
+if [ ! -f "$(basename "$0")" ]; then
+    print_error "This script must be run from its containing directory"
+    exit 1
+fi
+
+# Find required tools
+TERSER="../node_modules/.bin/terser"
+PARALLEL=$(which parallel)
+
+if [ ! -x "$PARALLEL" ]; then
+    print_error "GNU Parallel is required. Please install it first."
+    exit 1
+fi
+
+if [ ! -f "$TERSER" ]; then
+    print_error "Terser not found at $TERSER"
+    exit 1
+fi
+
+print_status "Starting export process..."
 
 # Clear and create the minified directory
-echo "Clearing minified directory..."
+print_status "Clearing minified directory..."
 rm -rf ./minified
 mkdir -p ./minified
 
-# Find path to local terser
-TERSER="../node_modules/.bin/terser"
-
-# Function to process files recursively
-process_files() {
-    local source_dir=$1
-    local terser_args=$2
+# Function to process directory with parallel execution
+process_directory() {
+    dir=$1
+    terser_args=$2
     
-    # Create corresponding directory structure in minified/
-    echo "Creating minified directory structure..."
-    find "$source_dir" -type d -exec mkdir -p "./minified/{}" \;
+    if [ ! -d "$dir" ]; then
+        return 0
+    fi
     
-    # Find all .js files and minify them
-    echo "Minifying .js files in $source_dir..."
-    find "$source_dir" -type f -name "*.js" | while read -r file; do
-        # Get the relative path
-        rel_path=${file#./}
-        # Create minified version
-        echo "Running: $TERSER $file $terser_args -o ./minified/$rel_path"
-        "$TERSER" "$file" $terser_args -o "./minified/$rel_path"
-        # Copy to parent directory maintaining directory structure
-        mkdir -p "../$(dirname "$rel_path")"
-        cp "./minified/$rel_path" "../$rel_path"
-    done
+    print_status "Processing $dir/..."
+    
+    # Create all required directories in one go
+    find "$dir" -type d -print0 | xargs -0 -I{} mkdir -p "./minified/{}"
+    
+    # Process files in parallel
+    find "$dir" -type f -name "*.js" -print0 | \
+    $PARALLEL -0 --bar --eta \
+    "mkdir -p ./minified/\$(dirname {}) && \
+    \"$TERSER\" {} $terser_args -o ./minified/{} 2>/dev/null && \
+    mkdir -p ../\$(dirname {}) && \
+    cp ./minified/{} ../{} && \
+    echo \"✓ {}\" || echo \"✗ Failed: {}\""
 }
 
-# Process scripts/ and common/ with aggressive minification
-if [ -d "./scripts" ]; then
-    process_files "scripts" "--compress sequences=true,dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=false --mangle --format comments=false"
-fi
-
-if [ -d "./common" ]; then
-    process_files "common" "--compress sequences=true,dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=false --mangle --format comments=false"
-fi
-
-# Process bin/ with preserved comments but still mangled
-if [ -d "./bin" ]; then
-    process_files "bin" "--mangle --format comments=true,beautify=false"
-fi
-
-# Process src/ with preserved comments but still mangled
-if [ -d "./src" ]; then
-    process_files "src" "--mangle --format comments=true,beautify=false"
-fi
-
-echo "Removing minified directory..."
-rm -rf ./minified
+# Process all directories in parallel if they exist
+(
+[ -d "./scripts" ] && process_directory "scripts" "--compress sequences=true,dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=false --mangle --format comments=false" &
+[ -d "./common" ] && process_directory "common" "--compress sequences=true,dead_code=true,conditionals=true,booleans=true,unused=true,if_return=true,join_vars=true,drop_console=false --mangle --format comments=false" &
+[ -d "./bin" ] && process_directory "bin" "--mangle --format comments=true,beautify=false" &
+[ -d "./src" ] && process_directory "src" "--mangle --format comments=true,beautify=false" &
+wait
+)
 
 # Remove the src/discraft/commands/index.js file and src/discraft/events/index.js files
-echo "Removing src/discraft/commands/index.js and src/discraft/events/index.js..."
+print_status "Removing index.js files..."
 rm -f ../src/discraft/commands/index.js
 rm -f ../src/discraft/events/index.js
 
-echo "Done exporting."
+print_success "Export completed successfully!"
