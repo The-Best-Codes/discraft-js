@@ -47,7 +47,7 @@
     "@rollup/plugin-replace": "^6.0.1",
     "commander": "^12.1.0",
     "discord.js": "^14.16.3",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "figlet": "^1.8.0",
     "nodemon": "^3.1.7",
     "rollup": "^4.28.0",
@@ -60,6 +60,6 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^7.2.1",
-    "globals": "^15.12.0"
+    "globals": "^15.13.0"
   }
 }

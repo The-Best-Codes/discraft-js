@@ -1,0 +1,18 @@
+{
+  "name": "playground",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "discraft dev",
+    "build": "discraft build",
+    "start": "discraft start"
+  },
+  "description": "Bot made with Discraft",
+  "type": "module",
+  "license": "MIT",
+  "devDependencies": {
+    "discraft": "^1.5.8"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3"
+  }
+}
