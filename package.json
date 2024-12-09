@@ -1,9 +1,10 @@
 {
   "name": "discraft",
-  "version": "1.5.9-beta.1",
+  "version": "1.5.9-beta.2",
   "description": "Like Next.js, but for Discord bots",
   "main": "index.js",
   "type": "module",
+  "readme": "README.md",
   "packageManager": "bun@1.1.38",
   "scripts": {
     "lint": "eslint .",
