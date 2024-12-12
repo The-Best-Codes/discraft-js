@@ -1,9 +1,9 @@
+import fs from "fs";
 import nodemon from "nodemon";
-import { info, warn, error, success } from "../common/utils/logger.js";
+import path from "path";
+import { error, info, success, warn } from "../common/utils/logger.js";
 import generateCommands from "./compile/genCommands.js";
 import generateEvents from "./compile/genEvents.js";
-import path from "path";
-import fs from "fs";
 
 try {
   // Get the user's project directory

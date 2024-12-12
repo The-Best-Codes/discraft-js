@@ -1,5 +1,5 @@
-import { logLevel } from "../../src/config/bot.config.js";
 import consola from "consola";
+import { logLevel } from "../../src/config/bot.config.js";
 
 export const log = consola.log;
 export const info = consola.info;

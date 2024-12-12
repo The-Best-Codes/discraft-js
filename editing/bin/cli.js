@@ -1,12 +1,12 @@
 #!/usr/bin/env node
 
-import { Command, Option } from "commander";
-import path from "path";
-import fs from "fs";
-import { fileURLToPath } from "url";
+import { checkbox, input, select } from "@inquirer/prompts";
 import { spawn } from "child_process";
-import { input, checkbox, select } from "@inquirer/prompts";
+import { Command, Option } from "commander";
 import figlet from "figlet";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // Functions for colorizing text (dim grey)
 const tColor = (color, text) => color.replace("%s", text);

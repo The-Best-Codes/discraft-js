@@ -1,8 +1,8 @@
 import { Collection, REST, Routes } from "discord.js";
-import { error, info, debug, success } from "../../utils/logger.js";
-import { token, clientId } from "../../config/bot.config.js";
-import { commands } from "./index.js";
+import { clientId, token } from "../../config/bot.config.js";
 import { commandCache } from "../../utils/commandCache.js";
+import { debug, error, info, success } from "../../utils/logger.js";
+import { commands } from "./index.js";
 
 export class CommandHandler {
   constructor(client, startTime) {

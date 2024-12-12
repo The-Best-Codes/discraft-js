@@ -1,6 +1,6 @@
 {
   "name": "discraft",
-  "version": "1.5.9-beta.4",
+  "version": "1.5.9-beta.5",
   "description": "Like Next.js, but for Discord bots",
   "main": "index.js",
   "type": "module",
@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.16.0",
+    "@rollup/plugin-terser": "^0.4.4",
     "@types/figlet": "^1.7.0",
     "esbuild": "^0.24.0",
     "eslint": "^9.16.0",

@@ -1,8 +1,8 @@
+import { input, search } from "@inquirer/prompts";
+import { Events } from "discord.js";
 import fs from "fs";
 import path from "path";
-import { search, input } from "@inquirer/prompts";
-import { success, error } from "../common/utils/logger.js";
-import { Events } from "discord.js";
+import { error, success } from "../common/utils/logger.js";
 
 async function generateEvent() {
   // Throw error if src/ directory doesn't exist

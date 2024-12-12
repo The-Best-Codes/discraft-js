@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
-import { info, error } from "../common/utils/logger.js";
 import fs from "fs";
 import path from "path";
+import { error, info } from "../common/utils/logger.js";
 
 const projectDir = process.cwd();
 const distDir = process.argv[process.argv.length - 1];

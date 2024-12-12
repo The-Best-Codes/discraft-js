@@ -1,17 +1,17 @@
-import fs from "fs";
-import path from "path";
-import { info, error, success } from "../common/utils/logger.js";
 import { checkbox, confirm } from "@inquirer/prompts";
-import { rollup } from "rollup";
-import { getFileSizes, displaySizeComparison } from "./utils/fileSizeUtil.js";
-import { minifyWithTerser } from "./utils/minifyUtilTerser.js";
-import generateCommands from "./compile/genCommands.js";
-import generateEvents from "./compile/genEvents.js";
-import { nodeResolve } from "@rollup/plugin-node-resolve";
+import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
+import { nodeResolve } from "@rollup/plugin-node-resolve";
 import replace from "@rollup/plugin-replace";
-import babel from "@rollup/plugin-babel";
+import fs from "fs";
+import path from "path";
+import { rollup } from "rollup";
+import { error, info, success } from "../common/utils/logger.js";
+import generateCommands from "./compile/genCommands.js";
+import generateEvents from "./compile/genEvents.js";
+import { displaySizeComparison, getFileSizes } from "./utils/fileSizeUtil.js";
+import { minifyWithTerser } from "./utils/minifyUtilTerser.js";
 
 const projectDir = process.cwd();
 const srcDir = path.join(projectDir, "src");
@@ -44,7 +44,7 @@ process.on("SIGINT", async () => {
   process.exit(0);
 });
 
-async function analyzeDependencies(bundlePath, rollupBundle) {
+async function analyzeDependencies(_bundlePath, rollupBundle) {
   const externalDeps = new Set();
 
   // Analyze the chunk modules from rollup

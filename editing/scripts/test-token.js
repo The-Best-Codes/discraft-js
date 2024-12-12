@@ -1,6 +1,6 @@
 import { Client, GatewayIntentBits } from "discord.js";
-import { error, success } from "../common/utils/logger.js";
 import dotenv from "dotenv";
+import { error, success } from "../common/utils/logger.js";
 
 dotenv.config();
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import{Command,Option}from"commander";import path from"path";import fs from"fs";import{fileURLToPath}from"url";import{spawn}from"child_process";import{input,checkbox,select}from"@inquirer/prompts";import figlet from"figlet";
+import{checkbox,input,select}from"@inquirer/prompts";import{spawn}from"child_process";import{Command,Option}from"commander";import figlet from"figlet";import fs from"fs";import path from"path";import{fileURLToPath}from"url";
 // Functions for colorizing text (dim grey)
 const tColor=(e,t)=>e.replace("%s",t);const __dirname=path.dirname(fileURLToPath(import.meta.url));let currentPackage={};const tFmt={cyan:"[36m%s[0m",green:"[32m%s[0m",grey:"[2m%s[0m",bold:`[1m`,blue:"[34m%s[0m",red:"[31m%s[0m",yellow:"[33m%s[0m"};const availableLicenses=["MIT","ISC","Apache-2.0","GPL-3.0","None"];
 // Ensure the package.json exists

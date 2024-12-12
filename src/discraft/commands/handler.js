@@ -1,4 +1,4 @@
-import{Collection,REST,Routes}from"discord.js";import{error,info,debug,success}from"../../utils/logger.js";import{token,clientId}from"../../config/bot.config.js";import{commands}from"./index.js";import{commandCache}from"../../utils/commandCache.js";export class CommandHandler{constructor(e,t){this.client=e;this.commands=new Collection;this.commandsData=[];this.setupEventListeners();this.serverStartTime=t}setupEventListeners(){
+import{Collection,REST,Routes}from"discord.js";import{clientId,token}from"../../config/bot.config.js";import{commandCache}from"../../utils/commandCache.js";import{debug,error,info,success}from"../../utils/logger.js";import{commands}from"./index.js";export class CommandHandler{constructor(e,t){this.client=e;this.commands=new Collection;this.commandsData=[];this.setupEventListeners();this.serverStartTime=t}setupEventListeners(){
 // Handle command interactions
 this.client.on("interactionCreate",(async e=>{if(!e.isCommand())return;const t=this.commands.get(e.commandName);if(!t)return;try{
 // Check cache for command result if command is cacheable

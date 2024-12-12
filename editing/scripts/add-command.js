@@ -1,7 +1,7 @@
+import { checkbox, confirm, input, search } from "@inquirer/prompts";
 import fs from "fs";
 import path from "path";
-import { input, confirm, search, checkbox } from "@inquirer/prompts";
-import { success, error } from "../common/utils/logger.js";
+import { error, success } from "../common/utils/logger.js";
 
 async function generateCommand() {
   // Throw error if src/ directory doesn't exist

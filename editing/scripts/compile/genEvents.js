@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { info, debug, error } from "../../common/utils/logger.js";
+import { debug, error, info } from "../../common/utils/logger.js";
 
 export default function generateEvents(srcDir) {
   try {
