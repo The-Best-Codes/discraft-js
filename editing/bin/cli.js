@@ -370,13 +370,14 @@ ${
             ".env",
           )} file`,
         );
-        if (cmdOptions.install === false)
+        if (cmdOptions.install !== true) {
           console.log(
             `\tRun ${tColor(
               tFmt.cyan,
               "npm install discord.js@latest dotenv@latest discraft@latest",
             )} to install dependencies`,
           );
+        }
         console.log(
           `\tRun ${tColor(tFmt.cyan, "npm run dev")} to start development\n`,
         );
