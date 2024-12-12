@@ -26,7 +26,7 @@ export class CommandHandler {
         if (command.cacheable) {
           const cachedResult = commandCache.get(
             interaction.commandName,
-            interaction.options.data
+            interaction.options.data,
           );
 
           if (cachedResult) {
@@ -66,7 +66,7 @@ export class CommandHandler {
           commandCache.set(
             interaction.commandName,
             interaction.options.data,
-            result
+            result,
           );
         }
       } catch (err) {
@@ -101,7 +101,7 @@ export class CommandHandler {
       debug(
         `Time to register commands: ${
           Date.now() - this.client.readyTimestamp
-        }ms`
+        }ms`,
       );
       success(`Time to online: ${Date.now() - this.serverStartTime}ms`);
     });
@@ -120,7 +120,7 @@ export class CommandHandler {
         debug(`Loaded command: ${command.data.name}`);
       } else {
         error(
-          `The command ${name} is missing required "data" or "execute" property.`
+          `The command ${name} is missing required "data" or "execute" property.`,
         );
       }
     }
@@ -133,7 +133,7 @@ export class CommandHandler {
     const rest = new REST().setToken(token);
     try {
       debug(
-        `Started refreshing ${this.commandsData.length} application (/) commands.`
+        `Started refreshing ${this.commandsData.length} application (/) commands.`,
       );
 
       // Register commands globally

@@ -4,13 +4,13 @@ import fs from "fs";
 import path from "path";
 
 const projectDir = process.cwd();
-const distDir =  process.argv[process.argv.length-1];
-const distPath =  path.join(projectDir, distDir);
+const distDir = process.argv[process.argv.length - 1];
+const distPath = path.join(projectDir, distDir);
 const bundlePath = path.join(distPath, "bundle.js");
 
 // Check if dist directory and bundle.js exist
 if (!fs.existsSync(distPath) || !fs.existsSync(bundlePath)) {
-  error("Build not found! Please run \"discraft build\" first");
+  error('Build not found! Please run "discraft build" first');
   info("You can create a production build by running: discraft build");
   process.exit(1);
 }
@@ -19,7 +19,7 @@ info("Starting bot in production mode...");
 
 const bot = spawn("node", ["-r", "dotenv/config", bundlePath], {
   stdio: "inherit",
-  cwd: projectDir
+  cwd: projectDir,
 });
 
 bot.on("error", (err) => {

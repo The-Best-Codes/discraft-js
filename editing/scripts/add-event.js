@@ -13,12 +13,12 @@ async function generateEvent() {
   if (!doesSrcDirExist) {
     if (isSrcDir) {
       error(
-        'You are in the "src/" directory. You should be in the root of your Discraft project.'
+        'You are in the "src/" directory. You should be in the root of your Discraft project.',
       );
       process.exit(1);
     } else {
       error(
-        'The "src/" directory does not exist. Please run "discraft init" to initialize a project, or ensure you are in the root of your Discraft project.'
+        'The "src/" directory does not exist. Please run "discraft init" to initialize a project, or ensure you are in the root of your Discraft project.',
       );
       process.exit(1);
     }
@@ -55,7 +55,7 @@ async function generateEvent() {
         // Filter options based on input
         return options
           .filter((option) =>
-            option.name.toLowerCase().includes(input.toLowerCase())
+            option.name.toLowerCase().includes(input.toLowerCase()),
           )
           .map((option) => ({
             name: `${option.name}`, // Show both name and description
@@ -95,12 +95,12 @@ import { Events } from "discord.js";
 
 export default (client) => {
     client.on(Events.${eventConfig.type}, (${
-    eventConfig.type === "messageCreate" ? "message" : "event"
-  }) => {
+      eventConfig.type === "messageCreate" ? "message" : "event"
+    }) => {
         debug("'${eventConfig.name}' event triggered");
         try {
             // Add your event handling logic here
-            
+
         } catch (err) {
             error("Error in '${eventConfig.name}' event handler:", err);
         }
@@ -112,7 +112,7 @@ export default (client) => {
     fs.writeFileSync(eventPath, eventContent);
     success(
       `Created event handler at src/events/${eventConfig.name}.js\n` +
-        `Event will trigger on: ${eventConfig.type}`
+        `Event will trigger on: ${eventConfig.type}`,
     );
     return {
       name: eventConfig.name,

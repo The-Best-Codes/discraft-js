@@ -1,25 +1,25 @@
-import js from '@eslint/js';
-import globals from 'globals';
-import importPlugin from 'eslint-plugin-import';
-import promisePlugin from 'eslint-plugin-promise';
-import nodePlugin from 'eslint-plugin-node';
+import js from "@eslint/js";
+import globals from "globals";
+import importPlugin from "eslint-plugin-import";
+import promisePlugin from "eslint-plugin-promise";
+import nodePlugin from "eslint-plugin-node";
 
 // Function to trim whitespace from global names
 const trimGlobals = (obj) => {
   return Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => [key.trim(), value])
+    Object.entries(obj).map(([key, value]) => [key.trim(), value]),
   );
 };
 
 export default [
   {
-    files: ['**/*.js'],
+    files: ["**/*.js"],
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: 'module',
+      sourceType: "module",
       globals: {
         ...trimGlobals(globals.browser),
-        ...trimGlobals(globals.node)
+        ...trimGlobals(globals.node),
       },
     },
     plugins: {
@@ -30,15 +30,15 @@ export default [
     },
     rules: {
       ...js.configs.recommended.rules,
-      'import/named': 'error',
-      'promise/always-return': 'error',
-      'promise/no-return-wrap': 'error',
-      'no-unused-vars': 'warn',
-      'consistent-return': 'error',
-      'camelcase': 'warn',
+      "import/named": "error",
+      "promise/always-return": "error",
+      "promise/no-return-wrap": "error",
+      "no-unused-vars": "warn",
+      "consistent-return": "error",
+      camelcase: "warn",
     },
   },
   {
-    ignores: ['dist/**', 'node_modules/**'],
+    ignores: ["dist/**", "node_modules/**"],
   },
-]
+];

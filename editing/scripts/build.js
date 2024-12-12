@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { info, error, success, log } from "../common/utils/logger.js";
+import { info, error, success } from "../common/utils/logger.js";
 import { checkbox, confirm } from "@inquirer/prompts";
 import { rollup } from "rollup";
 import { getFileSizes, displaySizeComparison } from "./utils/fileSizeUtil.js";
@@ -12,8 +12,6 @@ import commonjs from "@rollup/plugin-commonjs";
 import json from "@rollup/plugin-json";
 import replace from "@rollup/plugin-replace";
 import babel from "@rollup/plugin-babel";
-import { exec } from "child_process";
-
 
 const projectDir = process.cwd();
 const srcDir = path.join(projectDir, "src");
@@ -127,15 +125,17 @@ async function build(options) {
         exports: "auto",
         minifyInternalExports: true,
       },
-      external: config.standalone ? [] : (id) => {
-        return (
-          !id.startsWith(".") &&
-          !id.startsWith("/") &&
-          !id.startsWith("src/") &&
-          !id.startsWith("../") &&
-          !id.startsWith("./")
-        );
-      },
+      external: config.standalone
+        ? []
+        : (id) => {
+            return (
+              !id.startsWith(".") &&
+              !id.startsWith("/") &&
+              !id.startsWith("src/") &&
+              !id.startsWith("../") &&
+              !id.startsWith("./")
+            );
+          },
       plugins: [
         replace({
           preventAssignment: true,
@@ -194,7 +194,7 @@ async function build(options) {
       });
       await fs.promises.writeFile(
         path.join(outputDir, "package.json"),
-        JSON.stringify(packageJson, null, 2)
+        JSON.stringify(packageJson, null, 2),
       );
       info("Generated package.json with dependencies");
     } else {
@@ -217,7 +217,7 @@ async function build(options) {
 
     info(`Output location: ${outputDir}`);
     success(
-      "Build completed successfully in " + (Date.now() - startTime) + "ms"
+      "Build completed successfully in " + (Date.now() - startTime) + "ms",
     );
   } catch (err) {
     if (err.name === "ExitPromptError") {
@@ -248,8 +248,10 @@ async function getBuildConfig(options) {
     }
 
     // Check if "minify" is selected
-    console.log("\n")
-    const minify = await confirm({ message: 'Do you want to minify the code?' });
+    console.log("\n");
+    const minify = await confirm({
+      message: "Do you want to minify the code?",
+    });
 
     // If minify is selected, ask about additional options
     let additionalOptions = [];
@@ -281,19 +283,19 @@ async function getBuildConfig(options) {
             value: "standalone",
             name: "Create standalone bundle with all dependencies included",
             checked: false,
-          }
-        ]
+          },
+        ],
       });
     }
 
     // Return the final configuration
     return {
       minify: minify,
-      keepFunctionNames: additionalOptions.includes('keepFunctionNames'),
-      removeComments: additionalOptions.includes('removeComments'),
-      sourceMaps: additionalOptions.includes('sourceMaps'),
-      maxOptimize: additionalOptions.includes('maxOptimize'),
-      standalone: additionalOptions.includes('standalone')
+      keepFunctionNames: additionalOptions.includes("keepFunctionNames"),
+      removeComments: additionalOptions.includes("removeComments"),
+      sourceMaps: additionalOptions.includes("sourceMaps"),
+      maxOptimize: additionalOptions.includes("maxOptimize"),
+      standalone: additionalOptions.includes("standalone"),
     };
   } catch (err) {
     if (err.name === "ExitPromptError") {

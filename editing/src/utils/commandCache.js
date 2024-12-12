@@ -144,7 +144,7 @@ class CommandCache {
       size: this.cache.size,
       maxSize: this.maxSize,
       memoryUsage: `${(this.getCurrentMemoryUsage() / (1024 * 1024)).toFixed(
-        2
+        2,
       )}MB`,
       maxMemory: `${this.maxMemoryMB}MB`,
     };

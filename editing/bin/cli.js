@@ -35,7 +35,7 @@ try {
   // No need, since user could run discraft init directly from npx, so this err log would be baseless
 }
 
-const showBranding = (color = tFmt.cyan, txt = "Discraft-js") => {
+const showBranding = (color = tFmt.cyan, txt = "Discraft") => {
   try {
     console.log(
       color,
@@ -48,8 +48,8 @@ const showBranding = (color = tFmt.cyan, txt = "Discraft-js") => {
           width: 80,
           whitespaceBreak: true,
         },
-        "\n"
-      )
+        "\n",
+      ),
     );
   } catch {
     console.error("Failed to show branding");
@@ -69,10 +69,10 @@ program
   .argument("[project directory]", "project directory")
   .addOption(
     new Option("-li, --license <license>", "project license").choices(
-      availableLicenses
-    )
+      availableLicenses,
+    ),
   )
-  .addOption(new Option("-ni, --no-install", "skip deps installation"))
+  .addOption(new Option("-i, --install", "install dependencies"))
   .addOption(new Option("-af, --all-features", "allow all features"))
   .description("Initialize a new Discraft project")
   .action(async (projectName, projectDirectory, cmdOptions) => {
@@ -154,7 +154,7 @@ program
           "..",
           "src",
           "config",
-          "bot.config.js"
+          "bot.config.js",
         ),
         "discraft/commands/handler.js": path.join(
           __dirname,
@@ -162,7 +162,7 @@ program
           "src",
           "discraft",
           "commands",
-          "handler.js"
+          "handler.js",
         ),
         "discraft/events/handler.js": path.join(
           __dirname,
@@ -170,42 +170,42 @@ program
           "src",
           "discraft",
           "events",
-          "handler.js"
+          "handler.js",
         ),
         "services/discord.js": path.join(
           __dirname,
           "..",
           "src",
           "services",
-          "discord.js"
+          "discord.js",
         ),
         "utils/logger.js": path.join(
           __dirname,
           "..",
           "src",
           "utils",
-          "logger.js"
+          "logger.js",
         ),
         "utils/commandCache.js": path.join(
           __dirname,
           "..",
           "src",
           "utils",
-          "commandCache.js"
+          "commandCache.js",
         ),
         "events/ready.js": path.join(
           __dirname,
           "..",
           "src",
           "events",
-          "ready.js"
+          "ready.js",
         ),
         "events/error.js": path.join(
           __dirname,
           "..",
           "src",
           "events",
-          "error.js"
+          "error.js",
         ),
         "index.js": path.join(__dirname, "..", "src", "index.js"),
       };
@@ -241,21 +241,21 @@ program
           "..",
           "src",
           "commands",
-          "ping.js"
+          "ping.js",
         );
         templateFiles["commands/random.js"] = path.join(
           __dirname,
           "..",
           "src",
           "commands",
-          "random.js"
+          "random.js",
         );
         templateFiles["commands/status.js"] = path.join(
           __dirname,
           "..",
           "src",
           "commands",
-          "status.js"
+          "status.js",
         );
       }
 
@@ -285,7 +285,7 @@ program
 
       fs.writeFileSync(
         path.join(projectDir, "package.json"),
-        JSON.stringify(pkg, null, 2)
+        JSON.stringify(pkg, null, 2),
       );
 
       // Create .env and .env.example if selected
@@ -328,17 +328,19 @@ Bot made with Discraft
 - \`discraft build\`: Build for production
 - \`discraft start\`: Start production server
 
-${projectConfig.additionalFeatures.includes("exampleCommands")
-            ? "\n### Bot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
-            : ""
-          }
+${
+  projectConfig.additionalFeatures.includes("exampleCommands")
+    ? "\n### Bot Commands:\n- `/ping`: Check bot latency\n\n- `/random [pick, number]`: Pick something random out of a list; or pick a random number between the min and max\n\n- `/status`: Check bot and server status"
+    : ""
+}
 
 ## License
 
-${projectConfig.license === "None"
-            ? "This project is not licensed."
-            : `This project is licensed under the ${projectConfig.license} License.`
-          }
+${
+  projectConfig.license === "None"
+    ? "This project is not licensed."
+    : `This project is licensed under the ${projectConfig.license} License.`
+}
 `;
         fs.writeFileSync(path.join(projectDir, "README.md"), readme);
       }
@@ -351,37 +353,37 @@ ${projectConfig.license === "None"
       const welcomeUser = () => {
         console.log(
           tFmt.green,
-          tFmt.bold + "\n✨ Discraft project initialized successfully!"
+          tFmt.bold + "\n✨ Discraft project initialized successfully!",
         );
         console.log(tFmt.grey, "\nNext steps:");
         if (projectConfig.directory !== process.cwd()) {
           console.log(
             `\tRun ${tColor(
               tFmt.cyan,
-              `cd ${projectConfig.directory.replace(process.cwd() + "/", "")}`
-            )} to enter your project directory.`
+              `cd ${projectConfig.directory.replace(process.cwd() + "/", "")}`,
+            )} to enter your project directory.`,
           );
         }
         console.log(
           `\tAdd your bot token and client ID to ${tColor(
             tFmt.cyan,
-            ".env"
-          )} file`
+            ".env",
+          )} file`,
         );
-        if (cmdOptions.install == false)
+        if (cmdOptions.install === false)
           console.log(
             `\tRun ${tColor(
               tFmt.cyan,
-              "npm install discord.js@latest dotenv@latest discraft@latest"
-            )} to install dependencies`
+              "npm install discord.js@latest dotenv@latest discraft@latest",
+            )} to install dependencies`,
           );
         console.log(
-          `\tRun ${tColor(tFmt.cyan, "npm run dev")} to start development\n`
+          `\tRun ${tColor(tFmt.cyan, "npm run dev")} to start development\n`,
         );
       };
 
       // Install latest dependencies
-      if (cmdOptions.install !== false) {
+      if (cmdOptions.install === true) {
         console.log(tColor(tFmt.blue, "\n📦  Installing dependencies..."));
         const npmInstall = spawn(
           "npm",
@@ -389,7 +391,7 @@ ${projectConfig.license === "None"
           {
             stdio: "inherit",
             cwd: projectDir,
-          }
+          },
         );
 
         npmInstall.on("close", (code) => {
@@ -398,7 +400,7 @@ ${projectConfig.license === "None"
           } else {
             console.error(
               tFmt.red,
-              '\n❌ Failed to install dependencies. Please run "npm install" manually.'
+              '\n❌ Failed to install dependencies. Please run "npm install" manually.',
             );
           }
         });
@@ -409,7 +411,7 @@ ${projectConfig.license === "None"
       if (err.isTtyError) {
         console.error(
           tFmt.red,
-          "Prompt couldn't be rendered in the current environment"
+          "Prompt couldn't be rendered in the current environment",
         );
       } else if (err.message === "Aborted") {
         console.log(tFmt.red, "\nProject initialization cancelled.");
@@ -457,7 +459,7 @@ program
   .option(
     "--max-optimize",
     "Enable maximum optimization (slower build, faster runtime)",
-    true
+    true,
   )
   .action(() => {
     showBranding(tFmt.blue, "Building  Discraft-js");
@@ -473,7 +475,7 @@ program
           __dirname,
           "..",
           "node_modules",
-          "@babel/preset-env"
+          "@babel/preset-env",
         ),
       },
     });
@@ -517,7 +519,7 @@ program
           __dirname,
           "..",
           "scripts",
-          "test-token.js"
+          "test-token.js",
         );
         activeProcess = spawn("node", [scriptPath], {
           stdio: "inherit",
@@ -530,7 +532,7 @@ program
             console.error(`Token check process exited with code ${code}`);
           }
         });
-      })
+      }),
   );
 
 program
@@ -546,7 +548,7 @@ program
           __dirname,
           "..",
           "scripts",
-          "add-command.js"
+          "add-command.js",
         );
         try {
           const child = spawn("node", [scriptPath], {
@@ -569,7 +571,7 @@ program
           console.error("Error executing command generator:", err);
           process.exit(1);
         }
-      })
+      }),
   )
   .addCommand(
     new Command("event")
@@ -580,7 +582,7 @@ program
           __dirname,
           "..",
           "scripts",
-          "add-event.js"
+          "add-event.js",
         );
         try {
           const child = spawn("node", [scriptPath], {
@@ -603,7 +605,7 @@ program
           console.error("Error executing event generator:", err);
           process.exit(1);
         }
-      })
+      }),
   );
 
 program.on("command:*", invalidCmdHandler);
@@ -621,17 +623,17 @@ program.addHelpText(
         width: 80,
         whitespaceBreak: true,
       },
-      "\n"
-    )
-  )
+      "\n",
+    ),
+  ),
 );
 program.addHelpText("before", tFmt.blue.split("%s")[1]);
 program.addHelpText(
   "afterAll",
   `${tColor(
     tFmt.yellow,
-    "\n⭐ Support Us by Starring Our Repo: https://github.com/The-Best-Codes/discraft-js"
-  )}`
+    "\n⭐ Support Us by Starring Our Repo: https://github.com/The-Best-Codes/discraft-js",
+  )}`,
 );
 
 program.parse(process.argv);
@@ -642,9 +644,9 @@ function invalidCmdHandler(...cmd) {
   console.log(
     tFmt.red,
     tFmt.bold +
-    ` Sorry, the command \`${cmd
-      .join(" ")
-      .trim()}\` is not recognized. Please use a valid command.`
+      ` Sorry, the command \`${cmd
+        .join(" ")
+        .trim()}\` is not recognized. Please use a valid command.`,
   );
 
   // Collect all commands including subcommands, formatted with parent-child hierarchy
@@ -662,6 +664,9 @@ function invalidCmdHandler(...cmd) {
       allCommands.push(`${parentCmd} ${subcommand._name}`);
     });
   });
+
+  // Add the help command
+  allCommands.push("help");
 
   // Print available commands (parent commands and their subcommands)
   console.log(tFmt.red, ` Available commands: ${allCommands.join(", ")}`);

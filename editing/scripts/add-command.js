@@ -11,12 +11,12 @@ async function generateCommand() {
   if (!doesSrcDirExist) {
     if (isSrcDir) {
       error(
-        'You are in the "src/" directory. You should be in the root of your Discraft project.'
+        'You are in the "src/" directory. You should be in the root of your Discraft project.',
       );
       process.exit(1);
     } else {
       error(
-        'The "src/" directory does not exist. Please run "discraft init" to initialize a project, or ensure you are in the root of your Discraft project.'
+        'The "src/" directory does not exist. Please run "discraft init" to initialize a project, or ensure you are in the root of your Discraft project.',
       );
       process.exit(1);
     }
@@ -103,7 +103,7 @@ async function generateCommand() {
 
   if (addCmdOptions) {
     console.log(
-      "\nAdding options to your command... For each option, you'll need to specify:"
+      "\nAdding options to your command... For each option, you'll need to specify:",
     );
     console.log("- The type of data it accepts (text, number, etc.)");
     console.log('- The name of the option (e.g., "user" in /ban <user>)');
@@ -173,7 +173,9 @@ async function generateCommand() {
               .filter(
                 (option) =>
                   option.name.toLowerCase().includes(input.toLowerCase()) ||
-                  option.description.toLowerCase().includes(input.toLowerCase())
+                  option.description
+                    .toLowerCase()
+                    .includes(input.toLowerCase()),
               )
               .map((option) => ({
                 name: `${option.name} - ${option.description}`, // Show both name and description
@@ -395,7 +397,7 @@ async function generateCommand() {
   fs.writeFileSync(filePath, commandContent);
 
   success(
-    `Command ${commandConfig["name"]} created successfully at ${filePath}`
+    `Command ${commandConfig["name"]} created successfully at ${filePath}`,
   );
 
   // Return the command details for potential further use

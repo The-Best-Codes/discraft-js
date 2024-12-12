@@ -52,7 +52,7 @@ export const error = (message, ...args) => {
 export const trace = (message, ...args) => {
   console.trace(
     `${colors.fg.crimson}[TRACE]${colors.reset} ${message}`,
-    ...args
+    ...args,
   );
 };
 

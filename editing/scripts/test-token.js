@@ -8,7 +8,7 @@ const token = process.env.BOT_TOKEN;
 
 if (!token) {
   error(
-    "BOT_TOKEN is not set in the environment variables. Make sure you are in the root of your project and have an environment file (like .env) with the bot token."
+    "BOT_TOKEN is not set in the environment variables. Make sure you are in the root of your project and have an environment file (like .env) with the bot token.",
   );
   process.exit(1);
 }
