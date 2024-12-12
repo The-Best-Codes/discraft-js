@@ -374,7 +374,7 @@ ${
           console.log(
             `\tRun ${tColor(
               tFmt.cyan,
-              "npm install discord.js@latest dotenv@latest discraft@latest",
+              "npm install discord.js@latest dotenv@latest",
             )} to install dependencies`,
           );
         }
@@ -388,7 +388,7 @@ ${
         console.log(tColor(tFmt.blue, "\n📦  Installing dependencies..."));
         const npmInstall = spawn(
           "npm",
-          ["install", "discord.js@latest", "dotenv@latest", "discraft@latest"],
+          ["install", "discord.js@latest", "dotenv@latest"],
           {
             stdio: "inherit",
             cwd: projectDir,
@@ -463,7 +463,7 @@ program
     true,
   )
   .action(() => {
-    showBranding(tFmt.blue, "Building  Discraft-js");
+    showBranding(tFmt.blue, "Building  Discraft");
     console.log("\n");
     const scriptPath = path.join(__dirname, "..", "scripts", "build.js");
     activeProcess = spawn("node", [scriptPath, ...process.argv.slice(3)], {
@@ -493,7 +493,7 @@ program
   .description("Start production server")
   .option("-d, --dir <dir>", "Build directory", "dist")
   .action(({ dir }) => {
-    showBranding(tFmt.blue, "Starting  Discraft-js");
+    showBranding(tFmt.blue, "Starting  Discraft");
     console.log("\n");
     const scriptPath = path.join(__dirname, "..", "scripts", "start.js");
     activeProcess = spawn("node", [scriptPath, dir], {
@@ -616,7 +616,7 @@ program.addHelpText(
   tColor(
     tFmt.blue,
     figlet.textSync(
-      "Discraft-js",
+      "Discraft",
       {
         font: "Standard",
         horizontalLayout: "default",

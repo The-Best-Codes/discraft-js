@@ -10,7 +10,7 @@
   "type": "module",
   "license": "MIT",
   "devDependencies": {
-    "discraft": "^1.5.8"
+    "discraft": "^1.5.9"
   },
   "dependencies": {
     "discord.js": "^14.16.3"
