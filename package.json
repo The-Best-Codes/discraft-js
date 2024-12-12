@@ -1,6 +1,6 @@
 {
   "name": "discraft",
-  "version": "1.5.9-beta.5",
+  "version": "1.5.9",
   "description": "Like Next.js, but for Discord bots",
   "main": "index.js",
   "type": "module",

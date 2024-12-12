@@ -78,22 +78,11 @@ export default {
     commonjs(),
     terser({
       compress: {
-        passes: 2,
-        unsafe: true,
-        pure_getters: true,
-        sequences: true,
-        dead_code: true,
-        conditionals: true,
-        booleans: true,
-        unused: true,
-        if_return: true,
-        join_vars: true,
         drop_console: false
       },
       mangle: true,
       format: {
-        comments: false,
-        wrap_iife: true
+        comments: false
       }
     })
   ]
