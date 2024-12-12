@@ -1,3 +1,4 @@
+import presetEnv from "@babel/preset-env";
 import { checkbox, confirm } from "@inquirer/prompts";
 import babel from "@rollup/plugin-babel";
 import commonjs from "@rollup/plugin-commonjs";
@@ -155,7 +156,7 @@ async function build(options) {
           babelrc: false,
           presets: [
             [
-              "@babel/preset-env",
+              presetEnv,
               {
                 targets: { node: "current" },
                 modules: false,
