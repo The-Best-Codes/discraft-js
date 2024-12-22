@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "readme": "README.md",
-  "packageManager": "bun@1.1.41",
+  "packageManager": "bun@1.1.42",
   "scripts": {
     "lint": "eslint .",
     "build": "cd editing && bash export.sh"
