@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { CancelPromptError } from "@inquirer/core";
 import { program } from "commander";
 import consola from "consola";
 import { version } from "../../package.json";
@@ -42,11 +43,18 @@ program
 program
   .command("init")
   .description("Initialize a new Discraft project")
-  .action(() => {
-    init().catch((error) => {
-      consola.error("An error occurred during initialization:", error);
-      process.exit(1);
-    });
+  .action(async () => {
+    try {
+      await init();
+    } catch (error) {
+      if (error instanceof CancelPromptError) {
+        consola.info("Initialization cancelled by user.");
+        process.exit(0);
+      } else {
+        consola.error("An error occurred during initialization:", error);
+        process.exit(1);
+      }
+    }
   });
 
 program.parse(process.argv);

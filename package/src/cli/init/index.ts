@@ -68,6 +68,7 @@ async function init() {
   ]);
 
   let projectDir = currentWorkingDirectory;
+  let projectName = path.basename(currentWorkingDirectory);
 
   if (!useCurrentDir.useCurrent) {
     const projectDirResponse = await inquirer.prompt([
@@ -78,6 +79,7 @@ async function init() {
         default: "my-project",
       },
     ]);
+    projectName = projectDirResponse.projectName;
     projectDir = path.join(
       currentWorkingDirectory,
       projectDirResponse.projectName,
@@ -120,9 +122,43 @@ async function init() {
     }
 
     consola.success("Project initialized successfully!");
-    consola.info(
-      `Go to ${path.relative(currentWorkingDirectory, projectDir)} and run "${packageManagerResponse.packageManager} run build" and "${packageManagerResponse.packageManager} run start" to get started.`,
-    );
+
+    const pmNpmDefault =
+      packageManagerResponse.packageManager === "none"
+        ? "npm"
+        : packageManagerResponse.packageManager;
+    // Enhanced instructions
+    if (projectDir === currentWorkingDirectory) {
+      consola.info(`
+        Next Steps:
+        1. Copy the .env.example file to .env:
+
+           cp .env.example .env
+
+        2. Open the .env file and fill in your bot's token and any other necessary environment variables.
+        3. Run "${pmNpmDefault} run build" to compile your TypeScript code.
+        4. Run "${pmNpmDefault} run start" to start your bot.
+
+        You are all set! Happy bot building!
+    `);
+    } else {
+      consola.info(`
+        Next Steps:
+        1. Go to your project directory:
+
+           cd ${path.relative(currentWorkingDirectory, projectDir)}
+
+        2. Copy the .env.example file to .env:
+
+           cp .env.example .env
+
+        3. Open the .env file and fill in your bot's token and any other necessary environment variables.
+        4. Run "${pmNpmDefault} run build" to compile your TypeScript code.
+        5. Run "${pmNpmDefault} run start" to start your bot.
+
+        You are all set! Happy bot building!
+    `);
+    }
   } catch (error: any) {
     consola.error(`Failed to initialize project: ${error.message}`);
   }
