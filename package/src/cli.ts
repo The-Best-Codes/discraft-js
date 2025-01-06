@@ -43,9 +43,27 @@ program
 program
   .command("init")
   .description("Initialize a new Discraft project")
-  .action(async () => {
+  .option(
+    "-d, --dir <directory>",
+    "Project directory (defaults to current directory)",
+  )
+  .option(
+    "-p, --package-manager <pm>",
+    "Package manager to use (npm, yarn, pnpm, bun, or none)",
+    (value) => {
+      if (value && !["npm", "yarn", "pnpm", "bun", "none"].includes(value)) {
+        consola.error(
+          "Invalid package manager value. Must be 'npm', 'yarn', 'pnpm', 'bun', or 'none'.",
+        );
+        process.exit(1);
+      }
+      return value;
+    },
+  )
+  .option("--skip-install", "Skip dependency installation")
+  .action(async (options) => {
     try {
-      await init();
+      await init(options);
     } catch (error) {
       if (error instanceof CancelPromptError) {
         consola.info("Initialization cancelled by user.");
