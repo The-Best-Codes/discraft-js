@@ -1,0 +1,20 @@
+{
+  "name": "discraft-bot",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Bot created with discraft",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "discraft start",
+    "build": "discraft build",
+    "dev": "discraft dev"
+  },
+  "devDependencies": {
+    "discraft": "1.6.2-beta.0"
+  },
+  "dependencies": {
+    "consola": "^3.3.3",
+    "discord.js": "^14.17.2"
+  }
+}

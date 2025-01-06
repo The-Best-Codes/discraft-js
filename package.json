@@ -1,26 +1,15 @@
 {
   "name": "discraft",
-  "version": "1.6.1",
-  "description": "Like Next.js, but for Discord bots",
-  "main": "index.js",
+  "version": "1.6.2-beta.0",
+  "description": "Ultimate Discord bot framework",
   "type": "module",
-  "readme": "README.md",
   "packageManager": "bun@1.1.42",
   "scripts": {
-    "lint": "eslint .",
-    "build": "cd editing && bash export.sh"
+    "prepublish": "cd package && bun build.ts"
   },
   "bin": {
-    "discraft": "bin/cli.js"
+    "discraft": "package/dist/cli.js"
   },
-  "files": [
-    "bin/",
-    "scripts/",
-    "src/",
-    "common/",
-    "rollup.config.js",
-    ".babelrc"
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/The-Best-Codes/discraft-js.git"
@@ -31,40 +20,28 @@
     "framework",
     "cli"
   ],
+  "files": [
+    "package/dist",
+    "README.md",
+    "LICENSE"
+  ],
   "author": "The-Best-Codes",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/The-Best-Codes/discraft-js/issues"
   },
   "homepage": "https://github.com/The-Best-Codes/discraft-js#readme",
-  "dependencies": {
-    "@babel/core": "^7.26.0",
-    "@babel/preset-env": "^7.26.0",
-    "@inquirer/prompts": "^7.2.1",
-    "@rollup/plugin-babel": "^6.0.4",
-    "@rollup/plugin-commonjs": "^28.0.2",
-    "@rollup/plugin-json": "^6.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.0",
-    "@rollup/plugin-replace": "^6.0.2",
-    "commander": "^13.0.0",
-    "consola": "^3.3.0",
-    "discord.js": "^14.16.3",
-    "dotenv": "^16.4.7",
-    "figlet": "^1.8.0",
-    "nodemon": "^3.1.9",
-    "rollup": "^4.29.1",
-    "terser": "^5.37.0"
-  },
   "devDependencies": {
-    "@eslint/js": "^9.17.0",
-    "@rollup/plugin-terser": "^0.4.4",
-    "@types/babel__preset-env": "^7.9.7",
-    "@types/figlet": "^1.7.0",
-    "esbuild": "^0.24.2",
-    "eslint": "^9.17.0",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^7.2.1",
-    "globals": "^15.14.0"
+    "@types/bun": "^1.1.14"
+  },
+  "peerDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "consola": "^3.3.3",
+    "glob": "^11.0.0",
+    "inquirer": "^12.3.0",
+    "bun": "^1.1.42"
   }
 }
