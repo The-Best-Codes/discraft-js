@@ -1,15 +1,6 @@
 # discraft
 
-To install dependencies:
+For now, see:
+https://github.com/The-Best-Codes/discraft-js/blob/8947955b1e719599ac99ee62746ebb7e3b1275e6/README.md
 
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.42. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+This package is being redone.

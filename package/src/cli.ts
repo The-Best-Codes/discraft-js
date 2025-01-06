@@ -4,6 +4,7 @@ import { program } from "commander";
 import consola from "consola";
 import { version } from "../../package.json";
 import { build } from "./cli/build";
+import { init } from "./cli/init";
 import { start } from "./cli/start";
 
 program
@@ -34,6 +35,16 @@ program
   .action((options) => {
     build({ builder: options.builder }).catch((error) => {
       consola.error("An error occurred during build:", error);
+      process.exit(1);
+    });
+  });
+
+program
+  .command("init")
+  .description("Initialize a new Discraft project")
+  .action(() => {
+    init().catch((error) => {
+      consola.error("An error occurred during initialization:", error);
       process.exit(1);
     });
   });

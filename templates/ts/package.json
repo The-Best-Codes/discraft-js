@@ -10,7 +10,7 @@
     "build": "discraft build"
   },
   "devDependencies": {
-    "discraft": "1.6.2-beta.3"
+    "discraft": "latest"
   },
   "dependencies": {
     "consola": "^3.3.3",
