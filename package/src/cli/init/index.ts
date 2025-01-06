@@ -16,7 +16,6 @@ async function copyTemplate(templatePath: string, projectPath: string) {
     "events",
     "utils",
     ".env.example",
-    ".gitignore",
     "index.ts",
     "package.json",
     "tsconfig.json",
@@ -36,6 +35,20 @@ async function copyTemplate(templatePath: string, projectPath: string) {
       consola.error(`Failed to copy ${sourcePath} to ${destPath}`, e);
       throw new Error(`Failed to copy template files, ${e}`);
     }
+  }
+
+  // Handle .gitignore specially
+  const gitignoreSourcePath = path.join(templatePath, "gitignore.template");
+  const gitignoreDestPath = path.join(projectPath, ".gitignore");
+
+  try {
+    await fs.copyFile(gitignoreSourcePath, gitignoreDestPath);
+  } catch (e) {
+    consola.error(
+      `Failed to copy ${gitignoreSourcePath} to ${gitignoreDestPath}`,
+      e,
+    );
+    throw new Error(`Failed to copy .gitignore template file, ${e}`);
   }
 }
 
