@@ -1,6 +1,6 @@
 {
   "name": "discraft",
-  "version": "1.6.2-beta.10",
+  "version": "1.6.2-beta.11",
   "description": "Ultimate Discord bot framework",
   "type": "module",
   "packageManager": "bun@1.1.42",
@@ -30,6 +30,17 @@
     "LICENSE"
   ],
   "author": "The-Best-Codes",
+  "contributors": [
+    {
+      "name": "BestCodes",
+      "email": "hello@bestcodes.dev",
+      "url": "https://bestcodes.dev"
+    },
+    {
+      "name": "Arnav K",
+      "url": "https://github.com/ArnavK-09"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/The-Best-Codes/discraft-js/issues"
