@@ -41,7 +41,8 @@ async function copyTemplate(templatePath: string, projectPath: string) {
 
 async function init() {
   const currentWorkingDirectory = process.cwd();
-  const packageRoot = path.join(__dirname, "..", "..", ".."); // Navigate to package root from here
+  // Navigate to the discraft package root
+  const packageRoot = path.join(__dirname, "..", "..");
   const templatePath = path.join(packageRoot, "templates", "ts");
 
   const useCurrentDir = await inquirer.prompt([
