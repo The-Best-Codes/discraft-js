@@ -1,23 +1,32 @@
 import { spawn } from "child_process";
 import consola from "consola";
 import { build as esbuild } from "esbuild";
+import { nodeExternalsPlugin } from "esbuild-node-externals";
 import { promisify } from "util";
 
 const exec = promisify(require("child_process").exec);
+
+type Builder = "esbuild" | "bun";
 
 async function build(
   env: "dev" | "prod",
   entryPoint: string,
   outputDir: string,
+  builder?: Builder,
 ) {
-  let runner = "esbuild";
-  try {
-    // Use bun --version to check for bun existence
-    await exec("bun --version");
-    runner = "bun";
-    consola.info("Bun detected. Using Bun CLI for build.");
-  } catch (error) {
-    consola.info("Bun not detected. Using esbuild for build.");
+  let runner: Builder = builder || "esbuild";
+
+  if (!builder) {
+    try {
+      // Use bun --version to check for bun existence
+      await exec("bun --version");
+      runner = "bun";
+      consola.verbose("Bun detected. Using Bun CLI for build.");
+    } catch (error) {
+      consola.info("Bun not detected. Using esbuild for build.");
+    }
+  } else {
+    consola.info(`Using ${builder} instead of auto-detect.`);
   }
 
   if (runner === "bun") {
@@ -30,8 +39,10 @@ async function build(
         outputDir,
         "--target",
         "node",
-        "--external",
-        "*",
+        "--packages",
+        "external",
+        "--format",
+        "esm",
       ];
 
       if (env === "prod") {
@@ -68,10 +79,10 @@ async function build(
         entryPoints: [entryPoint],
         outdir: outputDir,
         platform: "node",
-        format: "cjs",
+        format: "esm",
         bundle: true,
         minify: env === "prod",
-        external: ["*"], // All packages are external
+        plugins: [nodeExternalsPlugin()],
       });
       consola.success("Build complete using esbuild.");
     } catch (error: any) {

@@ -1,3 +1,6 @@
+import { configDotenv } from "dotenv";
+configDotenv();
+
 import { registerCommands } from "./.discraft/commands/index";
 import { registerEvents } from "./.discraft/events/index";
 import client from "./clients/discord";

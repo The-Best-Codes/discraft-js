@@ -183,7 +183,7 @@ export async function registerCommands(client: Client) {
     `;
 
   await fs.writeFile(OUTPUT_COMMANDS_FILE, content);
-  logger.success("Commands index file generated.");
+  logger.verbose("Commands index file generated.");
 }
 
 async function generateEventsIndex(modules: ModuleInfo[]) {
@@ -259,11 +259,11 @@ export async function registerEvents(client: Client) {
 }
     `;
   await fs.writeFile(OUTPUT_EVENTS_FILE, content);
-  logger.success("Events index file generated.");
+  logger.verbose("Events index file generated.");
 }
 
 async function generateIndexFiles() {
-  logger.start("Generating Discraft index files...");
+  logger.verbose("Generating Discraft index files...");
   try {
     await fs.mkdir(path.join(DISCRAFT_DIR, "commands"), { recursive: true });
     await fs.mkdir(path.join(DISCRAFT_DIR, "events"), { recursive: true });
@@ -274,7 +274,7 @@ async function generateIndexFiles() {
   } catch (error) {
     logger.error("Failed to generate Discraft index files.", error);
   }
-  logger.success("Finished generating Discraft index files.");
+  logger.verbose("Finished generating Discraft index files.");
 }
 
 export { generateIndexFiles };

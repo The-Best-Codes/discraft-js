@@ -7,14 +7,14 @@
   "type": "module",
   "scripts": {
     "start": "discraft start",
-    "build": "discraft build",
-    "dev": "discraft dev"
+    "build": "discraft build"
   },
   "devDependencies": {
-    "discraft": "1.6.2-beta.1"
+    "discraft": "1.6.2-beta.3"
   },
   "dependencies": {
     "consola": "^3.3.3",
-    "discord.js": "^14.17.2"
+    "discord.js": "^14.17.2",
+    "dotenv": "^16.4.7"
   }
 }
