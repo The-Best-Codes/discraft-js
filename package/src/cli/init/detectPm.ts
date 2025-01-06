@@ -1,13 +1,16 @@
 import { execSync } from "child_process";
 
+function getEnvVar(key: string): string | undefined {
+  // Create a completely isolated dynamic lookup.
+  // This is necessary to avoid static replacement of process.env.SOME_VARIABLE
+  if (Object.prototype.hasOwnProperty.call(process.env, key)) {
+    return process.env[key];
+  }
+  return undefined;
+}
+
 async function detectPackageManager(): Promise<string | undefined> {
-  // Access process.env dynamically to avoid static replacement during build
-  const userAgent = Object.prototype.hasOwnProperty.call(
-    process.env,
-    "npm_config_user_agent",
-  )
-    ? process.env.npm_config_user_agent
-    : undefined;
+  const userAgent = getEnvVar("npm_config_user_agent");
 
   if (userAgent) {
     if (userAgent.startsWith("bun")) {

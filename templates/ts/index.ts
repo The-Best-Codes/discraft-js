@@ -28,7 +28,9 @@ registerEvents(client)
       }
     });
     client.login(process.env.DISCORD_TOKEN).catch((err) => {
-      logger.error("Client login failed.");
+      logger.error(
+        "Client login failed, make sure your token is set correctly.",
+      );
       logger.verbose(err);
     });
   });
