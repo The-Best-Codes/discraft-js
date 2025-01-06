@@ -1,6 +1,6 @@
 {
   "name": "discraft",
-  "version": "1.6.2-beta.0",
+  "version": "1.6.2-beta.1",
   "description": "Ultimate Discord bot framework",
   "type": "module",
   "packageManager": "bun@1.1.42",
