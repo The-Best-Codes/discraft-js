@@ -3,43 +3,11 @@ import consola from "consola";
 import fs from "fs-extra";
 import inquirer from "inquirer";
 import path from "path";
+import { fileURLToPath } from "url";
+import { detectPackageManager } from "./detectPm";
 
-async function detectPackageManager(): Promise<string | undefined> {
-  const userAgent = process.env.npm_config_user_agent;
-  if (userAgent) {
-    if (userAgent.startsWith("bun")) {
-      return "bun";
-    }
-    if (userAgent.startsWith("npm")) {
-      return "npm";
-    }
-    if (userAgent.startsWith("yarn")) {
-      return "yarn";
-    }
-    if (userAgent.startsWith("pnpm")) {
-      return "pnpm";
-    }
-  }
-
-  try {
-    execSync("bun --version", { stdio: "ignore" });
-    return "bun";
-  } catch (e) {}
-  try {
-    execSync("npm --version", { stdio: "ignore" });
-    return "npm";
-  } catch (e) {}
-  try {
-    execSync("yarn --version", { stdio: "ignore" });
-    return "yarn";
-  } catch (e) {}
-  try {
-    execSync("pnpm --version", { stdio: "ignore" });
-    return "pnpm";
-  } catch (e) {}
-
-  return undefined;
-}
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function copyTemplate(templatePath: string, projectPath: string) {
   const files = [
@@ -73,7 +41,7 @@ async function copyTemplate(templatePath: string, projectPath: string) {
 
 async function init() {
   const currentWorkingDirectory = process.cwd();
-  const packageRoot = path.join(__dirname, "..", "..", ".."); //navigate to package root from here
+  const packageRoot = path.join(__dirname, "..", "..", ".."); // Navigate to package root from here
   const templatePath = path.join(packageRoot, "templates", "ts");
 
   const useCurrentDir = await inquirer.prompt([
