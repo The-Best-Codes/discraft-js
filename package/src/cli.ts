@@ -17,7 +17,26 @@ program
 program
   .command("start")
   .description("Start the bot in production")
-  .action(start);
+  .option(
+    "-r, --runner <runner>",
+    "Specify the runner to use (node or bun). Defaults to auto-detect.",
+    (value) => {
+      if (value !== "node" && value !== "bun") {
+        consola.error("Invalid runner value. Must be 'node' or 'bun'.");
+        process.exit(1);
+      }
+      return value;
+    },
+  )
+  .action((options) => {
+    start({ runner: options.runner }).catch((error) => {
+      consola.error(
+        "An error occurred while starting the bot. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+      );
+      consola.verbose(error);
+      process.exit(1);
+    });
+  });
 
 program
   .command("build")

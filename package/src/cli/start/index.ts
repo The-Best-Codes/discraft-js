@@ -8,7 +8,11 @@ import { promisify } from "util";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const exec = promisify(require("child_process").exec);
 
-async function start() {
+interface StartOptions {
+  runner?: "node" | "bun";
+}
+
+async function start(options: StartOptions = {}) {
   const currentWorkingDirectory = process.cwd();
   consola.verbose("Starting the bot...");
   consola.verbose(`Current working directory: ${currentWorkingDirectory}`);
@@ -28,15 +32,23 @@ async function start() {
     return;
   }
 
-  let runner = "node";
-  try {
-    // Use bun --version to check for bun existence
-    await exec("bun --version");
-    runner = "bun";
-    consola.info("Bun detected. Using Bun to run the bot.");
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (error) {
-    consola.info("Bun not detected. Using Node to run the bot.");
+  let runner = options.runner;
+
+  if (!runner) {
+    try {
+      // Use bun --version to check for bun existence
+      await exec("bun --version");
+      runner = "bun";
+      consola.verbose("Bun detected. Using Bun to run the bot.");
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      runner = "node";
+      consola.verbose("Bun not detected. Using Node to run the bot.");
+    }
+  } else if (runner === "bun") {
+    consola.info("Using Bun to run the bot.");
+  } else if (runner === "node") {
+    consola.info("Using Node to run the bot.");
   }
 
   try {
