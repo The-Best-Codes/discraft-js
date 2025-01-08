@@ -5,7 +5,6 @@
 [![Discord Server](https://img.shields.io/discord/1170475897174896650)](https://discord.gg/dKeuR9yfBs)
 [![CodeQL](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql)
 [![Dependabot Updates](https://github.com/The-Best-Codes/discraft-js/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/dependabot/dependabot-updates)
-[![Publish to npm](https://github.com/The-Best-Codes/discraft-js/actions/workflows/npm-publish.yml/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/npm-publish.yml)
 
 Discraft is a modern, developer-friendly framework for building Discord bots with ease. It provides a robust CLI and a set of tools to streamline the development process, allowing you to focus on creating amazing bot experiences. Think of it as a "batteries-included" approach, letting you get started quickly and efficiently.
 
@@ -38,17 +37,33 @@ Discraft is a modern, developer-friendly framework for building Discord bots wit
 
 ### Installation
 
-You can install Discraft using `npm`:
+You can install Discraft locally in your project using `npm`, which is recommended for project-specific dependencies:
 
 ```bash
 npm install discraft --save-dev
 ```
 
-Or if you prefer `bun`:
+<details>
+    <summary>Alternative Package Manager Commands</summary>
+    <p>
+        If you prefer to use other package managers, here are the equivalent commands:
+        <br>
+        <b>pnpm:</b>
+        <pre><code>pnpm add discraft -D</code></pre>
+        <b>bun:</b>
+        <pre><code>bun add discraft --dev</code></pre>
+        <b>yarn:</b>
+        <pre><code>yarn add discraft -D</code></pre>
+    </p>
+</details>
+
+Alternatively, you can install Discraft globally to use the CLI from any directory:
 
 ```bash
-bun add discraft --dev
+npm install -g discraft
 ```
+
+When installed globally, you can use `discraft` command directly instead of `npx discraft`.
 
 ### Creating a New Project
 
@@ -58,7 +73,22 @@ To get started quickly, use the `discraft init` command:
 npx discraft init
 ```
 
+Or, if Discraft is installed globally:
+
+```bash
+discraft init
+```
+
 This will guide you through creating a new Discraft bot project, asking for details such as the project directory and package manager.
+
+**After initialization, you will need to copy the `.env.example` file to `.env` and then edit the `.env` file with your bot token and client ID.**
+
+```
+# From `Bot > Token` | https://discord.com/developers/applications
+DISCORD_TOKEN=''
+# From `General Information > App ID` | https://discord.com/developers/applications
+DISCORD_APP_ID=''
+```
 
 You can also specify options directly:
 
@@ -78,10 +108,50 @@ To start your bot in development mode:
 npx discraft dev
 ```
 
+<details>
+    <summary>Alternative Package Manager Commands</summary>
+    <p>
+        If you prefer to use other package managers, here are the equivalent commands:
+        <br>
+        <b>pnpm:</b>
+        <pre><code>pnpm discraft dev</code></pre>
+        <b>bun:</b>
+        <pre><code>bunx discraft dev</code></pre>
+        <b>yarn:</b>
+        <pre><code>yarn discraft dev</code></pre>
+    </p>
+</details>
+
+Or, if Discraft is installed globally:
+
+```bash
+discraft dev
+```
+
 To start your bot in production mode:
 
 ```bash
 npx discraft start
+```
+
+<details>
+    <summary>Alternative Package Manager Commands</summary>
+    <p>
+        If you prefer to use other package managers, here are the equivalent commands:
+        <br>
+        <b>pnpm:</b>
+        <pre><code>pnpm discraft start</code></pre>
+        <b>bun:</b>
+        <pre><code>bunx discraft start</code></pre>
+          <b>yarn:</b>
+        <pre><code>yarn discraft start</code></pre>
+    </p>
+</details>
+
+Or, if Discraft is installed globally:
+
+```bash
+discraft start
 ```
 
 ## ⚙️ Core Features
@@ -103,6 +173,37 @@ export default {
   async execute(data: { interaction: ChatInputCommandInteraction }) {
     const interaction = data.interaction;
     await interaction.reply("Pong!");
+  },
+};
+```
+
+Example long command (`commands/longcommand.ts`):
+
+```typescript
+import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+
+export default {
+  data: new SlashCommandBuilder()
+    .setName("longcommand")
+    .setDescription("A command that takes some time and edits the reply."),
+
+  async execute(data: { interaction: ChatInputCommandInteraction }) {
+    const interaction = data.interaction;
+
+    await interaction.deferReply();
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await interaction.editReply({ content: "Processing..." });
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await interaction.editReply({ content: "Almost done..." });
+
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await interaction.editReply({ content: "Done!" });
+    await interaction.followUp({
+      content: "Command Completed!",
+      ephemeral: true,
+    });
   },
 };
 ```
@@ -172,6 +273,12 @@ Initializes a new Discraft project.
 npx discraft init -d my-bot -p bun --skip-install
 ```
 
+Or, if Discraft is installed globally:
+
+```bash
+discraft init -d my-bot -p bun --skip-install
+```
+
 ### `discraft dev`
 
 Starts the bot in development mode with hot reloading.
@@ -188,6 +295,12 @@ Starts the bot in development mode with hot reloading.
 npx discraft dev -b esbuild -r bun -c
 ```
 
+Or, if Discraft is installed globally:
+
+```bash
+discraft dev -b esbuild -r bun -c
+```
+
 ### `discraft build`
 
 Builds the bot for production.
@@ -200,6 +313,12 @@ Builds the bot for production.
 
 ```bash
 npx discraft build -b bun
+```
+
+Or, if Discraft is installed globally:
+
+```bash
+discraft build -b bun
 ```
 
 ### `discraft start`
@@ -216,6 +335,12 @@ Starts the bot in production mode.
 npx discraft start -r node
 ```
 
+Or, if Discraft is installed globally:
+
+```bash
+discraft start -r node
+```
+
 ## 📁 Project Structure
 
 A typical Discraft project is structured as follows:
@@ -227,7 +352,7 @@ my-discraft-bot/
 │   └── discord.ts       # Discord.js client configuration
 ├── commands/            # Your bot's command files
 │   ├── ping.ts           # Example ping command
-│   └── long-command.ts     # Example long command
+│   └── longcommand.ts     # Example long command
 ├── events/              # Event handlers
 │   ├── error.ts          # Error handling
 │   ├── messageCreate.ts  # Example message handler
