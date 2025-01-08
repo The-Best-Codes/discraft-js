@@ -166,8 +166,11 @@ async function init(options: InitOptions = {}) {
       [
         `${kleur.gray("─")} ${kleur.yellow("cp")} ${kleur.cyan(".env.example")} ${kleur.cyan(".env")}`,
         `${kleur.gray("─")} Configure your ${kleur.cyan(".env")} file with your bot token`,
-        `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run build`)} to compile your TypeScript code`,
-        `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run start`)} to launch your bot`,
+        `${kleur.underline("Development")}`,
+        `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run dev`)} to start the development server`,
+        `${kleur.underline("Production")}`,
+        `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run build`)} to compile your bot code`,
+        `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run start`)} to launch your bot in production`,
       ].join("\n"),
     );
 
