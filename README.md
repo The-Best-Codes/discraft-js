@@ -1,4 +1,7 @@
-# Discraft
+<div align="center">
+  <img alt="Discraft Logo" src="https://github.com/user-attachments/assets/144fc363-a914-4e3a-851b-4f9744818930" for="cover" width="120" />
+  <h1>Discraft</h1>
+</div>
 
 [![npm version](https://img.shields.io/npm/v/discraft.svg)](https://www.npmjs.com/package/discraft)
 [![npm downloads](https://img.shields.io/npm/dm/discraft.svg)](https://www.npmjs.com/package/discraft)
