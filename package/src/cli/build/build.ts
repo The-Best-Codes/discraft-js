@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { spawn } from "child_process";
 import consola from "consola";
 import { build as esbuild } from "esbuild";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
 import { promisify } from "util";
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const exec = promisify(require("child_process").exec);
 
 type Builder = "esbuild" | "bun";
@@ -71,7 +74,10 @@ async function build(
       });
     } catch (error: any) {
       consola.error(`Error during bun build: ${error.message}`);
-      process.exit(1);
+      if (env !== "dev") {
+        process.exit(1);
+      }
+      throw error; // Throw the error, to be caught by `rebuildBot`
     }
   } else {
     try {
@@ -87,7 +93,10 @@ async function build(
       consola.success("Build complete using esbuild.");
     } catch (error: any) {
       consola.error(`Error during esbuild: ${error.message}`);
-      process.exit(1);
+      if (env !== "dev") {
+        process.exit(1);
+      }
+      throw error; // Throw the error, to be caught by `rebuildBot`
     }
   }
 }

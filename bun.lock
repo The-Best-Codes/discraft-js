@@ -3,6 +3,7 @@
   "workspaces": {
     "": {
       "dependencies": {
+        "chokidar": "latest",
         "commander": "latest",
         "consola": "latest",
         "esbuild": "latest",
@@ -159,7 +160,7 @@
 
     "@oven/bun-windows-x64-baseline": ["@oven/bun-windows-x64-baseline@1.1.42", "", { "os": "win32", "cpu": "x64" }, "sha512-xnlYa1jKknImCw7xmSD91H8e+w3BC6mIShOfHhFWfNhdyvEtundXhIu7VddwxKBMs5S/iiFJiutnZ2EyLq4CAQ=="],
 
-    "@types/bun": ["@types/bun@1.1.14", "", { "dependencies": { "bun-types": "1.1.37" } }, "sha512-opVYiFGtO2af0dnWBdZWlioLBoxSdDO5qokaazLhq8XQtGZbY4pY3/JxY8Zdf/hEwGubbp7ErZXoN1+h2yesxA=="],
+    "@types/bun": ["@types/bun@1.1.15", "", { "dependencies": { "bun-types": "1.1.42" } }, "sha512-Fi7ND1jCq8O5iU3s9z3TKHggD0hidgpe7wSxyisviXpbMmY4B1KiokF3f/mmjOoDrEcf873tSpixgen7Wm9X0g=="],
 
     "@types/estree": ["@types/estree@1.0.6", "", {}, "sha512-AYnb1nQyY49te+VRAVgmzfcgjYS91mY5P0TKUDCLEM+gNnA+3T6rWITXRLYCpahpqSQbN5cE+gHpnPyXjHWxcw=="],
 
@@ -211,13 +212,15 @@
 
     "bun": ["bun@1.1.42", "", { "optionalDependencies": { "@oven/bun-darwin-aarch64": "1.1.42", "@oven/bun-darwin-x64": "1.1.42", "@oven/bun-darwin-x64-baseline": "1.1.42", "@oven/bun-linux-aarch64": "1.1.42", "@oven/bun-linux-aarch64-musl": "1.1.42", "@oven/bun-linux-x64": "1.1.42", "@oven/bun-linux-x64-baseline": "1.1.42", "@oven/bun-linux-x64-musl": "1.1.42", "@oven/bun-linux-x64-musl-baseline": "1.1.42", "@oven/bun-windows-x64": "1.1.42", "@oven/bun-windows-x64-baseline": "1.1.42" }, "os": [ "linux", "win32", "darwin", ], "cpu": [ "x64", "arm64", ], "bin": { "bun": "bin/bun.exe", "bunx": "bin/bun.exe" } }, "sha512-PckeNolMEBaBEzixTMvp0jJD9r/9lly8AfctILi1ve14zwwChFjsxI4TJLQO2yezzOjVeG0u7xf8WQFbS7GjAA=="],
 
-    "bun-types": ["bun-types@1.1.37", "", { "dependencies": { "@types/node": "~20.12.8", "@types/ws": "~8.5.10" } }, "sha512-C65lv6eBr3LPJWFZ2gswyrGZ82ljnH8flVE03xeXxKhi2ZGtFiO4isRKTKnitbSqtRAcaqYSR6djt1whI66AbA=="],
+    "bun-types": ["bun-types@1.1.42", "", { "dependencies": { "@types/node": "~20.12.8", "@types/ws": "~8.5.10" } }, "sha512-beMbnFqWbbBQHll/bn3phSwmoOQmnX2nt8NI9iOQKFbgR5Z6rlH3YuaMdlid8vp5XGct3/W4QVQBmhoOEoe4nw=="],
 
     "callsites": ["callsites@3.1.0", "", {}, "sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ=="],
 
     "chalk": ["chalk@4.1.2", "", { "dependencies": { "ansi-styles": "^4.1.0", "supports-color": "^7.1.0" } }, "sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA=="],
 
     "chardet": ["chardet@0.7.0", "", {}, "sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA=="],
+
+    "chokidar": ["chokidar@4.0.3", "", { "dependencies": { "readdirp": "^4.0.1" } }, "sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA=="],
 
     "cli-width": ["cli-width@4.1.0", "", {}, "sha512-ouuZd4/dm2Sw5Gmqy6bGyNNNe1qt9RpmxveLSO7KcgsTnU7RXfsw+/bukWGo1abgBiMAic068rclZsO4IWmmxQ=="],
 
@@ -384,6 +387,8 @@
     "punycode": ["punycode@2.3.1", "", {}, "sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg=="],
 
     "queue-microtask": ["queue-microtask@1.2.3", "", {}, "sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A=="],
+
+    "readdirp": ["readdirp@4.0.2", "", {}, "sha512-yDMz9g+VaZkqBYS/ozoBJwaBhTbZo3UNYQHNRw1D3UFQB8oHB4uS/tAODO+ZLjGWmUbKnIlOWO+aaIiAxrUWHA=="],
 
     "resolve-from": ["resolve-from@4.0.0", "", {}, "sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g=="],
 

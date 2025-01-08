@@ -5,6 +5,7 @@ import { program } from "commander";
 import consola from "consola";
 import { version } from "../../package.json";
 import { build } from "./cli/build";
+import { dev } from "./cli/dev";
 import { init } from "./cli/init";
 import { start } from "./cli/start";
 
@@ -38,6 +39,30 @@ program
       consola.error("An error occurred during build:", error);
       process.exit(1);
     });
+  });
+
+program
+  .command("dev")
+  .description("Start the bot in development mode")
+  .option(
+    "-b, --builder <builder>",
+    "Specify the builder to use (esbuild or bun). Defaults to auto-detect.",
+    (value) => {
+      if (value !== "esbuild" && value !== "bun") {
+        consola.error("Invalid builder value. Must be 'esbuild' or 'bun'.");
+        process.exit(1);
+      }
+      return value;
+    },
+  )
+  .option("-c, --clear-console", "Clear the console on each rebuild.", false)
+  .action((options) => {
+    dev({ builder: options.builder, clearConsole: options.clearConsole }).catch(
+      (error) => {
+        consola.error("An error occurred during development:", error);
+        process.exit(1);
+      },
+    );
   });
 
 program

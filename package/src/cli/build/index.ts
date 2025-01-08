@@ -30,6 +30,7 @@ async function startBuild(options?: BuildOptions) {
     await build("prod", srcPath, outputPath, options?.builder);
     consola.info("Build output: " + outputPath);
     consola.success(`Build finished successfully!`);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     consola.error(`Build failed: ${error.message}`);
   }

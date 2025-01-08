@@ -1,6 +1,6 @@
 {
   "name": "discraft",
-  "version": "1.6.2-beta.11",
+  "version": "1.6.2-beta.12",
   "description": "Ultimate Discord bot framework",
   "type": "module",
   "packageManager": "bun@1.1.42",
@@ -48,7 +48,7 @@
   "homepage": "https://github.com/The-Best-Codes/discraft-js#readme",
   "devDependencies": {
     "@eslint/js": "^9.17.0",
-    "@types/bun": "^1.1.14",
+    "@types/bun": "^1.1.15",
     "@types/fs-extra": "^11.0.4",
     "bun": "^1.1.42",
     "eslint": "^9.17.0",
@@ -59,6 +59,7 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "chokidar": "^4.0.3",
     "commander": "^13.0.0",
     "consola": "^3.3.3",
     "esbuild": "^0.24.2",
