@@ -36,7 +36,10 @@ program
   )
   .action((options) => {
     build({ builder: options.builder }).catch((error) => {
-      consola.error("An error occurred during build:", error);
+      consola.error(
+        "An error occurred during build. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+      );
+      consola.verbose(error);
       process.exit(1);
     });
   });
@@ -55,14 +58,30 @@ program
       return value;
     },
   )
+  .option(
+    "-r, --runner <runner>",
+    "Specify the runner to use (node or bun). Defaults to auto-detect.",
+    (value) => {
+      if (value !== "node" && value !== "bun") {
+        consola.error("Invalid runner value. Must be 'node' or 'bun'.");
+        process.exit(1);
+      }
+      return value;
+    },
+  )
   .option("-c, --clear-console", "Clear the console on each rebuild.", false)
   .action((options) => {
-    dev({ builder: options.builder, clearConsole: options.clearConsole }).catch(
-      (error) => {
-        consola.error("An error occurred during development:", error);
-        process.exit(1);
-      },
-    );
+    dev({
+      builder: options.builder,
+      clearConsole: options.clearConsole,
+      runner: options.runner,
+    }).catch((error) => {
+      consola.error(
+        "An error occurred during development. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+      );
+      consola.verbose(error);
+      process.exit(1);
+    });
   });
 
 program
@@ -94,7 +113,10 @@ program
         consola.info("Initialization cancelled by user.");
         process.exit(0);
       } else {
-        consola.error("An error occurred during initialization:", error);
+        consola.error(
+          "An error occurred during initialization. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+        );
+        consola.verbose(error);
         process.exit(1);
       }
     }

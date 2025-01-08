@@ -26,7 +26,7 @@ async function build(
       runner = "bun";
       consola.verbose("Bun detected. Using Bun CLI for build.");
     } catch (error) {
-      consola.info("Bun not detected. Using esbuild for build.");
+      consola.verbose("Bun not detected. Using esbuild for build.");
     }
   } else {
     consola.info(`Using ${builder} instead of auto-detect.`);

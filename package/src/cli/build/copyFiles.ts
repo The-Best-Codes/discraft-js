@@ -14,6 +14,7 @@ async function copyFiles(rootDir: string, outputDir: string): Promise<void> {
       await fs.mkdir(path.dirname(destPath), { recursive: true }); // Ensure dest dir exists
       await fs.copyFile(sourcePath, destPath);
       consola.verbose(`Copied ${file} to ${destPath}`);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       if (err.code === "ENOENT") {
         consola.verbose(

@@ -65,13 +65,15 @@ async function init(options: InitOptions = {}) {
   const templatePath = path.join(packageRoot, "templates", "ts");
 
   let projectDir: string;
-  let projectName: string;
+  // Remove projectName variable declaration
+  // let projectName: string;
 
   if (options.dir) {
     projectDir = path.isAbsolute(options.dir)
       ? options.dir
       : path.join(currentWorkingDirectory, options.dir);
-    projectName = path.basename(projectDir);
+    // Remove assignment to projectName
+    // projectName = path.basename(projectDir);
   } else {
     const locationChoice = await inquirer.prompt([
       {
@@ -87,7 +89,8 @@ async function init(options: InitOptions = {}) {
 
     if (locationChoice.location === "current") {
       projectDir = currentWorkingDirectory;
-      projectName = path.basename(currentWorkingDirectory);
+      // Remove assignment to projectName
+      // projectName = path.basename(currentWorkingDirectory);
     } else {
       const { customDir } = await inquirer.prompt([
         {
@@ -97,7 +100,8 @@ async function init(options: InitOptions = {}) {
           default: "my-discord-bot",
         },
       ]);
-      projectName = customDir;
+      // Remove assignment to projectName
+      // projectName = customDir;
       projectDir = path.join(currentWorkingDirectory, customDir);
     }
   }
@@ -168,6 +172,7 @@ async function init(options: InitOptions = {}) {
     );
 
     console.log("\n" + kleur.bold("Happy bot building! 🚀") + "\n");
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     consola.error(`Failed to initialize project: ${error.message}`);
     process.exit(1);

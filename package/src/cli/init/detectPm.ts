@@ -1,3 +1,5 @@
+/* eslint-disable no-empty */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { execSync } from "child_process";
 
 function getEnvVar(key: string): string | undefined {

@@ -11,10 +11,12 @@ import { generateIndexFiles } from "../build/commandsAndEvents";
 const exec = promisify(require("child_process").exec);
 
 type Builder = "esbuild" | "bun";
+type Runner = "node" | "bun";
 
 interface DevOptions {
   builder?: Builder;
   clearConsole?: boolean;
+  runner?: Runner;
 }
 
 const CWD = process.cwd();
@@ -34,6 +36,31 @@ async function startDev(options?: DevOptions) {
   let botProcess: any = null;
   let runner: string = "node";
   const clearConsole = options?.clearConsole ?? false;
+
+  // Determine the runner
+  if (options?.runner) {
+    runner = options.runner;
+    consola.verbose(`Using provided runner: ${runner}`);
+  } else if (options?.builder === "bun") {
+    runner = "bun";
+    consola.verbose("Using Bun as runner (matched with builder)");
+  } else {
+    try {
+      // Only auto-detect bun if we're not using esbuild
+      if (!options?.builder) {
+        await exec("bun --version");
+        runner = "bun";
+        consola.verbose("Bun detected. Using Bun CLI for dev.");
+      } else {
+        // If builder is esbuild, default to node
+        runner = "node";
+        consola.verbose("Using Node as runner with esbuild builder");
+      }
+    } catch (error) {
+      runner = "node";
+      consola.verbose("Using Node CLI for dev.");
+    }
+  }
 
   // Function to start bot
   const startBot = async () => {
@@ -96,26 +123,11 @@ async function startDev(options?: DevOptions) {
   // Setup file watching and initial build
   try {
     consola.info("Starting in development mode...");
-    consola.info("Performing initial build...");
-
-    if (!options?.builder) {
-      try {
-        // Use bun --version to check for bun existence
-        await exec("bun --version");
-        runner = "bun";
-        consola.info("Bun detected. Using Bun CLI for dev.");
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      } catch (error) {
-        consola.info("Bun not detected. Using Node CLI for dev.");
-      }
-    } else {
-      runner = options.builder;
-      consola.info(`Using ${options.builder} instead of auto-detect.`);
-    }
+    consola.verbose("Performing initial build...");
 
     await generateIndexFiles();
     await build("dev", path.join(CWD, "index.ts"), DIST_DIR, options?.builder);
-    consola.success("Initial build complete.");
+    consola.verbose("Initial build complete.");
     await startBot();
 
     consola.info("Starting file watcher...");
