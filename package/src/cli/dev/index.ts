@@ -56,6 +56,7 @@ async function startDev(options?: DevOptions) {
         runner = "node";
         consola.verbose("Using Node as runner with esbuild builder");
       }
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       runner = "node";
       consola.verbose("Using Node CLI for dev.");
