@@ -1,4 +1,8 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  MessageFlags,
+  SlashCommandBuilder,
+} from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -20,7 +24,7 @@ export default {
     await interaction.editReply({ content: "Done!" });
     await interaction.followUp({
       content: "Command Completed!",
-      ephemeral: true,
+      flags: MessageFlags.Ephemeral,
     });
   },
 };

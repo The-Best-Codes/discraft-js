@@ -80,16 +80,30 @@ import {
   REST,
   Routes,
   SlashCommandBuilder,
+  ContextMenuCommandBuilder,
+  ApplicationCommandType,
+  UserContextMenuCommandInteraction,
+  MessageContextMenuCommandInteraction,
+  MessageFlags,
 } from "discord.js";
 import { logger } from "../../utils/logger";
 
 ${imports}
 
 // Define a type for the command modules
+type CommandData =
+  | SlashCommandBuilder
+  | ContextMenuCommandBuilder;
+
+type InteractionType =
+  | ChatInputCommandInteraction
+  | UserContextMenuCommandInteraction
+  | MessageContextMenuCommandInteraction;
+
 interface CommandModule {
-  data: SlashCommandBuilder;
+  data: CommandData;
   execute: (data: {
-    interaction: ChatInputCommandInteraction;
+    interaction: InteractionType;
   }) => Promise<void>;
 }
 
@@ -114,9 +128,16 @@ export async function registerCommands(client: Client) {
         continue;
       }
       const command = commandModule;
-      commands.push(command.data.toJSON());
-      commandMap.set(command.data.name, command);
-      logger.verbose(\`Registered command: \${command.data.name}\`);
+
+      if (command.data instanceof SlashCommandBuilder) {
+        commands.push(command.data.toJSON());
+        commandMap.set(command.data.name, command);
+        logger.verbose(\`Registered slash command: \${command.data.name}\`);
+      } else if (command.data instanceof ContextMenuCommandBuilder) {
+        commands.push(command.data.toJSON());
+        commandMap.set(command.data.name, command);
+        logger.verbose(\`Registered context menu command: \${command.data.name}\`);
+      }
       registeredCommands++;
     } catch (error) {
       logger.error(
@@ -152,32 +173,76 @@ export async function registerCommands(client: Client) {
   );
   // Handle Interactions
   client.on("interactionCreate", async (interaction: Interaction) => {
-    if (!interaction.isChatInputCommand()) return;
-    const command = commandMap.get(interaction.commandName);
-
-    if (!command) {
-      logger.error(\`No command matching \${interaction.commandName} was found.\`);
-      return;
-    }
-
-    // Execute function that supports editReply and followUp
-    try {
-      await command.execute({ interaction });
-    } catch (error) {
-      logger.error(\`Error executing command \${interaction.commandName}:\`);
-      logger.verbose(error);
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({
-          content: "There was an error executing this command!",
-          ephemeral: true,
-        });
-      } else {
-        await interaction.reply({
-          content: "There was an error executing this command!",
-          ephemeral: true,
-        });
-      }
-    }
+     if (interaction.isChatInputCommand()) {
+        const command = commandMap.get(interaction.commandName);
+        if (!command) {
+            logger.error(\`No command matching \${interaction.commandName} was found.\`);
+            return;
+        }
+          try {
+              await command.execute({ interaction });
+            } catch (error) {
+              logger.error(\`Error executing command \${interaction.commandName}:\`);
+              logger.verbose(error);
+              if (interaction.replied || interaction.deferred) {
+                await interaction.followUp({
+                  content: "There was an error executing this command!",
+                  flags: MessageFlags.Ephemeral,
+                });
+              } else {
+                await interaction.reply({
+                  content: "There was an error executing this command!",
+                  flags: MessageFlags.Ephemeral,
+                });
+              }
+            }
+     } else if (interaction.isUserContextMenuCommand()) {
+        const command = commandMap.get(interaction.commandName);
+         if (!command) {
+            logger.error(\`No command matching \${interaction.commandName} was found.\`);
+            return;
+         }
+          try {
+            await command.execute({ interaction });
+          } catch (error) {
+             logger.error(\`Error executing user context menu command \${interaction.commandName}:\`);
+              logger.verbose(error);
+              if (interaction.replied || interaction.deferred) {
+                  await interaction.followUp({
+                  content: "There was an error executing this command!",
+                  flags: MessageFlags.Ephemeral,
+                  });
+                } else {
+                    await interaction.reply({
+                    content: "There was an error executing this command!",
+                   flags: MessageFlags.Ephemeral,
+                  });
+              }
+          }
+     } else if (interaction.isMessageContextMenuCommand()) {
+        const command = commandMap.get(interaction.commandName);
+         if (!command) {
+            logger.error(\`No command matching \${interaction.commandName} was found.\`);
+            return;
+         }
+          try {
+              await command.execute({ interaction });
+            } catch (error) {
+                 logger.error(\`Error executing message context menu command \${interaction.commandName}:\`);
+                logger.verbose(error);
+                if (interaction.replied || interaction.deferred) {
+                    await interaction.followUp({
+                        content: "There was an error executing this command!",
+                        flags: MessageFlags.Ephemeral,
+                    });
+                } else {
+                    await interaction.reply({
+                        content: "There was an error executing this command!",
+                        flags: MessageFlags.Ephemeral,
+                    });
+                }
+            }
+     }
   });
 }
     `;
