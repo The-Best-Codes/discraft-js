@@ -165,59 +165,15 @@ Discraft offers a range of features designed to make Discord bot development a b
 
 ### Command System
 
-Discraft uses the Discord.js API to create robust slash commands. Place your command files in the `commands` directory, and Discraft will automatically register them with Discord on bot startup.
+Discraft uses the Discord.js API to create robust slash commands, as well as message and user context menu commands. Place your command files in the `commands` directory, and Discraft will automatically register them with Discord on bot startup.
 
-Example command (`commands/ping.ts`):
-
-```typescript
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-
-export default {
-  data: new SlashCommandBuilder().setName("ping").setDescription("Ping!"),
-
-  async execute(data: { interaction: ChatInputCommandInteraction }) {
-    const interaction = data.interaction;
-    await interaction.reply("Pong!");
-  },
-};
-```
-
-Example long command (`commands/longcommand.ts`):
-
-```typescript
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
-
-export default {
-  data: new SlashCommandBuilder()
-    .setName("longcommand")
-    .setDescription("A command that takes some time and edits the reply."),
-
-  async execute(data: { interaction: ChatInputCommandInteraction }) {
-    const interaction = data.interaction;
-
-    await interaction.deferReply();
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    await interaction.editReply({ content: "Processing..." });
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    await interaction.editReply({ content: "Almost done..." });
-
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    await interaction.editReply({ content: "Done!" });
-    await interaction.followUp({
-      content: "Command Completed!",
-      ephemeral: true,
-    });
-  },
-};
-```
+See [examples of commands here](https://github.com/The-Best-Codes/discraft-js/tree/main/templates/ts/commands).
 
 ### Event Handling
 
 Discraft simplifies registering event handlers. Place your event files in the `events` directory, and Discraft will register them when the bot starts.
 
-Example event handler (`events/ready.ts`):
+Example event handler (`events/ready.ts`, which will be registered when the bot starts):
 
 ```typescript
 import { ActivityType, Client, Events } from "discord.js";
@@ -246,6 +202,8 @@ export default {
   },
 };
 ```
+
+See [examples of more events here](https://github.com/The-Best-Codes/discraft-js/tree/main/templates/ts/events).
 
 ### Hot Reloading
 
@@ -357,7 +315,7 @@ my-discraft-bot/
 │   └── discord.ts       # Discord.js client configuration
 ├── commands/            # Your bot's command files
 │   ├── ping.ts           # Example ping command
-│   └── longcommand.ts     # Example long command
+│   └── ...             # Other commands
 ├── events/              # Event handlers
 │   ├── error.ts          # Error handling
 │   ├── messageCreate.ts  # Example message handler
