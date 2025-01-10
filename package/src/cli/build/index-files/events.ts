@@ -74,8 +74,10 @@ export async function registerEvents(client) {
   let content = "";
 
   if (extension === "ts") {
+    logger.verbose("Generating events index file for typescript");
     content = buildEventsTsIndex(modules);
   } else if (extension === "js") {
+    logger.verbose("Generating events index file for javascript");
     content = buildEventsJsIndex(modules);
   }
 

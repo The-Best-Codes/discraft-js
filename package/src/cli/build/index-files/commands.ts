@@ -73,8 +73,10 @@ export async function registerCommands(client) {
 
   let content = "";
   if (extension === "ts") {
+    logger.verbose("Generating commands index file for typescript");
     content = buildCommandsTsIndex(modules);
   } else if (extension === "js") {
+    logger.verbose("Generating commands index file for javascript");
     content = buildCommandsJsIndex(modules);
   }
 

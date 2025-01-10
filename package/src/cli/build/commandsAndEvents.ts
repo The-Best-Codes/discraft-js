@@ -19,6 +19,7 @@ async function generateIndexFiles(target?: BuildTarget | BuildTarget[]) {
       : [target]
     : ["commands", "events"];
   const isTS = await isTypeScriptProject();
+  logger.verbose("Is project typescript?", isTS);
   try {
     if (targets.includes("commands")) {
       await fs.mkdir(path.join(DISCRAFT_DIR, "commands"), { recursive: true });

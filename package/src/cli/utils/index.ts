@@ -24,12 +24,16 @@ async function getEntryPoint(): Promise<string> {
 
   try {
     await fs.access(tsPath, fs.constants.F_OK);
+    consola.verbose("Found index.ts file");
     return tsPath;
   } catch {
+    consola.verbose("index.ts file error: not found");
     try {
       await fs.access(jsPath, fs.constants.F_OK);
+      consola.verbose("Found index.js file");
       return jsPath;
     } catch {
+      consola.verbose("index.js file error: not found");
       consola.error(
         "Could not find index.ts or index.js file in current directory.",
       );
