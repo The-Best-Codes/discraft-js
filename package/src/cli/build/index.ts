@@ -9,23 +9,15 @@ type Builder = "esbuild" | "bun";
 
 interface BuildOptions {
   builder?: Builder;
-  file?: string;
 }
 
 async function startBuild(options?: BuildOptions) {
   consola.info(`Starting production build...`);
   const currentWorkingDirectory = process.cwd();
-  let outputPath = path.join(currentWorkingDirectory, "dist");
+  const outputPath = path.join(currentWorkingDirectory, "dist");
   let entryPoint;
   try {
-    entryPoint = await getEntryPoint(options?.file);
-    // If a custom file was provided and its not a default path, use the directory of that file for the output
-    if (options?.file && !options.file.includes("index.")) {
-      outputPath = path.join(path.dirname(entryPoint), "dist");
-      consola.info(
-        `Custom file provided, setting output path to: ${outputPath}`,
-      );
-    }
+    entryPoint = await getEntryPoint();
   } catch (e) {
     consola.error("Could not get entrypoint file");
     throw e;

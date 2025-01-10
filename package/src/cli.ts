@@ -28,9 +28,8 @@ program
       return value;
     },
   )
-  .option("-f, --file <file>", "Specify the entry point file.")
   .action((options) => {
-    start({ runner: options.runner, file: options.file }).catch((error) => {
+    start({ runner: options.runner }).catch((error) => {
       consola.error(
         "An error occurred while starting the bot. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
       );
@@ -53,9 +52,8 @@ program
       return value;
     },
   )
-  .option("-f, --file <file>", "Specify the entry point file.")
   .action((options) => {
-    build({ builder: options.builder, file: options.file }).catch((error) => {
+    build({ builder: options.builder }).catch((error) => {
       consola.error(
         "An error occurred during build. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
       );
@@ -90,13 +88,11 @@ program
     },
   )
   .option("-c, --clear-console", "Clear the console on each rebuild.", false)
-  .option("-f, --file <file>", "Specify the entry point file.")
   .action((options) => {
     dev({
       builder: options.builder,
       clearConsole: options.clearConsole,
       runner: options.runner,
-      file: options.file,
     }).catch((error) => {
       consola.error(
         "An error occurred during development. Set the CONSOLA_LEVEL to 'verbose' to see more details.",

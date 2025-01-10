@@ -1,26 +1,24 @@
 import consola from "consola";
 import path from "path";
-import { getEntryPoint, isBunInstalled, runSubprocess } from "../utils";
+import { CWD, getEntryPoint, isBunInstalled, runSubprocess } from "../utils";
 
 interface StartOptions {
   runner?: "node" | "bun";
-  file?: string;
 }
 
 async function start(options: StartOptions = {}) {
   consola.verbose("Starting the bot...");
   let entryPoint;
   try {
-    entryPoint = await getEntryPoint(options?.file);
+    entryPoint = await getEntryPoint();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     consola.error("Could not get entrypoint file");
     return;
   }
   consola.verbose(`Path to bot entrypoint: ${entryPoint}`);
-  const currentWorkingDirectory = process.cwd();
   const distPath = path.join(
-    currentWorkingDirectory,
+    CWD,
     "dist",
     path.basename(entryPoint).replace(/\.(ts|js)$/, ".js"),
   );
@@ -42,7 +40,7 @@ async function start(options: StartOptions = {}) {
   }
   try {
     consola.verbose("Starting the bot process...");
-    await runSubprocess(runner, [distPath]);
+    await runSubprocess(runner, [distPath], { cwd: CWD });
     // Exit the parent process after the child has exited
   } catch (e) {
     consola.error(`Error starting the bot: ${e}`);

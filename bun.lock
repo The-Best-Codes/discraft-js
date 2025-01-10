@@ -3,29 +3,29 @@
   "workspaces": {
     "": {
       "dependencies": {
-        "@inquirer/core": "^10.1.2",
-        "chokidar": "^4.0.3",
-        "commander": "^13.0.0",
-        "consola": "^3.3.3",
-        "esbuild": "^0.24.2",
-        "esbuild-node-externals": "^1.16.0",
-        "fs-extra": "^11.2.0",
-        "glob": "^11.0.0",
-        "inquirer": "^12.3.0",
-        "kleur": "^4.1.5",
+        "@inquirer/core": "latest",
+        "chokidar": "latest",
+        "commander": "latest",
+        "consola": "latest",
+        "esbuild": "latest",
+        "esbuild-node-externals": "latest",
+        "fs-extra": "latest",
+        "glob": "latest",
+        "inquirer": "latest",
+        "kleur": "latest",
       },
       "devDependencies": {
-        "@eslint/js": "^9.17.0",
-        "@types/bun": "^1.1.16",
-        "@types/fs-extra": "^11.0.4",
-        "@types/node": "^22.10.5",
-        "bun": "^1.1.43",
-        "eslint": "^9.17.0",
-        "globals": "^15.14.0",
-        "typescript-eslint": "^8.19.1",
+        "@eslint/js": "latest",
+        "@types/bun": "latest",
+        "@types/fs-extra": "latest",
+        "@types/node": "latest",
+        "bun": "latest",
+        "eslint": "latest",
+        "globals": "latest",
+        "typescript-eslint": "latest",
       },
       "peerDependencies": {
-        "typescript": "^5.7.3",
+        "typescript": "latest",
       },
     },
   },
@@ -294,7 +294,7 @@
 
     "fs-extra": ["fs-extra@11.2.0", "", { "dependencies": { "graceful-fs": "^4.2.0", "jsonfile": "^6.0.1", "universalify": "^2.0.0" } }, "sha512-PmDi3uwK5nFuXh7XDTlVnS17xJS7vW36is2+w3xcv8SVxiB4NyATf4ctkVY5bkSjX0Y4nbvZCq1/EjtEyr9ktw=="],
 
-    "glob": ["glob@11.0.0", "", { "dependencies": { "foreground-child": "^3.1.0", "jackspeak": "^4.0.1", "minimatch": "^10.0.0", "minipass": "^7.1.2", "package-json-from-dist": "^1.0.0", "path-scurry": "^2.0.0" }, "bin": { "glob": "dist/esm/bin.mjs" } }, "sha512-9UiX/Bl6J2yaBbxKoEBRm4Cipxgok8kQYcOPEhScPwebu2I0HoQOuYdIO6S3hLuWoZgpDpwQZMzTFxgpkyT76g=="],
+    "glob": ["glob@11.0.1", "", { "dependencies": { "foreground-child": "^3.1.0", "jackspeak": "^4.0.1", "minimatch": "^10.0.0", "minipass": "^7.1.2", "package-json-from-dist": "^1.0.0", "path-scurry": "^2.0.0" }, "bin": { "glob": "dist/esm/bin.mjs" } }, "sha512-zrQDm8XPnYEKawJScsnM0QzobJxlT/kHOOlRTio8IH/GrmxRE5fjllkzdaHclIuNjUQTJYH2xHNIGfdpJkDJUw=="],
 
     "glob-parent": ["glob-parent@6.0.2", "", { "dependencies": { "is-glob": "^4.0.3" } }, "sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A=="],
 

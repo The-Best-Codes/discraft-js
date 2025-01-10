@@ -3,9 +3,9 @@ import { spawn } from "child_process";
 import chokidar from "chokidar";
 import consola from "consola";
 import path from "path";
-import { build } from "../build/build";
+import { build as buildFn } from "../build/build";
 import { generateIndexFiles } from "../build/commandsAndEvents";
-import { CWD, getEntryPoint, isBunInstalled } from "../utils";
+import { getEntryPoint, isBunInstalled } from "../utils";
 // Utility function to run a subprocess and return a promise
 
 type Builder = "esbuild" | "bun";
@@ -14,13 +14,11 @@ type Runner = "node" | "bun";
 interface DevOptions {
   builder?: Builder;
   clearConsole?: boolean;
-  runner?: Runner;
-  file?: string;
 }
 
-const DIST_DIR = path.join(CWD, "dist");
-const DISCRAFT_DIR = path.join(CWD, ".discraft");
-const NODE_MODULES_DIR = path.join(CWD, "node_modules");
+const DIST_DIR = path.join(process.cwd(), "dist");
+const DISCRAFT_DIR = path.join(process.cwd(), ".discraft");
+const NODE_MODULES_DIR = path.join(process.cwd(), "node_modules");
 const IGNORED_FILES = [
   DIST_DIR,
   DISCRAFT_DIR,
@@ -32,14 +30,10 @@ const IGNORED_FILES = [
 
 async function startDev(options?: DevOptions) {
   let botProcess: any = null;
-  let runner: string = "node";
+  let runner: Runner = "node";
   const clearConsole = options?.clearConsole ?? false;
-
-  // Determine the runner
-  if (options?.runner) {
-    runner = options.runner;
-    consola.verbose(`Using provided runner: ${runner}`);
-  } else if (options?.builder === "bun") {
+  const CWD = process.cwd();
+  if (options?.builder === "bun") {
     runner = "bun";
     consola.verbose("Using Bun as runner (matched with builder)");
   } else {
@@ -80,6 +74,7 @@ async function startDev(options?: DevOptions) {
     try {
       botProcess = spawn(runner, [distPath], {
         stdio: "inherit",
+        cwd: CWD,
       });
 
       botProcess.on("error", (error: any) => {
@@ -109,15 +104,14 @@ async function startDev(options?: DevOptions) {
     consola.info("Change detected, rebuilding...");
     let entryPoint;
     try {
-      entryPoint = await getEntryPoint(options?.file);
+      entryPoint = await getEntryPoint();
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (e) {
-      consola.error("Could not get entrypoint file");
       return;
     }
     try {
       await generateIndexFiles();
-      await build("dev", entryPoint, DIST_DIR, options?.builder);
+      await buildFn("dev", entryPoint, DIST_DIR, options?.builder);
       consola.success("Rebuild complete.");
       await startBot();
     } catch (error: any) {
@@ -131,16 +125,15 @@ async function startDev(options?: DevOptions) {
   try {
     consola.info("Starting in development mode...");
     consola.verbose("Performing initial build...");
-    let entryPoint;
+    // eslint-disable-next-line no-useless-catch
     try {
-      entryPoint = await getEntryPoint(options?.file);
+      const entryPoint = await getEntryPoint();
+      consola.verbose("Entry point attempt: " + entryPoint);
     } catch (e) {
-      consola.error("Could not get entrypoint file");
       throw e;
     }
-
     await generateIndexFiles();
-    await build("dev", entryPoint, DIST_DIR, options?.builder);
+    await buildFn("dev", await getEntryPoint(), DIST_DIR, options?.builder);
     consola.verbose("Initial build complete.");
     await startBot();
 

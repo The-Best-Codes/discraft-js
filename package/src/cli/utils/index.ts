@@ -18,19 +18,10 @@ async function isBunInstalled(): Promise<boolean> {
 }
 
 // Utility function to get the project's entrypoint file (index.ts or index.js)
-async function getEntryPoint(customFile?: string): Promise<string> {
-  if (customFile) {
-    const customPath = path.resolve(CWD, customFile);
-    try {
-      await fs.access(customPath, fs.constants.F_OK);
-      return customPath;
-    } catch (err) {
-      consola.error(`Could not find custom entrypoint at ${customPath}`);
-      throw err;
-    }
-  }
+async function getEntryPoint(): Promise<string> {
   const tsPath = path.join(CWD, "index.ts");
   const jsPath = path.join(CWD, "index.js");
+
   try {
     await fs.access(tsPath, fs.constants.F_OK);
     return tsPath;
