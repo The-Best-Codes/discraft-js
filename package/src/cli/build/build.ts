@@ -1,13 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { spawn } from "child_process";
 import consola from "consola";
 import { build as esbuild } from "esbuild";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
-import { promisify } from "util";
-
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const exec = promisify(require("child_process").exec);
+import { isBunInstalled, runSubprocess } from "../utils";
 
 type Builder = "esbuild" | "bun";
 
@@ -20,18 +15,15 @@ async function build(
   let runner: Builder = builder || "esbuild";
 
   if (!builder) {
-    try {
-      // Use bun --version to check for bun existence
-      await exec("bun --version");
+    if (await isBunInstalled()) {
       runner = "bun";
       consola.verbose("Bun detected. Using Bun CLI for build.");
-    } catch (error) {
+    } else {
       consola.verbose("Bun not detected. Using esbuild for build.");
     }
   } else {
     consola.info(`Using ${builder} instead of auto-detect.`);
   }
-
   if (runner === "bun") {
     try {
       const bunArgs = [
@@ -51,27 +43,8 @@ async function build(
       if (env === "prod") {
         bunArgs.push("--minify");
       }
-
-      const childProcess = spawn(bunArgs[0], bunArgs.slice(1), {
-        stdio: "inherit",
-      });
-
-      await new Promise((resolve, reject) => {
-        childProcess.on("error", (error) => {
-          consola.error(`Error during bun build: ${error.message}`);
-          reject(error);
-        });
-
-        childProcess.on("exit", (code) => {
-          if (code === 0) {
-            consola.success("Build complete using Bun.");
-            resolve(true);
-          } else {
-            consola.error(`Bun build process exited with code ${code}`);
-            reject(new Error(`Bun build exited with code ${code}`));
-          }
-        });
-      });
+      await runSubprocess(bunArgs[0], bunArgs.slice(1));
+      consola.success("Build complete using Bun.");
     } catch (error: any) {
       consola.error(`Error during bun build: ${error.message}`);
       if (env !== "dev") {

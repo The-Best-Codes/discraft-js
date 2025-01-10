@@ -15,6 +15,7 @@ await fs.rm(outDir, { recursive: true, force: true });
 
 await build({
   entrypoints: [cliFile],
+  //minify: true,
   splitting: true,
   packages: "external",
   outdir: outDir,

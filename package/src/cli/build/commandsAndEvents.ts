@@ -1,6 +1,7 @@
 import { consola as logger } from "consola";
 import { promises as fs } from "fs";
 import path from "path";
+import { isTypeScriptProject } from "../utils";
 import { generateCommandsIndex } from "./index-files/commands";
 import { generateEventsIndex } from "./index-files/events";
 
@@ -17,15 +18,15 @@ async function generateIndexFiles(target?: BuildTarget | BuildTarget[]) {
       ? target
       : [target]
     : ["commands", "events"];
-
+  const isTS = await isTypeScriptProject();
   try {
     if (targets.includes("commands")) {
       await fs.mkdir(path.join(DISCRAFT_DIR, "commands"), { recursive: true });
-      await generateCommandsIndex();
+      await generateCommandsIndex(isTS ? "ts" : "js");
     }
     if (targets.includes("events")) {
       await fs.mkdir(path.join(DISCRAFT_DIR, "events"), { recursive: true });
-      await generateEventsIndex();
+      await generateEventsIndex(isTS ? "ts" : "js");
     }
   } catch (error) {
     logger.error("Failed to generate Discraft index files.", error);

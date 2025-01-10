@@ -1,7 +1,7 @@
 import consola from "consola";
-import fs from "fs/promises";
 import path from "path";
-import { build } from "./build";
+import { getEntryPoint } from "../utils";
+import { build as buildFn } from "./build";
 import { generateIndexFiles } from "./commandsAndEvents";
 import copyFiles from "./copyFiles";
 
@@ -9,21 +9,26 @@ type Builder = "esbuild" | "bun";
 
 interface BuildOptions {
   builder?: Builder;
+  file?: string;
 }
 
 async function startBuild(options?: BuildOptions) {
   consola.info(`Starting production build...`);
   const currentWorkingDirectory = process.cwd();
-  const srcPath = path.join(currentWorkingDirectory, "index.ts");
-  const outputPath = path.join(currentWorkingDirectory, "dist");
-
-  // Check if index.ts exists
+  let outputPath = path.join(currentWorkingDirectory, "dist");
+  let entryPoint;
   try {
-    await fs.access(srcPath, fs.constants.F_OK);
-  } catch (error) {
-    consola.error(`Error: Could not find index.ts at ${srcPath}.`);
-    consola.verbose("Error: ", error);
-    throw new Error(`index.ts not found at ${srcPath}`);
+    entryPoint = await getEntryPoint(options?.file);
+    // If a custom file was provided and its not a default path, use the directory of that file for the output
+    if (options?.file && !options.file.includes("index.")) {
+      outputPath = path.join(path.dirname(entryPoint), "dist");
+      consola.info(
+        `Custom file provided, setting output path to: ${outputPath}`,
+      );
+    }
+  } catch (e) {
+    consola.error("Could not get entrypoint file");
+    throw e;
   }
 
   consola.info("Performing pre-build setup...");
@@ -37,7 +42,7 @@ async function startBuild(options?: BuildOptions) {
 
   consola.info(`Creating production build...`);
   try {
-    await build("prod", srcPath, outputPath, options?.builder);
+    await buildFn("prod", entryPoint, outputPath, options?.builder);
     consola.info("Build output: " + outputPath);
     consola.success(`Build finished successfully!`);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

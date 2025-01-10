@@ -1,79 +1,48 @@
-import { execSync } from "child_process";
 import consola from "consola";
 import fs from "fs-extra";
 import inquirer from "inquirer";
 import kleur from "kleur";
 import path from "path";
 import { fileURLToPath } from "url";
+import { runSubprocess } from "../utils";
+import { loadTemplateConfig, type TemplateConfig } from "./config";
 import { detectPackageManager } from "./detectPm";
+import { copyTemplateFiles } from "./template";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-async function copyTemplate(templatePath: string, projectPath: string) {
-  const files = [
-    "clients",
-    "commands",
-    "events",
-    "utils",
-    ".env.example",
-    "index.ts",
-    "package.json",
-    "tsconfig.json",
-  ];
-
-  for (const file of files) {
-    const sourcePath = path.join(templatePath, file);
-    const destPath = path.join(projectPath, file);
-
-    try {
-      if (fs.lstatSync(sourcePath).isDirectory()) {
-        await fs.copy(sourcePath, destPath);
-      } else {
-        await fs.copyFile(sourcePath, destPath);
-      }
-    } catch (e) {
-      consola.error(`Failed to copy ${sourcePath} to ${destPath}`, e);
-      throw new Error(`Failed to copy template files, ${e}`);
-    }
-  }
-
-  // Handle .gitignore specially
-  const gitignoreSourcePath = path.join(templatePath, "gitignore.template");
-  const gitignoreDestPath = path.join(projectPath, ".gitignore");
-
-  try {
-    await fs.copyFile(gitignoreSourcePath, gitignoreDestPath);
-  } catch (e) {
-    consola.error(
-      `Failed to copy ${gitignoreSourcePath} to ${gitignoreDestPath}`,
-      e,
-    );
-    throw new Error(`Failed to copy .gitignore template file, ${e}`);
-  }
-}
 
 interface InitOptions {
   dir?: string;
   packageManager?: string;
   skipInstall?: boolean;
+  template?: "ts" | "js";
 }
 
 async function init(options: InitOptions = {}) {
   const currentWorkingDirectory = process.cwd();
   const packageRoot = path.join(__dirname, "..", "..");
-  const templatePath = path.join(packageRoot, "templates", "ts");
-
+  const template =
+    options.template ??
+    (
+      await inquirer.prompt({
+        type: "list",
+        name: "template",
+        message: "Select a template:",
+        choices: [
+          { name: "TypeScript", value: "ts" },
+          { name: "JavaScript", value: "js" },
+        ],
+        default: "ts",
+      })
+    ).template;
+  const templatePath = path.join(packageRoot, "templates", template);
   let projectDir: string;
-  // Remove projectName variable declaration
-  // let projectName: string;
 
   if (options.dir) {
     projectDir = path.isAbsolute(options.dir)
       ? options.dir
       : path.join(currentWorkingDirectory, options.dir);
-    // Remove assignment to projectName
-    // projectName = path.basename(projectDir);
   } else {
     const locationChoice = await inquirer.prompt([
       {
@@ -89,8 +58,6 @@ async function init(options: InitOptions = {}) {
 
     if (locationChoice.location === "current") {
       projectDir = currentWorkingDirectory;
-      // Remove assignment to projectName
-      // projectName = path.basename(currentWorkingDirectory);
     } else {
       const { customDir } = await inquirer.prompt([
         {
@@ -100,8 +67,6 @@ async function init(options: InitOptions = {}) {
           default: "my-discord-bot",
         },
       ]);
-      // Remove assignment to projectName
-      // projectName = customDir;
       projectDir = path.join(currentWorkingDirectory, customDir);
     }
   }
@@ -129,18 +94,36 @@ async function init(options: InitOptions = {}) {
 
   consola.info(`Initializing project in ${kleur.cyan(projectDir)}...`);
 
+  let templateConfig: TemplateConfig;
+  try {
+    templateConfig = await loadTemplateConfig(templatePath);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    consola.error("Could not load template config, using defaults");
+    templateConfig = {
+      files: [
+        "clients",
+        "commands",
+        "events",
+        "utils",
+        ".env.example",
+        "index.ts",
+        "package.json",
+        "tsconfig.json",
+      ],
+    };
+  }
   try {
     await fs.ensureDir(projectDir);
-    await copyTemplate(templatePath, projectDir);
+    await copyTemplateFiles(templatePath, projectDir, templateConfig);
     consola.success("Template files copied successfully!");
 
     if (packageManager && packageManager !== "none" && !options.skipInstall) {
       consola.info(
         `Installing dependencies with ${kleur.cyan(packageManager)}...`,
       );
-      execSync(`${packageManager} install`, {
+      await runSubprocess(packageManager, ["install"], {
         cwd: projectDir,
-        stdio: "inherit",
       });
       consola.success("Dependencies installed successfully!");
     }
@@ -150,6 +133,7 @@ async function init(options: InitOptions = {}) {
         ? "npm"
         : packageManager;
     const isCurrentDir = projectDir === currentWorkingDirectory;
+    const postCopyInstructions = templateConfig?.postCopy?.instructions ?? [];
 
     console.log(
       "\n" + kleur.bold("🎉 Project initialized successfully!") + "\n",
@@ -158,14 +142,17 @@ async function init(options: InitOptions = {}) {
 
     if (!isCurrentDir) {
       console.log(
-        `${kleur.gray("─")} cd ${kleur.cyan(path.relative(currentWorkingDirectory, projectDir))}`,
+        `${kleur.gray("─")} cd ${kleur.cyan(
+          path.relative(currentWorkingDirectory, projectDir),
+        )}`,
       );
     }
 
     console.log(
       [
-        `${kleur.gray("─")} ${kleur.yellow("cp")} ${kleur.cyan(".env.example")} ${kleur.cyan(".env")}`,
-        `${kleur.gray("─")} Configure your ${kleur.cyan(".env")} file with your bot token`,
+        ...postCopyInstructions.map(
+          (instruction) => `${kleur.gray("─")} ${instruction}`,
+        ),
         `${kleur.underline("Development")}`,
         `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run dev`)} to start the development server`,
         `${kleur.underline("Production")}`,
