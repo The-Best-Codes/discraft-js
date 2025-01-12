@@ -14,6 +14,7 @@ type Runner = "node" | "bun";
 interface DevOptions {
   builder?: Builder;
   clearConsole?: boolean;
+  runner?: Runner;
 }
 
 const DIST_DIR = path.join(process.cwd(), "dist");
