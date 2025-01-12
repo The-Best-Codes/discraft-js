@@ -1,3 +1,4 @@
 {
-  "target": "vercel"
+  "target": "vercel",
+  "language": "ts"
 }

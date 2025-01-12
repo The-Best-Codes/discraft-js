@@ -17,6 +17,7 @@
     "typescript": "^5.7.3"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.21.0",
     "@vercel/node": "^5.0.2",
     "consola": "^3.3.3",
     "discord-interactions": "^4.1.0",
