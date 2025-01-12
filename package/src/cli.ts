@@ -125,7 +125,16 @@ program
   .option("--skip-install", "Skip dependency installation")
   .option(
     "-t, --template <template>",
-    "Template to use (js or ts). Defaults to prompt.",
+    "Template to use (js, ts, or vercel-ts-ai). Defaults to prompt.",
+    (value) => {
+      if (value && !["js", "ts", "vercel-ts-ai"].includes(value)) {
+        consola.error(
+          "Invalid template value. Must be 'js', 'ts', or 'vercel-ts-ai'.",
+        );
+        process.exit(1);
+      }
+      return value;
+    },
   )
   .action(async (options) => {
     try {

@@ -20,22 +20,22 @@ async function loadTemplateConfig(
     return JSON.parse(configContent);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
-    // If config file doesn't exist we use default
-    return {
-      files: [
-        "clients",
-        "commands",
-        "events",
-        "utils",
-        ".env.example",
-        "index.ts",
-        "package.json",
-        "tsconfig.json",
-      ],
-      postCopy: {
-        instructions: ["Configure your .env file with your bot token"],
-      },
-    };
+      // If config file doesn't exist we use default based on the template name
+        return {
+        files: [
+          "clients",
+          "commands",
+          "events",
+          "utils",
+          ".env.example",
+          "index.ts",
+          "package.json",
+          "tsconfig.json",
+        ],
+        postCopy: {
+          instructions: ["Configure your .env file with your bot token"],
+        },
+      };
   }
 }
 

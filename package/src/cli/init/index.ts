@@ -16,7 +16,7 @@ interface InitOptions {
   dir?: string;
   packageManager?: string;
   skipInstall?: boolean;
-  template?: "ts" | "js";
+  template?: "ts" | "js" | "vercel-ts-ai";
 }
 
 async function init(options: InitOptions = {}) {
@@ -32,6 +32,7 @@ async function init(options: InitOptions = {}) {
         choices: [
           { name: "TypeScript", value: "ts" },
           { name: "JavaScript", value: "js" },
+          { name: "Vercel + TypeScript + Google AI", value: "vercel-ts-ai" },
         ],
         default: "ts",
       })

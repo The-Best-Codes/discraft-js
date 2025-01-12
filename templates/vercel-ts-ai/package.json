@@ -1,0 +1,28 @@
+{
+  "name": "discraft-bot",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Bot created with discraft",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "discraft start",
+    "build": "discraft build",
+    "dev": "discraft dev"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.5",
+    "discraft": "latest",
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "@vercel/node": "^5.0.2",
+    "consola": "^3.3.3",
+    "discord-interactions": "^4.1.0",
+    "discord.js": "^14.17.3",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "raw-body": "^3.0.0"
+  }
+}
