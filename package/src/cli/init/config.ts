@@ -6,6 +6,9 @@ interface TemplateConfig {
   postCopy?: {
     instructions?: string[];
     commands?: string[];
+    defaultDevelopment?: boolean | string;
+    defaultProduction?: boolean | string;
+    defaultStart?: boolean | string;
   };
 }
 

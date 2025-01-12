@@ -135,6 +135,9 @@ async function init(options: InitOptions = {}) {
         : packageManager;
     const isCurrentDir = projectDir === currentWorkingDirectory;
     const postCopyInstructions = templateConfig?.postCopy?.instructions ?? [];
+    const defaultDevelopment = templateConfig?.postCopy?.defaultDevelopment;
+    const defaultProduction = templateConfig?.postCopy?.defaultProduction;
+    const defaultStart = templateConfig?.postCopy?.defaultStart;
 
     console.log(
       "\n" + kleur.bold("🎉 Project initialized successfully!") + "\n",
@@ -149,18 +152,33 @@ async function init(options: InitOptions = {}) {
       );
     }
 
-    console.log(
-      [
-        ...postCopyInstructions.map(
-          (instruction) => `${kleur.gray("─")} ${instruction}`,
-        ),
-        `${kleur.underline("Development")}`,
+    const nextSteps = [
+      ...postCopyInstructions.map(
+        (instruction) => `${kleur.gray("─")} ${instruction}`,
+      ),
+    ];
+
+    if (defaultDevelopment !== false) {
+      nextSteps.push(`${kleur.underline("Development")}`);
+      nextSteps.push(
         `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run dev`)} to start the development server`,
-        `${kleur.underline("Production")}`,
+      );
+    }
+
+    if (defaultProduction !== false) {
+      nextSteps.push(`${kleur.underline("Production")}`);
+      nextSteps.push(
         `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run build`)} to compile your bot code`,
-        `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run start`)} to launch your bot in production`,
-      ].join("\n"),
-    );
+      );
+
+      if (defaultStart !== false) {
+        nextSteps.push(
+          `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run start`)} to launch your bot in production`,
+        );
+      }
+    }
+
+    console.log(nextSteps.join("\n"));
 
     console.log("\n" + kleur.bold("Happy bot building! 🚀") + "\n");
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -3,7 +3,6 @@
     "commands",
     "utils",
     ".env.example",
-    "discraft.conf.json",
     "index.ts",
     "package.json",
     "README.md",
@@ -12,8 +11,10 @@
   "postCopy": {
     "instructions": [
       "Configure your .env file with your bot public token and app ID",
-      "Add your Google API key to the .env file to enable the chat command",
-      "See the project README file for instuctions on deploying to Vercel"
-    ]
+      "Add your Google API key to the .env file to enable the chat command"
+    ],
+    "defaultDevelopment": false,
+    "defaultStart": false,
+    "defaultProduction": false
   }
 }

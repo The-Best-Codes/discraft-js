@@ -6,15 +6,15 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "discraft start",
-    "build": "discraft build",
-    "dev": "discraft dev"
+    "deploy": "vercel deploy",
+    "build": "discraft vercel build"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/node": "^22.10.5",
     "discraft": "latest",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vercel": "^39.2.6"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
