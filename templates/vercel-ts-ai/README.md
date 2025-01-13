@@ -96,9 +96,17 @@ GOOGLE_AI_MODEL='gemini-2.0-flash-exp'
 
 ## Discord Bot Setup
 
+### Create a Discord Application
+
 1. **Create a Discord Application:** Go to the [Discord Developer Portal](https://discord.com/developers/applications) and create a new application.
 2. **Add a Bot User:** Add a bot user to your application.
 3. **Invite the Bot:** Use the 'OAuth2 > URL Generator' section to create an invite link and add your bot to a server. Select the `applications.commands` scope and send this link to a discord server you own so you can see your bot in action.
+
+### Change the Bot's Interactions Endpoint URL
+
+1. **Go to the Bot's Application Page:** Go to the [Discord Developer Portal](https://discord.com/developers/applications) and select your bot's application.
+2. **Go to the General Information Tab.**
+3. **Set the Interactions Endpoint URL:** In the Interactions Endpoint URL field, enter the URL of your bot's API endpoint. This should be the URL of your Vercel deployment, followed by `/api`.
 
 ## Example Commands
 
