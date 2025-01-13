@@ -2,6 +2,7 @@
   "files": [
     "commands",
     "public",
+    "scripts",
     "utils",
     ".env.example",
     ".vercelignore",
@@ -13,8 +14,9 @@
   ],
   "postCopy": {
     "instructions": [
-      "Configure your .env file with your bot public token and app ID",
-      "Add your Google API key to the .env file to enable the chat command"
+      "Copy .env.example to .env",
+      "Add your Discord and Google AI credentials to .env",
+      "Check out the README.md file in your project to learn how to deploy to Vercel"
     ],
     "defaultDevelopment": false,
     "defaultStart": false,

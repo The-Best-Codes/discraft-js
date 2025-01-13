@@ -14,7 +14,7 @@
     "discraft": "latest"
   },
   "dependencies": {
-    "consola": "^3.3.3",
+    "consola": "^3.4.0",
     "discord.js": "^14.17.3",
     "dotenv": "^16.4.7"
   }
