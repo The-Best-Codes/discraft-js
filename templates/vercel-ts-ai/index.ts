@@ -1,4 +1,9 @@
 import type { VercelRequest, VercelResponse } from "@vercel/node";
+import {
+  type APIInteractionResponse,
+  InteractionResponseType,
+  MessageFlags,
+} from "discord-api-types/v10";
 import { InteractionType, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
 import commands from "./.discraft/commands/index";
@@ -84,8 +89,23 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const command = (commands as any)[commandName];
 
       if (command) {
-        const commandResponse = await command.execute({ interaction: message });
-        logger.debug("Command executed successfully", { commandName });
+        let commandResponse: APIInteractionResponse;
+        try {
+          commandResponse = await command.execute({ interaction: message });
+          logger.debug("Command executed successfully", { commandName });
+        } catch (error) {
+          logger.error("Error executing command", {
+            commandName,
+            error,
+          });
+          commandResponse = {
+            type: InteractionResponseType.ChannelMessageWithSource,
+            data: {
+              content: "An error occurred while processing your request.",
+              flags: MessageFlags.Ephemeral,
+            },
+          };
+        }
         return res.status(200).json(commandResponse);
       }
 

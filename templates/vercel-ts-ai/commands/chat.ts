@@ -1,5 +1,14 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { type SimplifiedInteraction } from "../utils/types";
+import {
+  type APIApplicationCommandInteraction,
+  type APIApplicationCommandOption,
+  type APIChatInputApplicationCommandInteraction,
+  type APIInteractionResponse,
+  ApplicationCommandOptionType,
+  InteractionResponseType,
+  MessageFlags,
+  type RESTPostAPIApplicationCommandsJSONBody,
+} from "discord-api-types/v10";
 
 export default {
   data: {
@@ -9,40 +18,56 @@ export default {
       {
         name: "prompt",
         description: "The prompt for the AI",
-        type: 3,
+        type: ApplicationCommandOptionType.String,
         required: true,
       },
       {
         name: "image",
         description: "Optional image to include in the prompt",
-        type: 11,
+        type: ApplicationCommandOptionType.Attachment,
         required: false,
       },
     ],
-  },
-
-  async execute(data: { interaction: SimplifiedInteraction }) {
+  } as RESTPostAPIApplicationCommandsJSONBody,
+  async execute(data: {
+    interaction: APIApplicationCommandInteraction;
+  }): Promise<APIInteractionResponse> {
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
     const model = genAI.getGenerativeModel({
       model: process.env.GOOGLE_AI_MODEL || "gemini-1.5-flash",
     });
     const interaction = data.interaction;
-    const promptOption = interaction.data.options?.find(
+
+    if (interaction.data.type !== 1) {
+      return {
+        type: InteractionResponseType.ChannelMessageWithSource,
+        data: {
+          content:
+            "This command can only be used as a chat input (slash) command.",
+          flags: MessageFlags.Ephemeral,
+        },
+      };
+    }
+
+    const chatInteraction =
+      interaction as APIChatInputApplicationCommandInteraction;
+
+    const promptOption = chatInteraction.data.options?.find(
       (option) => option.name === "prompt",
-    );
-    const imageOption = interaction.data.options?.find(
+    ) as (APIApplicationCommandOption & { value: string }) | undefined;
+    const imageOption = chatInteraction.data.options?.find(
       (option) => option.name === "image",
-    );
+    ) as (APIApplicationCommandOption & { value: string }) | undefined;
     const prompt = promptOption?.value || "";
     const imageAttachment =
-      interaction.data.resolved?.attachments?.[imageOption?.value || ""];
+      chatInteraction.data.resolved?.attachments?.[imageOption?.value || ""];
 
     if (prompt.length > 2000) {
       return {
-        type: 4,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
           content: "Prompt must be less than 2000 characters.",
-          flags: 64,
+          flags: MessageFlags.Ephemeral,
         },
       };
     }
@@ -68,7 +93,7 @@ export default {
       const response = result.response.text();
 
       return {
-        type: 4,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
           content: response,
         },
@@ -76,9 +101,10 @@ export default {
     } catch (error) {
       console.error("Error during AI chat:", error);
       return {
-        type: 4,
+        type: InteractionResponseType.ChannelMessageWithSource,
         data: {
           content: "An error occurred while processing your request.",
+          flags: MessageFlags.Ephemeral,
         },
       };
     }

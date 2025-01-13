@@ -10,7 +10,6 @@
     "build": "discraft vercel build"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
     "@types/node": "^22.10.5",
     "discraft": "latest",
     "typescript": "^5.7.3",
@@ -20,9 +19,8 @@
     "@google/generative-ai": "^0.21.0",
     "@vercel/node": "^5.0.2",
     "consola": "^3.3.3",
+    "discord-api-types": "^0.37.115",
     "discord-interactions": "^4.1.0",
-    "discord.js": "^14.17.3",
-    "express": "^4.21.2",
     "raw-body": "^3.0.0"
   }
 }

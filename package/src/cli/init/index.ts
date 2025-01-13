@@ -123,10 +123,15 @@ async function init(options: InitOptions = {}) {
       consola.info(
         `Installing dependencies with ${kleur.cyan(packageManager)}...`,
       );
-      await runSubprocess(packageManager, ["install"], {
-        cwd: projectDir,
-      });
-      consola.success("Dependencies installed successfully!");
+      try {
+        await runSubprocess(packageManager, ["install"], {
+          cwd: projectDir,
+        });
+        consola.success("Dependencies installed successfully!");
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+      } catch (error: any) {
+        consola.error("Could not install dependencies.");
+      }
     }
 
     const pmCommand =
