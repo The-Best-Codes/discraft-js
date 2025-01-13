@@ -1,12 +1,15 @@
 {
   "files": [
     "commands",
+    "public",
     "utils",
     ".env.example",
+    ".vercelignore",
     "index.ts",
     "package.json",
     "README.md",
-    "tsconfig.json"
+    "tsconfig.json",
+    "vercel.json"
   ],
   "postCopy": {
     "instructions": [

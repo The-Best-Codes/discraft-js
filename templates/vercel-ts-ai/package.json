@@ -6,7 +6,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
-    "deploy": "vercel deploy",
+    "deploy": "vercel --prod",
     "build": "discraft vercel build"
   },
   "devDependencies": {

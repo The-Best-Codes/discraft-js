@@ -1,19 +1,18 @@
-import {
-  ChatInputCommandInteraction,
-  MessageFlags,
-  SlashCommandBuilder,
-} from "discord.js";
+import { type SimplifiedInteraction } from "../utils/types";
 
 export default {
-  data: new SlashCommandBuilder()
-    .setName("ping")
-    .setDescription("Check if the bot is online"),
+  data: {
+    name: "ping",
+    description: "Check if the bot is online",
+  },
 
-  async execute(data: { interaction: ChatInputCommandInteraction }) {
-    const interaction = data.interaction;
-    await interaction.reply({
-      content: "Pong from Vercel!",
-      flags: MessageFlags.Ephemeral,
-    });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async execute(data: { interaction: SimplifiedInteraction }) {
+    return {
+      type: 4,
+      data: {
+        content: "Pong from Vercel!",
+      },
+    };
   },
 };

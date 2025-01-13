@@ -6,6 +6,7 @@ import { InteractionType, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
 import commands from "./.discraft/commands/index";
 import { logger } from "./utils/logger";
+import { type SimplifiedInteraction } from "./utils/types";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -71,7 +72,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Parse the message
-    const message = JSON.parse(rawBody.toString());
+    const message: SimplifiedInteraction = JSON.parse(rawBody.toString());
     logger.debug("Parsed message", { message });
 
     // Handle different interaction types
@@ -86,9 +87,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       const command = (commands as any)[commandName];
 
       if (command) {
-        await command.execute({ interaction: message });
+        const commandResponse = await command.execute({ interaction: message });
         logger.debug("Command executed successfully", { commandName });
-        return; // Assume command sends a response, so we should return early here
+        return res.status(200).json(commandResponse);
       }
 
       logger.warn("Unknown command", { commandName });
