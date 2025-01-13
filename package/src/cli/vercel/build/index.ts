@@ -2,6 +2,7 @@
 import consola from "consola";
 import { build as esbuild } from "esbuild";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
+import { promises as fs } from "fs";
 import path from "path";
 
 import {
@@ -16,6 +17,63 @@ type Builder = "esbuild" | "bun";
 
 interface BuildOptions {
   builder?: Builder;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+async function compileAndRunRegisterScript(isTS: boolean) {
+  const registerTsPath = path.join(process.cwd(), "scripts", "register.ts");
+  const registerJsPath = path.join(process.cwd(), "scripts", "register.js");
+  const outPath = path.join(
+    process.cwd(),
+    ".discraft",
+    "commands",
+    "register.js",
+  );
+
+  let registerFile: string | null = null;
+  try {
+    await fs.access(registerTsPath);
+    registerFile = registerTsPath;
+  } catch {
+    try {
+      await fs.access(registerJsPath);
+      registerFile = registerJsPath;
+    } catch {
+      consola.warn(
+        "register.ts or register.js not found in scripts folder. Skipping compilation.",
+      );
+      return;
+    }
+  }
+
+  consola.info("Compiling and running register script...");
+
+  try {
+    if (registerFile?.endsWith(".ts")) {
+      // Compile register.ts to register.js
+      await esbuild({
+        entryPoints: [registerFile],
+        outfile: outPath,
+        platform: "node",
+        format: "esm",
+        bundle: true,
+        plugins: [nodeExternalsPlugin()],
+      });
+      consola.verbose("register.ts compiled to .discraft/commands/register.js");
+    } else {
+      // Copy register.js to .discraft/commands/register.js
+      await fs.copyFile(registerFile!, outPath);
+      consola.verbose("register.js copied to .discraft/commands/register.js");
+    }
+
+    // Run register.js
+    await runSubprocess("node", [outPath]);
+    consola.success("Command registration script ran successfully.");
+  } catch (error: any) {
+    consola.error(`Error during register script execution.`);
+    consola.verbose(error);
+    consola.warn("Continuing build process.");
+  }
 }
 
 async function startBuild(options?: BuildOptions) {
@@ -35,6 +93,9 @@ async function startBuild(options?: BuildOptions) {
   const isTS = await isTypeScriptProject();
   await generateVercelCommandsIndex(isTS ? "ts" : "js");
   consola.success("Command index file generated.");
+
+  // Compile & Run register.ts or register.js if it exists.
+  await compileAndRunRegisterScript(isTS);
 
   let runner: Builder = options?.builder || "esbuild";
 
