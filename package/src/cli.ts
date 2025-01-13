@@ -63,7 +63,6 @@ program
     });
   });
 
-// Vercel command is now nested under 'vercel'
 program
   .command("vercel")
   .description("Commands for Vercel deployments")
@@ -92,6 +91,7 @@ program
         });
       }),
   );
+
 program
   .command("dev")
   .description("Start the bot in development mode")
