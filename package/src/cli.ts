@@ -8,6 +8,7 @@ import { build } from "./cli/build";
 import { dev } from "./cli/dev";
 import { init } from "./cli/init";
 import { start } from "./cli/start";
+import { build as vercelBuild } from "./cli/vercel/build";
 
 program
   .version(version)
@@ -62,6 +63,35 @@ program
     });
   });
 
+// Vercel command is now nested under 'vercel'
+program
+  .command("vercel")
+  .description("Commands for Vercel deployments")
+  .addCommand(
+    program
+      .createCommand("build")
+      .description("Build the bot for Vercel")
+      .option(
+        "-b, --builder <builder>",
+        "Specify the builder to use (esbuild or bun). Defaults to auto-detect.",
+        (value) => {
+          if (value !== "esbuild" && value !== "bun") {
+            consola.error("Invalid builder value. Must be 'esbuild' or 'bun'.");
+            process.exit(1);
+          }
+          return value;
+        },
+      )
+      .action((options) => {
+        vercelBuild({ builder: options.builder }).catch((error) => {
+          consola.error(
+            "An error occurred during the vercel build. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+          );
+          consola.verbose(error);
+          process.exit(1);
+        });
+      }),
+  );
 program
   .command("dev")
   .description("Start the bot in development mode")
