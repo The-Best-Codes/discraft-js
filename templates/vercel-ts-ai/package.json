@@ -22,7 +22,6 @@
     "consola": "^3.3.3",
     "discord-interactions": "^4.1.0",
     "discord.js": "^14.17.3",
-    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "raw-body": "^3.0.0"
   }

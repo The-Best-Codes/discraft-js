@@ -1,6 +1,3 @@
-import { configDotenv } from "dotenv";
-configDotenv();
-
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { InteractionType, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
