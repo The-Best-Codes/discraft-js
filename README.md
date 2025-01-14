@@ -7,11 +7,12 @@
 [![npm downloads](https://img.shields.io/npm/dm/discraft.svg)](https://www.npmjs.com/package/discraft)
 [![Discord Server](https://img.shields.io/discord/1170475897174896650)](https://discord.gg/dKeuR9yfBs)
 [![CodeQL](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql)
-[![Dependabot Updates](https://github.com/The-Best-Codes/discraft-js/actions/workflows/dependabot/dependabot-updates/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/dependabot/dependabot-updates)
 
 Discraft is a modern, developer-friendly framework for building Discord bots with ease.
 It provides a robust CLI and a set of tools to streamline the development process, allowing you to focus on creating amazing bot experiences.
 Think of it as a "batteries-included" approach, letting you get started quickly and efficiently. It's like Next.js for Discord bots.
+
+> Note: If you are viewing this documentation on npm, check out the [GitHub repository](https://github.com/The-Best-Codes/discraft-js) for more up-to-date documentation.
 
 ## Table of Contents
 
