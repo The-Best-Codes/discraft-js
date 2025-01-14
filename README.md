@@ -29,6 +29,8 @@ Think of it as a "batteries-included" approach, letting you get started quickly 
   - [`discraft dev`](#discraft-dev)
   - [`discraft build`](#discraft-build)
   - [`discraft start`](#discraft-start)
+  - [`discraft vercel build`](#discraft-vercel-build)
+- [🚀 Deploying to Vercel](#-deploying-to-vercel)
 - [📁 Project Structure](#-project-structure)
 - [🛠️ Development](#️-development)
   - [Dependencies](#dependencies)
@@ -68,7 +70,7 @@ Alternatively, you can install Discraft globally to use the CLI from any directo
 npm install -g discraft
 ```
 
-When installed globally, you can use `discraft` command directly instead of `npx discraft`.
+When installed globally, you can use the `discraft` command directly instead of `npx discraft`.
 
 ### Creating a New Project
 
@@ -84,7 +86,7 @@ Or, if Discraft is installed globally:
 discraft init
 ```
 
-This will guide you through creating a new Discraft bot project, asking for details such as the project directory and package manager.
+This will guide you through creating a new Discraft bot project, asking for details such as the project directory, package manager, and template.
 
 **After initialization, you will need to copy the `.env.example` file to `.env` and then edit the `.env` file with your bot token and client ID.**
 
@@ -98,7 +100,7 @@ DISCORD_APP_ID=''
 You can also specify options directly:
 
 ```bash
-npx discraft init -d my-bot-dir -p bun # Initialize a project in 'my-bot-dir' using bun
+npx discraft init -d my-bot-dir -p bun -t ts # Initialize a project in 'my-bot-dir' using bun and the typescript template
 ```
 
 See the [CLI Reference](#-cli-reference) for all options.
@@ -229,17 +231,18 @@ Initializes a new Discraft project.
 - `-d, --dir <directory>`: Specify the project directory (defaults to current directory).
 - `-p, --package-manager <pm>`: Package manager to use (npm, yarn, pnpm, bun, or none).
 - `--skip-install`: Skip dependency installation.
+- `-t, --template <template>`: Template to use (js, ts, or vercel-ts-ai). Defaults to prompt.
 
 **Example:**
 
 ```bash
-npx discraft init -d my-bot -p bun --skip-install
+npx discraft init -d my-bot -p bun --skip-install -t ts
 ```
 
 Or, if Discraft is installed globally:
 
 ```bash
-discraft init -d my-bot -p bun --skip-install
+discraft init -d my-bot -p bun --skip-install -t ts
 ```
 
 ### `discraft dev`
@@ -303,6 +306,55 @@ Or, if Discraft is installed globally:
 ```bash
 discraft start -r node
 ```
+
+### `discraft vercel build`
+
+Builds the bot for deployment on Vercel. This command is a subcommand of `discraft vercel`.
+
+**Options:**
+
+- `-b, --builder <builder>`: Specify the builder to use (esbuild or bun). Defaults to auto-detect.
+
+**Example:**
+
+```bash
+npx discraft vercel build -b bun
+```
+
+Or, if Discraft is installed globally:
+
+```bash
+discraft vercel build -b bun
+```
+
+## 🚀 Deploying to Vercel
+
+To deploy your Discraft bot to Vercel, follow these steps:
+
+1. **Create a Vercel Project:** If you haven't already, create a new project in your Vercel dashboard. You can import your project from GitHub, GitLab or Bitbucket.
+2. **Set Environment Variables:** In your Vercel project settings, go to "Environment Variables" and add the following variables:
+   - `DISCORD_TOKEN`: Your Discord bot's token.
+   - `DISCORD_APP_ID`: Your Discord application's ID.
+   - **For AI templates:**
+     - `GOOGLE_AI_API_KEY`: Your Google AI API key.
+     - `GOOGLE_AI_MODEL`: The Google AI model you wish to use (e.g., `gemini-2.0-flash-exp`).
+       You can find the project settings [here](https://vercel.com/dashboard).
+3. **Run a Discraft Vercel Build**: In your project directory, run `npm run vercel-build` or `discraft vercel build` to create the API routes and files for your bot. This command prepares your bot for serverless deployment by generating the necessary API routes.
+   <details>
+        <summary>Alternative Package Manager Commands</summary>
+        <p>
+            If you prefer to use other package managers, here are the equivalent commands:
+            <br>
+             <b>pnpm:</b>
+                <pre><code>pnpm discraft vercel build</code></pre>
+             <b>bun:</b>
+                <pre><code>bunx discraft vercel build</code></pre>
+              <b>yarn:</b>
+                <pre><code>yarn discraft vercel build</code></pre>
+        </p>
+    </details>
+4. **Deploy:** You can deploy your bot to Vercel by running `npm run deploy` or using the `vercel` CLI. If using the CLI, you can run `vercel` and select the project you created. If you imported your project from a git repo, it should automatically deploy on commits. You can now set your bot's interactions endpoint to the `https://<your-project>.vercel.app/api` url.
+   - To setup the interactions endpoint, please see the 'Discord Bot Setup' section of the Vercel + TypeScript + Google AI template [README](https://github.com/The-Best-Codes/discraft-js/blob/main/templates/vercel-ts-ai/README.md).
 
 ## 📁 Project Structure
 
