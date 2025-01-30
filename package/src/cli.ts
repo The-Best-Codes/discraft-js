@@ -99,28 +99,42 @@ program
   .addCommand(
     program
       .createCommand("build")
-      .description("Build a standalone executable of your bot using Bun")
+      .description("Build a standalone executable of your bot")
       .option(
         "--target <target>",
-        "Target platform for bun build (e.g., bun-linux-x64). See Bun docs for options.",
+        `Target platform for executable.
+Supported targets:
+- bun-linux-x64
+- bun-linux-arm64
+- bun-windows-x64
+- bun-darwin-x64
+- bun-darwin-arm64`,
       )
-      .option(
-        "--entry <entry>",
-        "Custom entry point, defaults to dist/index.js",
-        "dist/index.js",
-      )
-      .option(
-        "--outfile <outfile>",
-        "Output file name, defaults to discraft-bot",
-        "discraft-bot",
-      )
+      .option("--entry <entry>", "Custom entry point", "dist/index.js")
+      .option("--outfile <outfile>", "Output file name", "dist/discraft-bot")
       .action((options) => {
         if (!options.target) {
           consola.error(
             "The --target option is required for `discraft exec build`.",
           );
+          program.help();
           process.exit(1);
         }
+        const supportedTargets = [
+          "bun-linux-x64",
+          "bun-linux-arm64",
+          "bun-windows-x64",
+          "bun-darwin-x64",
+          "bun-darwin-arm64",
+        ];
+        if (!supportedTargets.includes(options.target)) {
+          consola.error(
+            `Invalid target: ${options.target}. Supported targets are:\n${supportedTargets.join("\n")}`,
+          );
+          program.help();
+          process.exit(1);
+        }
+
         execBuild({
           target: options.target,
           entry: options.entry,

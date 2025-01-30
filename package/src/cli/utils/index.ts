@@ -55,7 +55,7 @@ async function runSubprocess(
       ...options,
     });
 
-    childProcess.on("error", (error) => {
+    childProcess.on("error", (error: Error) => {
       consola.error(`Error during subprocess: ${error.message}`);
       reject(error);
     });
