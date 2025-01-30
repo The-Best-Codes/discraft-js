@@ -21,8 +21,8 @@ async function build(options: ExecBuildOptions) {
   const distDir = path.dirname(outputFullPath);
 
   consola.info(`Building executable for target: ${target}`);
-  consola.info(`Entry point: ${entryFullPath}`);
-  consola.info(`Output file: ${outputFullPath}`);
+  consola.verbose(`Entry point: ${entryFullPath}`);
+  consola.verbose(`Output file: ${outputFullPath}`);
 
   if (!(await isBunInstalled())) {
     consola.error(
@@ -50,14 +50,22 @@ async function build(options: ExecBuildOptions) {
       "bun",
       "build",
       "--compile",
-      `--target=${target}`,
+      `--target=${"bun-" + target}`,
       entryFullPath,
       `--outfile=${outputFullPath}`,
     ];
     await runSubprocess(bunArgs[0], bunArgs.slice(1));
-    consola.success(
-      `Executable build finished successfully! Output file: ${outputFullPath}`,
-    );
+    consola.success(`Executable built to \`${outputFullPath}\``);
+
+    const tips = [
+      "Run the executable from the terminal (not by clicking on it) so you don't create duplicate processes",
+      "The `.env` file should be in the same directory as the executable or the bot won't start",
+      "Run `chmod +x <executable>` if the executable needs permission to run",
+    ];
+
+    consola.log("Important notes:");
+    tips.forEach((tip) => consola.info(tip));
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     consola.error(`Executable build failed: ${error.message}`);

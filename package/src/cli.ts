@@ -104,11 +104,11 @@ program
         "--target <target>",
         `Target platform for executable.
 Supported targets:
-- bun-linux-x64
-- bun-linux-arm64
-- bun-windows-x64
-- bun-darwin-x64
-- bun-darwin-arm64`,
+- linux-x64
+- linux-arm64
+- windows-x64
+- darwin-x64
+- darwin-arm64`,
       )
       .option("--entry <entry>", "Custom entry point", "dist/index.js")
       .option("--outfile <outfile>", "Output file name", "dist/discraft-bot")
@@ -117,21 +117,19 @@ Supported targets:
           consola.error(
             "The --target option is required for `discraft exec build`.",
           );
-          program.help();
           process.exit(1);
         }
         const supportedTargets = [
-          "bun-linux-x64",
-          "bun-linux-arm64",
-          "bun-windows-x64",
-          "bun-darwin-x64",
-          "bun-darwin-arm64",
+          "linux-x64",
+          "linux-arm64",
+          "windows-x64",
+          "darwin-x64",
+          "darwin-arm64",
         ];
         if (!supportedTargets.includes(options.target)) {
           consola.error(
             `Invalid target: ${options.target}. Supported targets are:\n${supportedTargets.join("\n")}`,
           );
-          program.help();
           process.exit(1);
         }
 
