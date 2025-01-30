@@ -1,5 +1,7 @@
 # Discraft Vercel + TypeScript + AI Template
 
+### **Check out the [Vercel Deployment Guide](https://dev.to/best_codes/make-a-free-ai-chatbot-with-discord-vercel-373l) for a more detailed, step-by-step guide.**
+
 Let's get started creating a serverless Discord bot with Discraft and Vercel!
 This template leverages TypeScript and Google AI for enhanced functionality.
 

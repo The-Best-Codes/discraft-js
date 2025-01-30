@@ -6,6 +6,7 @@ import consola from "consola";
 import { version } from "../../package.json";
 import { build } from "./cli/build";
 import { dev } from "./cli/dev";
+import { build as execBuild } from "./cli/exec/build";
 import { init } from "./cli/init";
 import { start } from "./cli/start";
 import { build as vercelBuild } from "./cli/vercel/build";
@@ -85,6 +86,48 @@ program
         vercelBuild({ builder: options.builder }).catch((error) => {
           consola.error(
             "An error occurred during the vercel build. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+          );
+          consola.verbose(error);
+          process.exit(1);
+        });
+      }),
+  );
+
+program
+  .command("exec")
+  .description("Commands for executable builds")
+  .addCommand(
+    program
+      .createCommand("build")
+      .description("Build a standalone executable of your bot using Bun")
+      .option(
+        "--target <target>",
+        "Target platform for bun build (e.g., bun-linux-x64). See Bun docs for options.",
+      )
+      .option(
+        "--entry <entry>",
+        "Custom entry point, defaults to dist/index.js",
+        "dist/index.js",
+      )
+      .option(
+        "--outfile <outfile>",
+        "Output file name, defaults to discraft-bot",
+        "discraft-bot",
+      )
+      .action((options) => {
+        if (!options.target) {
+          consola.error(
+            "The --target option is required for `discraft exec build`.",
+          );
+          process.exit(1);
+        }
+        execBuild({
+          target: options.target,
+          entry: options.entry,
+          outfile: options.outfile,
+        }).catch((error) => {
+          consola.error(
+            "An error occurred during the executable build. Set CONSOLA_LEVEL to 'verbose' for details.",
           );
           consola.verbose(error);
           process.exit(1);

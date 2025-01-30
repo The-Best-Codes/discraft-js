@@ -12,9 +12,11 @@ Discraft is a modern, developer-friendly framework for building Discord bots wit
 It provides a robust CLI and a set of tools to streamline the development process, allowing you to focus on creating amazing bot experiences.
 Think of it as a "batteries-included" approach, letting you get started quickly and efficiently. It's like Next.js for Discord bots.
 
-> Note: If you are viewing this documentation on npm, check out the [GitHub repository](https://github.com/The-Best-Codes/discraft-js) for more up-to-date documentation.
+> **Note:** If you are viewing this documentation on npm, check out the [GitHub repository](https://github.com/The-Best-Codes/discraft-js) for more up-to-date documentation.
 
 ## Table of Contents
+
+> **Looking for instructions on how to deploy to Vercel?** Check out the [Vercel Deployment Guide](https://dev.to/best_codes/make-a-free-ai-chatbot-with-discord-vercel-373l).
 
 - [🚀 Getting Started](#-getting-started)
   - [Installation](#installation)
@@ -329,6 +331,8 @@ discraft vercel build -b bun
 ```
 
 ## 🚀 Deploying to Vercel
+
+**Check out the [Vercel Deployment Guide](https://dev.to/best_codes/make-a-free-ai-chatbot-with-discord-vercel-373l) for a more detailed, step-by-step guide.**
 
 To deploy your Discraft bot to Vercel, follow these steps:
 
