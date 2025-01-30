@@ -33,6 +33,7 @@ Think of it as a "batteries-included" approach, letting you get started quickly 
   - [`discraft build`](#discraft-build)
   - [`discraft start`](#discraft-start)
   - [`discraft vercel build`](#discraft-vercel-build)
+  - [`discraft exec build`](#discraft-exec-build)
 - [🚀 Deploying to Vercel](#-deploying-to-vercel)
 - [📁 Project Structure](#-project-structure)
 - [🛠️ Development](#️-development)
@@ -328,6 +329,40 @@ Or, if Discraft is installed globally:
 
 ```bash
 discraft vercel build -b bun
+```
+
+### `discraft exec build`
+
+Builds a standalone executable of your bot. This command is a subcommand of `discraft exec`.
+
+**Important notes:**
+
+- You must run `discraft build` before running `discraft exec build`.
+- This command only works with the JavaScript and TypeScript templates (not the Vercel template).
+- The `.env` file should be in the same directory as the executable or the bot won't start.
+
+**Options:**
+
+- `--target <target>`: Target platform for executable.
+  Supported targets:
+  - `linux-x64`
+  - `linux-arm64`
+  - `windows-x64`
+  - `darwin-x64`
+  - `darwin-arm64`
+- `--entry <entry>`: Custom entry point (defaults to `dist/index.js`).
+- `--outfile <outfile>`: Output file name (defaults to `dist/discraft-bot`).
+
+**Example:**
+
+```bash
+npx discraft exec build --target linux-x64
+```
+
+Or, if Discraft is installed globally:
+
+```bash
+discraft exec build --target linux-x64
 ```
 
 ## 🚀 Deploying to Vercel
