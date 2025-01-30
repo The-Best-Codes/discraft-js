@@ -353,6 +353,18 @@ Builds a standalone executable of your bot. This command is a subcommand of `dis
 - `--entry <entry>`: Custom entry point (defaults to `dist/index.js`).
 - `--outfile <outfile>`: Output file name (defaults to `dist/discraft-bot`).
 
+**Targets:**
+
+| Target       | OS      | Architecture |
+| ------------ | ------- | ------------ |
+| linux-x64    | Linux   | x64          |
+| linux-arm64  | Linux   | arm64        |
+| windows-x64  | Windows | x64          |
+| darwin-x64   | macOS   | x64          |
+| darwin-arm64 | macOS   | arm64        |
+
+You can find more information about targets in the [Bun documentation](https://bun.sh/docs/bundler/executables#cross-compile-to-other-platforms).
+
 **Example:**
 
 ```bash
