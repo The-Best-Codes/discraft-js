@@ -1,8 +1,9 @@
 import { WebContainer } from "@webcontainer/api";
-import Ansi from "ansi-to-html";
+import { FitAddon } from "@xterm/addon-fit";
+import { Terminal } from "@xterm/xterm";
 import { useEffect, useRef, useState } from "react";
-
-const ansiConverter = new Ansi();
+import "xterm/css/xterm.css";
+import "./Terminal.css";
 
 const files = {
   "index.js": {
@@ -42,28 +43,51 @@ app.listen(port, () => {
 export default function App() {
   const [webcontainerInstance, setWebcontainerInstance] =
     useState<WebContainer | null>(null);
-  const [output, setOutput] = useState<string>("");
   const terminalRef = useRef<HTMLDivElement>(null);
   const [iframeURL, setIframeURL] = useState<string | null>(null);
   const [isBooted, setIsBooted] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+  const terminal = useRef<Terminal | null>(null);
+  const fitAddon = useRef<FitAddon | null>(null);
+  const startProcessRef = useRef<any | null>(null);
 
   useEffect(() => {
     const initializeWebContainer = async () => {
       if (isBooted) return;
+
+      // Initialize xterm
+      if (terminalRef.current) {
+        const term = new Terminal({
+          convertEol: true,
+          cursorBlink: true,
+          theme: {
+            background: "#1e1e1e",
+            foreground: "#d4d4d4",
+            cursor: "#d4d4d4",
+          },
+        });
+        fitAddon.current = new FitAddon();
+        term.loadAddon(fitAddon.current);
+        term.open(terminalRef.current);
+        fitAddon.current.fit();
+        terminal.current = term;
+
+        window.addEventListener("resize", () => {
+          fitAddon.current?.fit();
+        });
+      }
       try {
         const webcontainer = await WebContainer.boot();
         setWebcontainerInstance(webcontainer);
         setIsBooted(true);
         await webcontainer.mount(files);
 
-        // Install dependencies
+        //Install dependancies
         const installProcess = await webcontainer.spawn("npm", ["install"]);
         installProcess.output.pipeTo(
           new WritableStream({
             write(chunk) {
-              const htmlChunk = ansiConverter.toHtml(chunk);
-              setOutput((prevOutput) => prevOutput + htmlChunk);
+              terminal.current?.write(chunk);
             },
           }),
         );
@@ -71,17 +95,23 @@ export default function App() {
         if (installExitCode !== 0) {
           throw new Error("Installation failed");
         }
-
         // Start the dev server
         const startProcess = await webcontainer.spawn("npm", ["run", "start"]);
+        startProcessRef.current = startProcess;
+
         startProcess.output.pipeTo(
           new WritableStream({
             write(chunk) {
-              const htmlChunk = ansiConverter.toHtml(chunk);
-              setOutput((prevOutput) => prevOutput + htmlChunk);
+              terminal.current?.write(chunk);
             },
           }),
         );
+        // Handle user input
+        terminal.current?.onData((data) => {
+          const encoder = new TextEncoder();
+          const encoded = encoder.encode(data);
+          startProcessRef.current.input.write(encoded);
+        });
 
         webcontainer.on("server-ready", (port, url) => {
           console.log(`Server ready at ${url}`);
@@ -96,16 +126,22 @@ export default function App() {
 
     return () => {
       if (webcontainerInstance) {
-        webcontainerInstance.teardown(); // Keep teardown
+        webcontainerInstance.teardown();
       }
+      if (terminal.current) {
+        terminal.current.dispose();
+      }
+      window.removeEventListener("resize", () => {
+        fitAddon.current?.fit();
+      });
     };
   }, []);
 
   useEffect(() => {
-    if (terminalRef.current) {
-      terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
+    if (terminal.current) {
+      fitAddon.current?.fit();
     }
-  }, [output]);
+  }, [terminal, isBooted]);
 
   return (
     <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4">
@@ -114,11 +150,7 @@ export default function App() {
         Running an Express server in WebContainer:
       </p>
       <div className="w-full max-w-4xl flex flex-col">
-        <div
-          className="bg-gray-800 border border-gray-700 rounded-md p-4 overflow-y-auto w-full h-96 font-mono mb-4" // Adjusted width, added mb-4 for margin
-          ref={terminalRef}
-          dangerouslySetInnerHTML={{ __html: output }}
-        ></div>
+        <div className="terminal-container  mb-4" ref={terminalRef}></div>
 
         <div className="w-full h-96 bg-gray-800 border border-gray-700 rounded-md overflow-hidden">
           {iframeURL ? (
