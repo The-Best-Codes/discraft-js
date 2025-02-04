@@ -1,172 +1,284 @@
-import { WebContainer } from "@webcontainer/api";
 import { FitAddon } from "@xterm/addon-fit";
-import { Terminal } from "@xterm/xterm";
+import { Loader2, Play, StopCircle as Stop } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import "xterm/css/xterm.css";
-import "./Terminal.css";
+import { useWebContainer } from "react-webcontainers";
+import { useXTerm } from "react-xtermjs";
+import { initialFiles } from "./files";
 
-const files = {
-  "index.js": {
-    file: {
-      contents: `
-import express from 'express';
-const app = express();
-const port = 3111;
-
-app.get('/', (req, res) => {
-    res.send('Welcome to a WebContainers app! 🥳');
-});
-
-app.listen(port, () => {
-    console.log(\`App is live at http://localhost:\${port}\`);
-});`,
-    },
-  },
-  "package.json": {
-    file: {
-      contents: `
-        {
-          "name": "example-app",
-          "type": "module",
-          "dependencies": {
-            "express": "latest",
-            "nodemon": "latest"
-          },
-          "scripts": {
-            "start": "nodemon index.js"
-          }
-        }`,
-    },
-  },
-};
+// Define Process Status Types
+type ProcessStatus = "idle" | "installing" | "running" | "stopped" | "error";
 
 export default function App() {
-  const [webcontainerInstance, setWebcontainerInstance] =
-    useState<WebContainer | null>(null);
-  const terminalRef = useRef<HTMLDivElement>(null);
-  const [iframeURL, setIframeURL] = useState<string | null>(null);
-  const [isBooted, setIsBooted] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const terminal = useRef<Terminal | null>(null);
-  const fitAddon = useRef<FitAddon | null>(null);
-  const startProcessRef = useRef<any | null>(null);
+  const webcontainer = useWebContainer();
+  const { instance: terminal, ref: terminalRef } = useXTerm();
+  const inputWriter = useRef<WritableStreamDefaultWriter<string> | null>(null);
+  const fitAddon = useRef<FitAddon>(new FitAddon());
+  const resizeHandler = useRef<(() => void) | null>(null);
+  const [processStatus, setProcessStatus] = useState<ProcessStatus>("idle"); // State for process status
+  // @ts-ignore
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isRunning, setIsRunning] = useState(false); // Track if index.js is running
+  const [installProgress, setInstallProgress] = useState<number | null>(null); // Progress for npm install
+  const [isInitialized, setIsInitialized] = useState(false); // Track if everything is initialized
+
+  const [process, setProcess] = useState<{
+    start: () => Promise<void>;
+    stop: () => Promise<void>;
+  } | null>(null);
 
   useEffect(() => {
-    const initializeWebContainer = async () => {
-      if (isBooted) return;
+    async function initialize() {
+      if (!terminal || !webcontainer) return;
 
-      // Initialize xterm
-      if (terminalRef.current) {
-        const term = new Terminal({
-          convertEol: true,
-          cursorBlink: true,
-          theme: {
-            background: "#1e1e1e",
-            foreground: "#d4d4d4",
-            cursor: "#d4d4d4",
-          },
-        });
-        fitAddon.current = new FitAddon();
-        term.loadAddon(fitAddon.current);
-        term.open(terminalRef.current);
-        fitAddon.current.fit();
-        terminal.current = term;
+      setProcessStatus("installing");
 
-        window.addEventListener("resize", () => {
-          fitAddon.current?.fit();
-        });
-      }
+      // Initialize terminal
+      terminal.loadAddon(fitAddon.current);
+      terminal.options.theme = {
+        foreground: "#eff0eb",
+        background: "#1a1b26",
+        green: "#9ece6a",
+        cyan: "#7dcfff",
+      };
+      terminal.options.fontSize = 14;
+      terminal.options.fontFamily = 'Menlo, Monaco, "Courier New", monospace';
+      terminal.options.cursorBlink = true;
+
+      // Handle terminal resize
+      resizeHandler.current = () => fitAddon.current.fit();
+      window.addEventListener("resize", resizeHandler.current);
+      resizeHandler.current();
+
       try {
-        const webcontainer = await WebContainer.boot();
-        setWebcontainerInstance(webcontainer);
-        setIsBooted(true);
-        await webcontainer.mount(files);
+        // Write files
+        for (const [path, { file }] of Object.entries(initialFiles)) {
+          await webcontainer.fs.writeFile(path, file.contents);
+          console.log(`Successfully wrote ${path}`);
+        }
+        console.log("All initial files written successfully.");
+      } catch (error) {
+        console.error("Error during initialization:", error);
+        setProcessStatus("error");
+        return;
+      }
 
-        //Install dependancies
+      // Check for node_modules and install if needed
+      try {
+        if (!webcontainer) throw new Error("WebContainer not initialized");
+        await webcontainer.fs.readdir("node_modules");
+        console.log("node_modules already exists.");
+      } catch (error: unknown) {
+        if (
+          error instanceof Error &&
+          error.message === "WebContainer not initialized"
+        )
+          throw error;
+
+        // Any other error means node_modules doesn't exist
+        console.log("node_modules does not exist, installing...");
+        setInstallProgress(0);
+        if (!webcontainer) throw new Error("WebContainer not initialized");
         const installProcess = await webcontainer.spawn("npm", ["install"]);
+
+        // Function to update install progress from stdout
+        const updateInstallProgress = (data: string) => {
+          const match = data.match(/(\d+)%/);
+          if (match && match[1]) {
+            setInstallProgress(parseInt(match[1], 10));
+          }
+        };
+
         installProcess.output.pipeTo(
           new WritableStream({
-            write(chunk) {
-              terminal.current?.write(chunk);
+            write(data) {
+              terminal?.write(data); // Still write install output to terminal
+              updateInstallProgress(data); // Try to parse progress
             },
           }),
         );
-        const installExitCode = await installProcess.exit;
-        if (installExitCode !== 0) {
-          throw new Error("Installation failed");
+
+        await installProcess.exit;
+        setInstallProgress(100); // Set to 100% when install finishes
+        console.log("npm install finished.");
+      } finally {
+        setInstallProgress(null); // Hide progress bar after install (or if not needed)
+      }
+
+      // Create start and stop process functions
+      const startProcess = async () => {
+        try {
+          if (!webcontainer) throw new Error("WebContainer not initialized");
+
+          setProcessStatus("running");
+          setIsRunning(true);
+          console.log("Starting process...");
+
+          // Clean up any existing input writer
+          if (inputWriter.current) {
+            await inputWriter.current.close();
+            inputWriter.current = null;
+          }
+
+          // Start npm directly
+          const shellProcess = await webcontainer.spawn("npm", ["start"]);
+          inputWriter.current = shellProcess.input.getWriter();
+
+          // Set up shell output handling
+          shellProcess.output.pipeTo(
+            new WritableStream({
+              write(data) {
+                terminal?.write(data);
+              },
+              close() {
+                console.log("Process output stream closed");
+              },
+              abort(reason: Error) {
+                console.error("Process output stream aborted:", reason);
+              },
+            }),
+          );
+
+          // Set up input handling
+          terminal?.onData((data: string) => {
+            inputWriter.current?.write(data).catch((err: Error) => {
+              console.error("Error writing to process:", err);
+            });
+          });
+
+          // Monitor process exit
+          const exitCode = await shellProcess.exit;
+          console.log("Process finished with code:", exitCode);
+          setIsRunning(false);
+          setProcessStatus(exitCode === 0 ? "stopped" : "error");
+        } catch (error) {
+          console.error("Error starting process:", error);
+          setIsRunning(false);
+          setProcessStatus("error");
+          throw error;
         }
-        // Start the dev server
-        const startProcess = await webcontainer.spawn("npm", ["run", "start"]);
-        startProcessRef.current = startProcess;
+      };
 
-        startProcess.output.pipeTo(
-          new WritableStream({
-            write(chunk) {
-              terminal.current?.write(chunk);
-            },
-          }),
-        );
-        // Handle user input
-        terminal.current?.onData((data) => {
-          const encoder = new TextEncoder();
-          const encoded = encoder.encode(data);
-          startProcessRef.current.input.write(encoded);
-        });
+      const stopProcess = async () => {
+        try {
+          if (!webcontainer) throw new Error("WebContainer not initialized");
 
-        webcontainer.on("server-ready", (port, url) => {
-          console.log(`Server ready at ${url}`);
-          setIframeURL(url);
-        });
-      } catch (error) {
-        console.error("Failed to initialize WebContainer:", error);
-      }
-    };
+          setProcessStatus("stopped");
+          setIsRunning(false);
+          console.log("Stopping process...");
 
-    initializeWebContainer();
+          if (inputWriter.current) {
+            // Send Ctrl+C (ASCII code 3)
+            await inputWriter.current.write("\x03");
+            // Send 'exit' command to close the shell
+            await inputWriter.current.write("exit\n");
+            await inputWriter.current.close();
+            inputWriter.current = null;
+          }
 
-    return () => {
-      if (webcontainerInstance) {
-        webcontainerInstance.teardown();
-      }
-      if (terminal.current) {
-        terminal.current.dispose();
-      }
-      window.removeEventListener("resize", () => {
-        fitAddon.current?.fit();
-      });
-    };
-  }, []);
+          console.log("Process stopped successfully");
+        } catch (error) {
+          console.error("Error stopping process:", error);
+          setProcessStatus("error");
+          throw error;
+        }
+      };
 
-  useEffect(() => {
-    if (terminal.current) {
-      fitAddon.current?.fit();
+      setProcess({ start: startProcess, stop: stopProcess });
+      setProcessStatus("idle"); // Set to idle after initial setup is done
+      setIsInitialized(true); // Mark as initialized
+      console.log("Initialization complete.");
     }
-  }, [terminal, isBooted]);
+
+    initialize();
+
+    // Set up cleanup
+    return () => {
+      if (resizeHandler.current) {
+        window.removeEventListener("resize", resizeHandler.current);
+      }
+      inputWriter.current?.close();
+    };
+  }, [terminal, webcontainer]);
+
+  const handleStart = async () => {
+    if (
+      process &&
+      processStatus !== "running" &&
+      processStatus !== "installing"
+    ) {
+      await process.start();
+    }
+  };
+
+  const handleStop = async () => {
+    if (process && processStatus === "running") {
+      await process.stop();
+    }
+  };
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen flex flex-col items-center p-4">
-      <h1 className="text-3xl font-bold mb-4">WebContainer Example</h1>
-      <p className="text-gray-400 mb-4">
-        Running an Express server in WebContainer:
-      </p>
-      <div className="w-full max-w-4xl flex flex-col">
-        <div className="terminal-container  mb-4" ref={terminalRef}></div>
-
-        <div className="w-full h-96 bg-gray-800 border border-gray-700 rounded-md overflow-hidden">
-          {iframeURL ? (
-            <iframe
-              ref={iframeRef}
-              src={iframeURL}
-              className="w-full h-full"
-              title="WebContainer Preview"
-            ></iframe>
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <span className="text-gray-400">Loading preview...</span>
-            </div>
-          )}
+    <div className="h-screen bg-gray-900 text-green-400 p-4 flex flex-col">
+      {installProgress !== null && (
+        <div className="mb-2 bg-gray-800 rounded-md overflow-hidden">
+          <div
+            className="bg-green-500 h-2"
+            style={{ width: `${installProgress}%` }}
+          ></div>
+          <div className="px-2 py-1 text-sm text-gray-300 text-center">
+            {installProgress < 100
+              ? `Installing dependencies... ${installProgress}%`
+              : "Finalizing installation..."}
+          </div>
         </div>
+      )}
+
+      <div className="flex justify-start items-center mb-2">
+        <button
+          onClick={handleStart}
+          disabled={
+            !isInitialized ||
+            processStatus === "running" ||
+            processStatus === "installing"
+          }
+          className={`bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 flex items-center`}
+          aria-label="Start"
+        >
+          <Play className="mr-2 h-4 w-4" />
+          Start
+        </button>
+        <button
+          onClick={handleStop}
+          disabled={processStatus !== "running"}
+          className={`ml-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 flex items-center`}
+          aria-label="Stop"
+        >
+          <Stop className="mr-2 h-4 w-4" />
+          Stop
+        </button>
+        {processStatus === "installing" && (
+          <div className="ml-4 flex items-center text-gray-400">
+            <Loader2 className="animate-spin mr-2 h-4 w-4" /> Installing...
+          </div>
+        )}
+        {processStatus === "running" && (
+          <div className="ml-4 text-green-400">Running</div>
+        )}
+        {processStatus === "stopped" && (
+          <div className="ml-4 text-red-400">Stopped</div>
+        )}
+        {processStatus === "idle" && (
+          <div className="ml-4 text-gray-400">Idle</div>
+        )}
+        {processStatus === "error" && (
+          <div className="ml-4 text-red-500">Error</div>
+        )}
       </div>
+
+      <div
+        ref={terminalRef}
+        className="h-full bg-gray-800 rounded-md"
+        style={{ height: "100%", width: "100%" }}
+      ></div>
     </div>
   );
 }
