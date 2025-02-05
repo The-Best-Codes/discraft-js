@@ -186,7 +186,7 @@ export default function App() {
     <div className="h-screen bg-slate-900 text-slate-300 p-6">
       <div className="h-full flex gap-6">
         {/* Left panel - Controls */}
-        <div className="w-1/3 flex flex-col gap-4 min-w-[300px]">
+        <div className="w-1/3 flex flex-col gap-4 max-h-full overflow-auto">
           <ControlPanel
             isInitialized={isInitialized}
             processStatus={processStatus}
@@ -197,7 +197,7 @@ export default function App() {
         </div>
 
         {/* Right panel - Terminal */}
-        <div className="flex-1">
+        <div className="w-2/3">
           <Terminal terminalRef={terminalRef} terminal={terminal} />
         </div>
       </div>

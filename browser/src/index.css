@@ -14,7 +14,7 @@
 
 /* Custom scrollbar for dark mode */
 ::-webkit-scrollbar {
-    @apply w-2;
+    @apply w-2 h-2;
 }
 
 ::-webkit-scrollbar-track {
@@ -41,32 +41,6 @@
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     @apply backdrop-blur-md rounded-lg shadow-lg p-4;
-}
-
-/* Status indicators */
-.status-dot {
-    @apply w-2 h-2 rounded-full;
-}
-
-.status-dot.running {
-    @apply bg-emerald-400 animate-pulse;
-}
-
-.status-dot.error {
-    @apply bg-rose-500;
-}
-
-.status-dot.stopped {
-    @apply bg-slate-400;
-}
-
-.status-dot.starting {
-    @apply bg-amber-400 animate-pulse;
-}
-
-/* Transitions */
-.transition-all {
-    @apply duration-200;
 }
 
 /* Interactive elements */

@@ -41,7 +41,7 @@ export function ControlPanel({
               processStatus === "initializing"
             }
             className="w-full bg-emerald-600/90 hover:bg-emerald-500/90
-              text-white font-medium py-2.5 px-4 rounded-md shadow-lg transition-all
+              text-white font-medium py-2.5 px-4 rounded-md shadow-lg transition-all duration-200
               disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-700/50
               flex items-center justify-center gap-2 focus:outline-none focus:ring-2
               focus:ring-emerald-500/50 focus:ring-offset-2 focus:ring-offset-slate-900"
@@ -55,7 +55,7 @@ export function ControlPanel({
             onClick={onStop}
             disabled={processStatus !== "running"}
             className="w-full bg-rose-600/90 hover:bg-rose-500/90
-              text-white font-medium py-2.5 px-4 rounded-md shadow-lg transition-all
+              text-white font-medium py-2.5 px-4 rounded-md shadow-lg transition-all duration-200
               disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-700/50
               flex items-center justify-center gap-2 focus:outline-none focus:ring-2
               focus:ring-rose-500/50 focus:ring-offset-2 focus:ring-offset-slate-900"
