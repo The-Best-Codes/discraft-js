@@ -4,7 +4,13 @@ import { useXTerm } from "react-xtermjs";
 import { initialFiles } from "./files";
 
 // Define Process Status Types
-type ProcessStatus = "idle" | "installing" | "running" | "stopped" | "error";
+type ProcessStatus =
+  | "initializing"
+  | "idle"
+  | "installing"
+  | "running"
+  | "stopped"
+  | "error";
 
 import { ControlPanel } from "./components/ControlPanel";
 import { Terminal } from "./components/Terminal";
@@ -13,7 +19,8 @@ export default function App() {
   const webcontainer = useWebContainer();
   const { instance: terminal, ref: terminalRef } = useXTerm();
   const inputWriter = useRef<WritableStreamDefaultWriter<string> | null>(null);
-  const [processStatus, setProcessStatus] = useState<ProcessStatus>("idle");
+  const [processStatus, setProcessStatus] =
+    useState<ProcessStatus>("initializing");
   const [isInitialized, setIsInitialized] = useState(false);
 
   const [process, setProcess] = useState<{
