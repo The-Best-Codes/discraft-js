@@ -13,6 +13,7 @@ type ProcessStatus =
   | "error";
 
 import { ControlPanel } from "./components/ControlPanel";
+import { MonitoringPanel } from "./components/MonitoringPanel";
 import { Terminal } from "./components/Terminal";
 
 export default function App() {
@@ -194,6 +195,7 @@ export default function App() {
             onStart={handleStart}
             onStop={handleStop}
           />
+          <MonitoringPanel processStatus={processStatus} />
         </div>
 
         {/* Right panel - Terminal */}
