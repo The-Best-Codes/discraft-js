@@ -35,6 +35,9 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
     undefined,
   );
   const [isMeasuring, setIsMeasuring] = useState(false);
+  const [isSupported, setIsSupported] = useState<boolean | undefined>(
+    undefined,
+  );
   const prevStatusRef = useRef<ProcessStatus>("idle");
   const measureAbortController = useRef<AbortController | null>(null);
 
@@ -111,7 +114,9 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
 
       setIsMeasuring(true);
       try {
-        if ("measureUserAgentSpecificMemory" in performance) {
+        const supported = "measureUserAgentSpecificMemory" in performance;
+        setIsSupported(supported);
+        if (supported) {
           const memory = await (
             performance as any
           ).measureUserAgentSpecificMemory();
@@ -133,6 +138,7 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
           });
         } else {
           setCurrentMemory(undefined);
+          setIsSupported(false);
         }
       } catch (error) {
         console.error("Error monitoring memory usage:", error);
@@ -183,7 +189,11 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
           {isMeasuring ? (
             <Loader2 className="h-5 w-5 text-slate-400 animate-spin" />
           ) : (
-            <Cpu className="h-5 w-5 text-emerald-400" />
+            <Cpu
+              className={`h-5 w-5 ${
+                isSupported === false ? "text-yellow-400" : "text-emerald-400"
+              }`}
+            />
           )}
           <div className="flex flex-col">
             <span className="font-medium">Memory Usage</span>
@@ -195,9 +205,11 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
               {processStatus === "running"
                 ? isMeasuring
                   ? "Measuring..."
-                  : currentMemory === undefined
-                    ? "Measuring..."
-                    : `${currentMemory} MB`
+                  : isSupported === false
+                    ? "Not available"
+                    : currentMemory === undefined
+                      ? "Waiting..."
+                      : `${currentMemory} MB`
                 : "Not running"}
             </span>
           </div>
@@ -209,7 +221,9 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-800/50 rounded-md border border-slate-700/50">
             <BarChart2 className="h-8 w-8 text-slate-600 mb-2" />
             <span className="text-slate-400 text-sm">
-              No data collected yet
+              {isSupported === false && processStatus === "running"
+                ? "Your browser does not support this feature"
+                : "No data collected yet"}
             </span>
           </div>
         ) : (
