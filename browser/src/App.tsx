@@ -122,7 +122,9 @@ export default function App() {
           // Monitor process exit
           const exitCode = await shellProcess.exit;
           console.log("Process finished with code:", exitCode);
-          setProcessStatus(exitCode === 0 ? "stopped" : "error");
+          setProcessStatus(
+            exitCode === 0 || exitCode === 130 ? "stopped" : "error",
+          );
         } catch (error) {
           console.error("Error starting process:", error);
           setProcessStatus("error");
@@ -141,7 +143,6 @@ export default function App() {
             // Send Ctrl+C (ASCII code 3)
             await inputWriter.current.write("\x03");
             // Send 'exit' command to close the shell
-            await inputWriter.current.write("exit\n");
             await inputWriter.current.close();
             inputWriter.current = null;
           }
