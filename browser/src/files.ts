@@ -17,7 +17,6 @@ export const initialFiles = {
     file: {
       contents: `import chalk from 'chalk';
 console.log(chalk.green('Hello from WebContainer!'));
-await new Promise(r => setTimeout(r, 200000));
 `.trim(),
     },
   },

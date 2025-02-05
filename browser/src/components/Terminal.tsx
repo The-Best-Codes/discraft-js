@@ -22,6 +22,7 @@ export function Terminal({ terminalRef, terminal, onResize }: TerminalProps) {
       green: "#9ece6a",
       cyan: "#7dcfff",
     };
+    terminal.options.convertEol = true;
     terminal.options.fontSize = 14;
     terminal.options.fontFamily = 'Menlo, Monaco, "Courier New", monospace';
     terminal.options.cursorBlink = true;

@@ -73,6 +73,10 @@ export default function App() {
           }),
         );
 
+        if ((await installProcess.exit) !== 0) {
+          console.error("npm install exited with a non-zero code.");
+        }
+
         await installProcess.exit;
         console.log("npm install finished.");
       } finally {
