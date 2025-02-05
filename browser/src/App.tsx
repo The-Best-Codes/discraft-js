@@ -1,5 +1,3 @@
-import { FitAddon } from "@xterm/addon-fit";
-import { Loader2, Play, StopCircle as Stop } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useWebContainer } from "react-webcontainers";
 import { useXTerm } from "react-xtermjs";
@@ -8,18 +6,15 @@ import { initialFiles } from "./files";
 // Define Process Status Types
 type ProcessStatus = "idle" | "installing" | "running" | "stopped" | "error";
 
+import { ControlPanel } from "./components/ControlPanel";
+import { Terminal } from "./components/Terminal";
+
 export default function App() {
   const webcontainer = useWebContainer();
   const { instance: terminal, ref: terminalRef } = useXTerm();
   const inputWriter = useRef<WritableStreamDefaultWriter<string> | null>(null);
-  const fitAddon = useRef<FitAddon>(new FitAddon());
-  const resizeHandler = useRef<(() => void) | null>(null);
-  const [processStatus, setProcessStatus] = useState<ProcessStatus>("idle"); // State for process status
-  // @ts-ignore
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isRunning, setIsRunning] = useState(false); // Track if index.js is running
-  const [installProgress, setInstallProgress] = useState<number | null>(null); // Progress for npm install
-  const [isInitialized, setIsInitialized] = useState(false); // Track if everything is initialized
+  const [processStatus, setProcessStatus] = useState<ProcessStatus>("idle");
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const [process, setProcess] = useState<{
     start: () => Promise<void>;
@@ -31,23 +26,6 @@ export default function App() {
       if (!terminal || !webcontainer) return;
 
       setProcessStatus("installing");
-
-      // Initialize terminal
-      terminal.loadAddon(fitAddon.current);
-      terminal.options.theme = {
-        foreground: "#eff0eb",
-        background: "#1a1b26",
-        green: "#9ece6a",
-        cyan: "#7dcfff",
-      };
-      terminal.options.fontSize = 14;
-      terminal.options.fontFamily = 'Menlo, Monaco, "Courier New", monospace';
-      terminal.options.cursorBlink = true;
-
-      // Handle terminal resize
-      resizeHandler.current = () => fitAddon.current.fit();
-      window.addEventListener("resize", resizeHandler.current);
-      resizeHandler.current();
 
       try {
         // Write files
@@ -76,32 +54,21 @@ export default function App() {
 
         // Any other error means node_modules doesn't exist
         console.log("node_modules does not exist, installing...");
-        setInstallProgress(0);
         if (!webcontainer) throw new Error("WebContainer not initialized");
         const installProcess = await webcontainer.spawn("npm", ["install"]);
-
-        // Function to update install progress from stdout
-        const updateInstallProgress = (data: string) => {
-          const match = data.match(/(\d+)%/);
-          if (match && match[1]) {
-            setInstallProgress(parseInt(match[1], 10));
-          }
-        };
 
         installProcess.output.pipeTo(
           new WritableStream({
             write(data) {
-              terminal?.write(data); // Still write install output to terminal
-              updateInstallProgress(data); // Try to parse progress
+              terminal?.write(data);
             },
           }),
         );
 
         await installProcess.exit;
-        setInstallProgress(100); // Set to 100% when install finishes
         console.log("npm install finished.");
       } finally {
-        setInstallProgress(null); // Hide progress bar after install (or if not needed)
+        // Installation complete
       }
 
       // Create start and stop process functions
@@ -110,7 +77,6 @@ export default function App() {
           if (!webcontainer) throw new Error("WebContainer not initialized");
 
           setProcessStatus("running");
-          setIsRunning(true);
           console.log("Starting process...");
 
           // Clean up any existing input writer
@@ -148,11 +114,9 @@ export default function App() {
           // Monitor process exit
           const exitCode = await shellProcess.exit;
           console.log("Process finished with code:", exitCode);
-          setIsRunning(false);
           setProcessStatus(exitCode === 0 ? "stopped" : "error");
         } catch (error) {
           console.error("Error starting process:", error);
-          setIsRunning(false);
           setProcessStatus("error");
           throw error;
         }
@@ -163,7 +127,6 @@ export default function App() {
           if (!webcontainer) throw new Error("WebContainer not initialized");
 
           setProcessStatus("stopped");
-          setIsRunning(false);
           console.log("Stopping process...");
 
           if (inputWriter.current) {
@@ -193,9 +156,6 @@ export default function App() {
 
     // Set up cleanup
     return () => {
-      if (resizeHandler.current) {
-        window.removeEventListener("resize", resizeHandler.current);
-      }
       inputWriter.current?.close();
     };
   }, [terminal, webcontainer]);
@@ -217,68 +177,23 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen bg-gray-900 text-green-400 p-4 flex flex-col">
-      {installProgress !== null && (
-        <div className="mb-2 bg-gray-800 rounded-md overflow-hidden">
-          <div
-            className="bg-green-500 h-2"
-            style={{ width: `${installProgress}%` }}
-          ></div>
-          <div className="px-2 py-1 text-sm text-gray-300 text-center">
-            {installProgress < 100
-              ? `Installing dependencies... ${installProgress}%`
-              : "Finalizing installation..."}
-          </div>
+    <div className="h-screen bg-slate-900 text-slate-300 p-6">
+      <div className="h-full flex gap-6">
+        {/* Left panel - Controls */}
+        <div className="w-1/3 flex flex-col gap-4 min-w-[300px]">
+          <ControlPanel
+            isInitialized={isInitialized}
+            processStatus={processStatus}
+            onStart={handleStart}
+            onStop={handleStop}
+          />
         </div>
-      )}
 
-      <div className="flex justify-start items-center mb-2">
-        <button
-          onClick={handleStart}
-          disabled={
-            !isInitialized ||
-            processStatus === "running" ||
-            processStatus === "installing"
-          }
-          className={`bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 flex items-center`}
-          aria-label="Start"
-        >
-          <Play className="mr-2 h-4 w-4" />
-          Start
-        </button>
-        <button
-          onClick={handleStop}
-          disabled={processStatus !== "running"}
-          className={`ml-2 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline disabled:opacity-50 flex items-center`}
-          aria-label="Stop"
-        >
-          <Stop className="mr-2 h-4 w-4" />
-          Stop
-        </button>
-        {processStatus === "installing" && (
-          <div className="ml-4 flex items-center text-gray-400">
-            <Loader2 className="animate-spin mr-2 h-4 w-4" /> Installing...
-          </div>
-        )}
-        {processStatus === "running" && (
-          <div className="ml-4 text-green-400">Running</div>
-        )}
-        {processStatus === "stopped" && (
-          <div className="ml-4 text-red-400">Stopped</div>
-        )}
-        {processStatus === "idle" && (
-          <div className="ml-4 text-gray-400">Idle</div>
-        )}
-        {processStatus === "error" && (
-          <div className="ml-4 text-red-500">Error</div>
-        )}
+        {/* Right panel - Terminal */}
+        <div className="flex-1">
+          <Terminal terminalRef={terminalRef} terminal={terminal} />
+        </div>
       </div>
-
-      <div
-        ref={terminalRef}
-        className="h-full bg-gray-800 rounded-md"
-        style={{ height: "100%", width: "100%" }}
-      ></div>
     </div>
   );
 }

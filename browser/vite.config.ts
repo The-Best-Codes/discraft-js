@@ -11,9 +11,6 @@ export default defineConfig({
     }),
     tailwindcss(),
   ],
-  css: {
-    devSourcemap: true,
-  },
   server: {
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin",
