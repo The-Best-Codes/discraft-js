@@ -214,10 +214,7 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-              margin={{ top: 0, left: 0, bottom: 0, right: 0 }}
-              data={memoryUsage}
-            >
+            <LineChart data={memoryUsage}>
               <XAxis
                 dataKey="time"
                 tick={{ fontSize: 12 }}
