@@ -24,6 +24,7 @@ export default function App() {
   const [isInitialized, setIsInitialized] = useState(false);
 
   const shellProcess = useRef<ShellProcess | null>(null);
+  const npmProcess = useRef<any | null>(null);
   const [process, setProcess] = useState<{
     start: () => Promise<void>;
     stop: () => Promise<void>;
@@ -132,19 +133,26 @@ export default function App() {
           setProcessStatus("running");
           console.log("Starting process...");
 
-          // We don't need to start a new process since JSH is already running
-          // Just send the npm start command to the JSH shell
-          shellProcess.current?.input.write("npm start\n");
+          // Start the npm process directly
+          const process = await webcontainer.spawn("npm", ["start"]);
+          npmProcess.current = process;
+
+          // Pipe output to terminal
+          process.output.pipeTo(
+            new WritableStream({
+              write(data) {
+                terminal?.write(data);
+              },
+            })
+          );
 
           // Monitor process exit
-          if (!shellProcess.current) {
-            throw new Error("Shell process not initialized");
-          }
-          const exitCode = await shellProcess.current.exit;
-          console.log("Process finished with code:", exitCode);
-          setProcessStatus(
-            exitCode === 0 || exitCode === 130 ? "stopped" : "error",
-          );
+          process.exit.then((exitCode) => {
+            console.log("Process finished with code:", exitCode);
+            npmProcess.current = null;
+            setProcessStatus(exitCode === 0 || exitCode === 130 ? "stopped" : "error");
+          });
+
         } catch (error) {
           console.error("Error starting process:", error);
           setProcessStatus("error");
@@ -156,14 +164,13 @@ export default function App() {
         try {
           if (!webcontainer) throw new Error("WebContainer not initialized");
 
-          setProcessStatus("stopped");
-          console.log("Stopping process...");
-
-          if (shellProcess.current) {
-            // Send Ctrl+C (ASCII code 3)
-            await shellProcess.current.input.write("\x03");
+          if (npmProcess.current) {
+            // Kill the npm process
+            await npmProcess.current.kill();
+            npmProcess.current = null;
           }
 
+          setProcessStatus("stopped");
           console.log("Process stopped successfully");
         } catch (error) {
           console.error("Error stopping process:", error);
@@ -182,6 +189,9 @@ export default function App() {
 
     // Set up cleanup
     return () => {
+      if (npmProcess.current) {
+        npmProcess.current.kill().catch(console.error);
+      }
       shellProcess.current?.input.close().catch(console.error);
       inputWriter.current?.close().catch(console.error);
     };
