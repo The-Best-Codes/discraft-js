@@ -48,7 +48,7 @@ export function Terminal({ terminalRef, terminal, onResize }: TerminalProps) {
     <div
       ref={terminalRef}
       className="terminal-container h-full w-full overflow-hidden relative"
-      style={{ minHeight: "400px" }}
+      style={{ minHeight: "200px" }}
     />
   );
 }

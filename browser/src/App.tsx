@@ -183,10 +183,10 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen bg-slate-900 text-slate-300 p-6">
-      <div className="h-full flex gap-6">
-        {/* Left panel - Controls */}
-        <div className="w-1/3 flex flex-col gap-4 max-h-full overflow-auto">
+    <div className="h-screen bg-slate-900 text-slate-300 p-3 sm:p-6">
+      <div className="h-full flex flex-col lg:flex-row gap-4 lg:gap-6">
+        {/* Controls panel - Full width on mobile, left panel on desktop */}
+        <div className="lg:w-1/3 flex flex-col gap-4 max-h-[50vh] lg:max-h-full overflow-auto">
           <ControlPanel
             isInitialized={isInitialized}
             processStatus={processStatus}
@@ -196,8 +196,8 @@ export default function App() {
           <MonitoringPanel processStatus={processStatus} />
         </div>
 
-        {/* Right panel - Terminal */}
-        <div className="w-2/3">
+        {/* Terminal panel - Full width on mobile, right panel on desktop */}
+        <div className="lg:w-2/3 h-[45vh] lg:h-full">
           <Terminal terminalRef={terminalRef} terminal={terminal} />
         </div>
       </div>
