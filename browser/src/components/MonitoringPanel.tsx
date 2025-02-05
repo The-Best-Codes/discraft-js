@@ -10,7 +10,13 @@ import {
   YAxis,
 } from "recharts";
 
-import { ProcessStatus } from "../types";
+type ProcessStatus =
+  | "initializing"
+  | "idle"
+  | "installing"
+  | "running"
+  | "stopped"
+  | "error";
 
 interface MonitoringPanelProps {
   processStatus: ProcessStatus;
@@ -182,7 +188,9 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
           <div className="flex flex-col">
             <span className="font-medium">Memory Usage</span>
             <span
-              className={`text-sm text-slate-400 ${isMeasuring ? "animate-pulse" : ""}`}
+              className={`text-sm text-slate-400 ${
+                isMeasuring ? "animate-pulse" : ""
+              }`}
             >
               {processStatus === "running"
                 ? isMeasuring
@@ -206,7 +214,10 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={memoryUsage}>
+            <LineChart
+              margin={{ top: 0, left: 0, bottom: 0, right: 0 }}
+              data={memoryUsage}
+            >
               <XAxis
                 dataKey="time"
                 tick={{ fontSize: 12 }}
@@ -215,7 +226,9 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
                 domain={["dataMin", "dataMax"]}
                 tickFormatter={(time) => {
                   const date = new Date(time);
-                  return `${date.getHours()}:${String(date.getMinutes()).padStart(2, "0")}`;
+                  return `${date.getHours()}:${String(
+                    date.getMinutes(),
+                  ).padStart(2, "0")}`;
                 }}
               />
               <YAxis
@@ -234,7 +247,12 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
                 formatter={(value: number) => [`${value} MB`, "Memory"]}
                 labelFormatter={(time) => {
                   const date = new Date(time);
-                  return `${date.getHours()}:${String(date.getMinutes()).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
+                  return `${date.getHours()}:${String(
+                    date.getMinutes(),
+                  ).padStart(2, "0")}:${String(date.getSeconds()).padStart(
+                    2,
+                    "0",
+                  )}`;
                 }}
               />
               <Line

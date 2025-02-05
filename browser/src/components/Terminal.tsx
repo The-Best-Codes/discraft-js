@@ -1,9 +1,10 @@
 import { FitAddon } from "@xterm/addon-fit";
+import type { Terminal as ITerminal } from "@xterm/xterm";
 import React, { useEffect, useRef } from "react";
 
 interface TerminalProps {
   terminalRef: React.RefObject<HTMLDivElement>;
-  terminal: any; // Using any here since the terminal type is complex
+  terminal: ITerminal | null;
   onResize?: () => void;
 }
 
@@ -23,6 +24,7 @@ export function Terminal({ terminalRef, terminal, onResize }: TerminalProps) {
       cyan: "#7dcfff",
     };
     terminal.options.convertEol = true;
+    terminal.options.disableStdin = true;
     terminal.options.fontSize = 14;
     terminal.options.fontFamily = 'Menlo, Monaco, "Courier New", monospace';
     terminal.options.cursorBlink = true;
