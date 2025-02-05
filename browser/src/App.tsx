@@ -2,15 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { useWebContainer } from "react-webcontainers";
 import { useXTerm } from "react-xtermjs";
 import { initialFiles } from "./files";
+import { ProcessStatus } from "./types";
 
-// Define Process Status Types
-type ProcessStatus =
-  | "initializing"
-  | "idle"
-  | "installing"
-  | "running"
-  | "stopped"
-  | "error";
+// JSH Shell Process Type
+type ShellProcess = {
+  input: WritableStreamDefaultWriter<string>;
+  resize: (dimensions: { cols: number; rows: number }) => void;
+  exit: Promise<number>;
+};
 
 import { ControlPanel } from "./components/ControlPanel";
 import { MonitoringPanel } from "./components/MonitoringPanel";
@@ -24,6 +23,7 @@ export default function App() {
     useState<ProcessStatus>("initializing");
   const [isInitialized, setIsInitialized] = useState(false);
 
+  const shellProcess = useRef<ShellProcess | null>(null);
   const [process, setProcess] = useState<{
     start: () => Promise<void>;
     stop: () => Promise<void>;
@@ -33,7 +33,48 @@ export default function App() {
     async function initialize() {
       if (!terminal || !webcontainer) return;
 
-      setProcessStatus("installing");
+      setProcessStatus("setting-up");
+
+      // Start JSH shell
+      try {
+        if (!webcontainer) throw new Error("WebContainer not initialized");
+        
+        const jshProcess = await webcontainer.spawn('jsh', {
+          terminal: {
+            cols: terminal?.cols || 80,
+            rows: terminal?.rows || 24
+          }
+        });
+
+        // Set up shell output handling
+        jshProcess.output.pipeTo(
+          new WritableStream({
+            write(data) {
+              terminal?.write(data);
+            }
+          })
+        );
+
+        // Store shell process for input handling
+        shellProcess.current = {
+          input: jshProcess.input.getWriter(),
+          resize: (dimensions) => jshProcess.resize(dimensions),
+          exit: jshProcess.exit
+        };
+
+        // Set up input handling
+        terminal?.onData((data) => {
+          shellProcess.current?.input.write(data).catch((err: Error) => {
+            console.error("Error writing to JSH process:", err);
+          });
+        });
+
+        setProcessStatus("installing");
+      } catch (error) {
+        console.error("Error initializing JSH:", error);
+        setProcessStatus("error");
+        return;
+      }
 
       try {
         // Write files
@@ -91,40 +132,15 @@ export default function App() {
           setProcessStatus("running");
           console.log("Starting process...");
 
-          // Clean up any existing input writer
-          if (inputWriter.current) {
-            await inputWriter.current.close();
-            inputWriter.current = null;
-          }
-
-          // Start npm directly
-          const shellProcess = await webcontainer.spawn("npm", ["start"]);
-          inputWriter.current = shellProcess.input.getWriter();
-
-          // Set up shell output handling
-          shellProcess.output.pipeTo(
-            new WritableStream({
-              write(data) {
-                terminal?.write(data);
-              },
-              close() {
-                console.log("Process output stream closed");
-              },
-              abort(reason: Error) {
-                console.error("Process output stream aborted:", reason);
-              },
-            }),
-          );
-
-          // Set up input handling
-          terminal?.onData((data: string) => {
-            inputWriter.current?.write(data).catch((err: Error) => {
-              console.error("Error writing to process:", err);
-            });
-          });
+          // We don't need to start a new process since JSH is already running
+          // Just send the npm start command to the JSH shell
+          shellProcess.current?.input.write("npm start\n");
 
           // Monitor process exit
-          const exitCode = await shellProcess.exit;
+          if (!shellProcess.current) {
+            throw new Error("Shell process not initialized");
+          }
+          const exitCode = await shellProcess.current.exit;
           console.log("Process finished with code:", exitCode);
           setProcessStatus(
             exitCode === 0 || exitCode === 130 ? "stopped" : "error",
@@ -143,12 +159,9 @@ export default function App() {
           setProcessStatus("stopped");
           console.log("Stopping process...");
 
-          if (inputWriter.current) {
+          if (shellProcess.current) {
             // Send Ctrl+C (ASCII code 3)
-            await inputWriter.current.write("\x03");
-            // Send 'exit' command to close the shell
-            await inputWriter.current.close();
-            inputWriter.current = null;
+            await shellProcess.current.input.write("\x03");
           }
 
           console.log("Process stopped successfully");
@@ -169,7 +182,8 @@ export default function App() {
 
     // Set up cleanup
     return () => {
-      inputWriter.current?.close();
+      shellProcess.current?.input.close().catch(console.error);
+      inputWriter.current?.close().catch(console.error);
     };
   }, [terminal, webcontainer]);
 
@@ -196,7 +210,7 @@ export default function App() {
         <div className="w-1/3 flex flex-col gap-4 min-w-[300px]">
           <ControlPanel
             isInitialized={isInitialized}
-            processStatus={processStatus}
+            processStatus={processStatus === "setting-up" ? "installing" : processStatus}
             onStart={handleStart}
             onStop={handleStop}
           />

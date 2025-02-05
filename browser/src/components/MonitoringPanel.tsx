@@ -10,13 +10,7 @@ import {
   YAxis,
 } from "recharts";
 
-type ProcessStatus =
-  | "initializing"
-  | "idle"
-  | "installing"
-  | "running"
-  | "stopped"
-  | "error";
+import { ProcessStatus } from "../types";
 
 interface MonitoringPanelProps {
   processStatus: ProcessStatus;

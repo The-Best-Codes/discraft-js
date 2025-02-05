@@ -8,15 +8,11 @@ import {
   Square as Stop,
 } from "lucide-react";
 
+import { ProcessStatus } from "../types";
+
 interface ControlPanelProps {
   isInitialized: boolean;
-  processStatus:
-    | "initializing"
-    | "idle"
-    | "installing"
-    | "running"
-    | "stopped"
-    | "error";
+  processStatus: ProcessStatus;
   onStart: () => void;
   onStop: () => void;
 }
@@ -38,7 +34,8 @@ export function ControlPanel({
               !isInitialized ||
               processStatus === "running" ||
               processStatus === "installing" ||
-              processStatus === "initializing"
+              processStatus === "initializing" ||
+              processStatus === "setting-up"
             }
             className="w-full bg-emerald-600/90 hover:bg-emerald-500/90
               text-white font-medium py-2.5 px-4 rounded-md shadow-lg transition-all
@@ -70,10 +67,9 @@ export function ControlPanel({
       <div className="flex flex-col gap-2">
         <h2 className="text-sm font-medium text-slate-400">Status</h2>
         <div className="bg-slate-800/50 rounded-md p-3 flex items-center gap-3">
-          {processStatus === "initializing" && (
-            <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
-          )}
-          {processStatus === "installing" && (
+          {(processStatus === "initializing" ||
+            processStatus === "installing" ||
+            processStatus === "setting-up") && (
             <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
           )}
           {processStatus === "running" && (
@@ -91,6 +87,7 @@ export function ControlPanel({
           <div className="flex flex-col">
             <span className="font-medium">
               {processStatus === "initializing" && "Initializing..."}
+              {processStatus === "setting-up" && "Setting up..."}
               {processStatus === "installing" && "Installing..."}
               {processStatus === "running" && "Running"}
               {processStatus === "stopped" && "Stopped"}
@@ -99,6 +96,7 @@ export function ControlPanel({
             </span>
             <span className="text-sm text-slate-400">
               {processStatus === "initializing" && "Setting up environment"}
+              {processStatus === "setting-up" && "Loading JSH shell"}
               {processStatus === "installing" && "Setting up dependencies"}
               {processStatus === "running" && "Process is active"}
               {processStatus === "stopped" && "Process terminated"}
