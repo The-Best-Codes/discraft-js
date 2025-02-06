@@ -21,6 +21,20 @@ interface EnvVars {
   [key: string]: string;
 }
 
+const isValidEnvKey = (key: string): boolean => {
+  //  Must start with a letter or underscore
+  if (!/^[a-zA-Z_]/.test(key)) {
+    return false;
+  }
+
+  // Can only contain letters, numbers, and underscores
+  if (!/^[a-zA-Z0-9_]*$/.test(key)) {
+    return false;
+  }
+
+  return true;
+};
+
 export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
   const webcontainer = useWebContainer();
   const [envVars, setEnvVars] = useState<EnvVars>({});
@@ -31,6 +45,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const [editedValue, setEditedValue] = useState("");
   const [hiddenValues, setHiddenValues] = useState<Set<string>>(new Set());
+  const [keyError, setKeyError] = useState<string | null>(null);
 
   // Load env vars from localStorage and write to WebContainer on mount
   useEffect(() => {
@@ -81,6 +96,15 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
     e.preventDefault();
     if (!webcontainer || !newKey.trim() || !newValue.trim()) return;
 
+    if (!isValidEnvKey(newKey)) {
+      setKeyError(
+        "Invalid key. Must start with a letter or underscore and contain only letters, numbers, and underscores.",
+      );
+      return;
+    }
+
+    setKeyError(null); // Clear any previous error
+
     setIsLoading(true);
     // Hide the value by default for new variables
     setHiddenValues((prev) => new Set([...prev, newKey]));
@@ -113,6 +137,8 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
 
   const handleDelete = async (keyToDelete: string) => {
     if (!webcontainer) return;
+
+    setKeyError(null);
 
     // Add to loading set
     setLoadingKeys((prev) => new Set([...prev, keyToDelete]));
@@ -155,12 +181,22 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
   };
 
   const startEditing = (key: string, value: string) => {
+    setKeyError(null);
     setEditingKey(key);
     setEditedValue(value);
   };
 
   const handleSave = async (key: string) => {
     if (!webcontainer || !editedValue.trim()) return;
+
+    if (!isValidEnvKey(key)) {
+      setKeyError(
+        "Invalid key. Must start with a letter or underscore and contain only letters, numbers, and underscores.",
+      );
+      return;
+    }
+
+    setKeyError(null);
 
     setLoadingKeys((prev) => new Set([...prev, key]));
     try {
@@ -189,6 +225,11 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
     }
   };
 
+  const handleNewKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setNewKey(e.target.value);
+    setKeyError(null); // Clear any previous error when typing
+  };
+
   return (
     <div className="controls-panel flex flex-col gap-4">
       <div className="flex flex-col gap-3">
@@ -207,13 +248,16 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
             <input
               type="text"
               value={newKey}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setNewKey(e.target.value)
-              }
+              onChange={handleNewKeyChange}
               placeholder="Name"
               disabled={isLoading}
-              className="bg-slate-900/50 border border-slate-700/50 rounded-md px-2 py-1.5 text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:bg-slate-700/50 disabled:border-none"
+              className={`bg-slate-900/50 border ${
+                keyError ? "border-red-500" : "border-slate-700/50"
+              } rounded-md px-2 py-1.5 text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:bg-slate-700/50 disabled:border-none`}
             />
+            {keyError && (
+              <p className="text-red-500 text-sm italic">{keyError}</p>
+            )}
             <input
               type="text"
               value={newValue}
@@ -229,7 +273,11 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
           <button
             type="submit"
             disabled={
-              isLoading || !newKey.trim() || !newValue.trim() || !isInitialized
+              isLoading ||
+              !newKey.trim() ||
+              !newValue.trim() ||
+              !isInitialized ||
+              keyError !== null
             }
             className="w-full bg-blue-600/90 hover:bg-blue-500/90 text-white font-medium py-2 px-4 rounded-md shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-700/50 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900"
           >
@@ -277,7 +325,12 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
                             value={isEditing ? editedValue : value}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>,
-                            ) => isEditing && setEditedValue(e.target.value)}
+                            ) => {
+                              if (isEditing) {
+                                setEditedValue(e.target.value);
+                                setKeyError(null);
+                              }
+                            }}
                             readOnly={!isEditing}
                             className="h-8 w-full text-base p-1 bg-slate-900/50 border border-slate-700 text-slate-300 rounded-md focus:outline-none focus:ring-0 focus:border-blue-500 focus:border-2"
                           />
