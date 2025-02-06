@@ -14,6 +14,7 @@ type ProcessStatus =
 
 import { ControlPanel } from "./components/ControlPanel";
 import { MonitoringPanel } from "./components/MonitoringPanel";
+import { SecretsPanel } from "./components/SecretsPanel";
 import { Terminal } from "./components/Terminal";
 
 export default function App() {
@@ -193,6 +194,7 @@ export default function App() {
             onStart={handleStart}
             onStop={handleStop}
           />
+          <SecretsPanel isInitialized={isInitialized} />
           <MonitoringPanel processStatus={processStatus} />
         </div>
 

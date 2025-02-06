@@ -175,43 +175,44 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
       <div className="flex flex-col gap-3">
         <h2 className="text-lg font-medium text-slate-200">Monitoring</h2>
 
-        <div className="bg-slate-800/50 rounded-md p-3 flex items-center gap-3 border border-slate-700/50">
-          <Timer className="h-5 w-5 text-blue-400" />
-          <div className="flex flex-col">
-            <span className="font-medium">Running Time</span>
-            <span className="text-sm text-slate-400">
-              {runningTime || "Not running"}
-            </span>
+        <div className="flex flex-row gap-3 w-full">
+          <div className="bg-slate-800/50 rounded-md p-3 flex w-1/2 items-center gap-3 border border-slate-700/50">
+            <Timer className="h-5 w-5 text-blue-400" />
+            <div className="flex flex-col">
+              <span className="font-medium">Running Time</span>
+              <span className="text-sm text-slate-400">
+                {runningTime || "Not running"}
+              </span>
+            </div>
           </div>
-        </div>
-
-        <div className="bg-slate-800/50 rounded-md p-3 flex items-center gap-3 border border-slate-700/50">
-          {isMeasuring ? (
-            <Loader2 className="h-5 w-5 text-slate-400 animate-spin" />
-          ) : (
-            <Cpu
-              className={`h-5 w-5 ${
-                isSupported === false ? "text-yellow-400" : "text-emerald-400"
-              }`}
-            />
-          )}
-          <div className="flex flex-col">
-            <span className="font-medium">Memory Usage</span>
-            <span
-              className={`text-sm text-slate-400 ${
-                isMeasuring ? "animate-pulse" : ""
-              }`}
-            >
-              {processStatus === "running"
-                ? isMeasuring
-                  ? "Measuring..."
-                  : isSupported === false
-                    ? "Not available"
-                    : currentMemory === undefined
-                      ? "Waiting..."
-                      : `${currentMemory} MB`
-                : "Not running"}
-            </span>
+          <div className="bg-slate-800/50 rounded-md p-3 flex w-1/2 items-center gap-3 border border-slate-700/50">
+            {isMeasuring ? (
+              <Loader2 className="h-5 w-5 text-slate-400 animate-spin" />
+            ) : (
+              <Cpu
+                className={`h-5 w-5 ${
+                  isSupported === false ? "text-yellow-400" : "text-green-400"
+                }`}
+              />
+            )}
+            <div className="flex flex-col">
+              <span className="font-medium">Memory Usage</span>
+              <span
+                className={`text-sm text-slate-400 ${
+                  isMeasuring ? "animate-pulse" : ""
+                }`}
+              >
+                {processStatus === "running"
+                  ? isMeasuring
+                    ? "Measuring..."
+                    : isSupported === false
+                      ? "Not available"
+                      : currentMemory === undefined
+                        ? "Waiting..."
+                        : `${currentMemory} MB`
+                  : "Not running"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
