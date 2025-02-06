@@ -21,49 +21,6 @@ interface EnvVars {
   [key: string]: string;
 }
 
-const Button = ({
-  variant = "ghost",
-  size = "icon",
-  className = "",
-  children,
-  ...props
-}: any) => {
-  let baseClass = "rounded-md";
-  let variantClass = "";
-  let sizeClass = "";
-
-  if (variant === "ghost") {
-    variantClass = "hover:bg-slate-700/20";
-  } else if (variant === "outline") {
-    variantClass =
-      "border border-slate-700 hover:bg-slate-700/20 text-slate-300";
-  }
-
-  if (size === "icon") {
-    sizeClass = "h-6 w-6 p-1";
-  } else if (size === "sm") {
-    sizeClass = "py-1.5 px-2 text-sm";
-  }
-
-  return (
-    <button
-      className={`${baseClass} ${variantClass} ${sizeClass} ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-};
-
-const Input = ({ className = "", ...props }: any) => {
-  return (
-    <input
-      className={`bg-slate-900/50 border border-slate-700/50 rounded-md px-2 py-1.5 text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:bg-slate-700/50 disabled:border-none ${className}`}
-      {...props}
-    />
-  );
-};
-
 export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
   const webcontainer = useWebContainer();
   const [envVars, setEnvVars] = useState<EnvVars>({});
@@ -93,7 +50,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
 
         // Write to .env file
         const envContent = Object.entries(storedVars)
-          .map(([key, value]) => `"${key}"="${value}"`)
+          .map(([key, value]) => `${key}="${value}"`)
           .join("\n");
 
         await webcontainer.fs.writeFile(".env", envContent);
@@ -247,7 +204,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
           </div>
 
           <div className="flex flex-col gap-2">
-            <Input
+            <input
               type="text"
               value={newKey}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -255,8 +212,9 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
               }
               placeholder="Name"
               disabled={isLoading}
+              className="bg-slate-900/50 border border-slate-700/50 rounded-md px-2 py-1.5 text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:bg-slate-700/50 disabled:border-none"
             />
-            <Input
+            <input
               type="text"
               value={newValue}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -264,6 +222,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
               }
               placeholder="Value"
               disabled={isLoading}
+              className="bg-slate-900/50 border border-slate-700/50 rounded-md px-2 py-1.5 text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:bg-slate-700/50 disabled:border-none"
             />
           </div>
 
@@ -313,32 +272,28 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
                           {key}:
                         </span>
                         <div className="flex-grow min-w-0">
-                          <Input
+                          <input
                             type={isHidden ? "password" : "text"}
                             value={isEditing ? editedValue : value}
                             onChange={(
                               e: React.ChangeEvent<HTMLInputElement>,
                             ) => isEditing && setEditedValue(e.target.value)}
                             readOnly={!isEditing}
-                            className="h-8 w-full text-base py-0 px-1 bg-slate-900/50 border border-slate-700 text-slate-300 rounded-md"
+                            className="h-8 w-full text-base p-1 bg-slate-900/50 border border-slate-700 text-slate-300 rounded-md focus:outline-none focus:ring-0 focus:border-blue-500 focus:border-2"
                           />
                         </div>
                       </div>
                       <div className="flex items-center space-x-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-slate-500 hover:text-slate-300"
+                        <button
+                          className="rounded-md hover:bg-slate-700/20 h-6 w-6 p-1 text-slate-500 hover:text-slate-300"
                           onClick={() => toggleValueVisibility(key)}
                           aria-label={isHidden ? "Show value" : "Hide value"}
                         >
                           {isHidden ? <EyeOff size={14} /> : <Eye size={14} />}
-                        </Button>
+                        </button>
                         {isEditing ? (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-green-400 hover:text-green-300"
+                          <button
+                            className="rounded-md hover:bg-slate-700/20 h-6 w-6 p-1 text-green-400 hover:text-green-300"
                             onClick={() => handleSave(key)}
                             disabled={isLoading}
                             aria-label="Save"
@@ -348,23 +303,19 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
                             ) : (
                               <Save size={14} />
                             )}
-                          </Button>
+                          </button>
                         ) : (
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="text-blue-400 hover:text-blue-300"
+                          <button
+                            className="rounded-md hover:bg-slate-700/20 h-6 w-6 p-1 text-blue-400 hover:text-blue-300"
                             onClick={() => startEditing(key, value)}
                             disabled={isLoading}
                             aria-label="Edit"
                           >
                             <Edit2 size={14} />
-                          </Button>
+                          </button>
                         )}
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="text-red-400 hover:text-red-300"
+                        <button
+                          className="rounded-md hover:bg-slate-700/20 h-6 w-6 p-1 text-red-400 hover:text-red-300"
                           onClick={() => handleDelete(key)}
                           disabled={isLoading}
                           aria-label="Delete"
@@ -374,7 +325,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
                           ) : (
                             <Trash2 size={14} />
                           )}
-                        </Button>
+                        </button>
                       </div>
                     </div>
                   );
