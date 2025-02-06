@@ -21,6 +21,49 @@ interface EnvVars {
   [key: string]: string;
 }
 
+const Button = ({
+  variant = "ghost",
+  size = "icon",
+  className = "",
+  children,
+  ...props
+}: any) => {
+  let baseClass = "rounded-md";
+  let variantClass = "";
+  let sizeClass = "";
+
+  if (variant === "ghost") {
+    variantClass = "hover:bg-slate-700/20";
+  } else if (variant === "outline") {
+    variantClass =
+      "border border-slate-700 hover:bg-slate-700/20 text-slate-300";
+  }
+
+  if (size === "icon") {
+    sizeClass = "h-6 w-6 p-1";
+  } else if (size === "sm") {
+    sizeClass = "py-1.5 px-2 text-sm";
+  }
+
+  return (
+    <button
+      className={`${baseClass} ${variantClass} ${sizeClass} ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+const Input = ({ className = "", ...props }: any) => {
+  return (
+    <input
+      className={`bg-slate-900/50 border border-slate-700/50 rounded-md px-2 py-1.5 text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:bg-slate-700/50 disabled:border-none ${className}`}
+      {...props}
+    />
+  );
+};
+
 export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
   const webcontainer = useWebContainer();
   const [envVars, setEnvVars] = useState<EnvVars>({});
@@ -50,7 +93,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
 
         // Write to .env file
         const envContent = Object.entries(storedVars)
-          .map(([key, value]) => `${key}=${value}`)
+          .map(([key, value]) => `"${key}"="${value}"`)
           .join("\n");
 
         await webcontainer.fs.writeFile(".env", envContent);
@@ -66,21 +109,14 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
 
   // Function to create loading skeleton rows
   const LoadingSkeleton = () => (
-    <div className="animate-pulse flex flex-col gap-3">
-      {[1, 2, 3].map((i) => (
-        <div
-          key={i}
-          className="flex flex-wrap items-center gap-2 text-sm bg-slate-900/30 p-2 rounded-md"
-        >
-          <div className="bg-slate-700/50 h-6 w-32 rounded" />
-          <div className="text-slate-400">=</div>
-          <div className="bg-slate-700/50 h-6 flex-1 rounded" />
-          <div className="flex items-center gap-1 ml-auto">
-            <div className="bg-slate-700/50 h-7 w-7 rounded-md" />
-            <div className="bg-slate-700/50 h-7 w-7 rounded-md" />
-          </div>
-        </div>
-      ))}
+    <div className="animate-pulse flex flex-row gap-2 p-2">
+      <div className="bg-gray-700 h-6 w-1/3 rounded-md" />
+      <div className="bg-gray-700 h-6 w-2/3 rounded-md" />
+      <div className="flex items-center justify-end gap-2">
+        <div className="bg-gray-700 h-6 w-6 rounded-md" />
+        <div className="bg-gray-700 h-6 w-6 rounded-md" />
+        <div className="bg-gray-700 h-6 w-6 rounded-md" />
+      </div>
     </div>
   );
 
@@ -201,157 +237,159 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
       <div className="flex flex-col gap-3">
         <h2 className="text-lg font-medium text-slate-200">Secrets</h2>
 
-        {!isInitialized ? (
-          <div className="bg-slate-800/50 rounded-md p-3 flex items-center gap-2 border border-slate-700/50">
-            <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
-            <span className="text-slate-400">Container is starting...</span>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-slate-800/50 rounded-md p-3 flex flex-col gap-3 border border-slate-700/50 mt-4"
+        >
+          <div className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-blue-400" />
+            <span className="font-medium text-slate-200">Add New Variable</span>
           </div>
-        ) : (
-          <>
-            {/* Add new env var form */}
-            <form
-              onSubmit={handleSubmit}
-              className="bg-slate-800/50 rounded-md p-3 flex flex-col gap-3 border border-slate-700/50"
-            >
-              <div className="flex items-center gap-2">
-                <Plus className="h-5 w-5 text-blue-400" />
-                <span className="font-medium">Add Variable</span>
-              </div>
 
-              <div className="flex flex-col gap-2">
-                <input
-                  type="text"
-                  value={newKey}
-                  onChange={(e) => setNewKey(e.target.value)}
-                  placeholder="Name"
-                  className="bg-slate-900/50 border border-slate-700/50 rounded-md px-2 py-1.5"
-                  disabled={isLoading}
-                />
-                <input
-                  type="text"
-                  value={newValue}
-                  onChange={(e) => setNewValue(e.target.value)}
-                  placeholder="Value"
-                  className="bg-slate-900/50 border border-slate-700/50 rounded-md px-2 py-1.5"
-                  disabled={isLoading}
-                />
-              </div>
+          <div className="flex flex-col gap-2">
+            <Input
+              type="text"
+              value={newKey}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewKey(e.target.value)
+              }
+              placeholder="Name"
+              disabled={isLoading}
+            />
+            <Input
+              type="text"
+              value={newValue}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewValue(e.target.value)
+              }
+              placeholder="Value"
+              disabled={isLoading}
+            />
+          </div>
 
-              <button
-                type="submit"
-                disabled={isLoading || !newKey.trim() || !newValue.trim()}
-                className="w-full bg-blue-600/90 hover:bg-blue-500/90 text-white font-medium py-2 px-4 rounded-md shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-700/50 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900"
-              >
-                {isLoading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Add Variable"
-                )}
-              </button>
-            </form>
+          <button
+            type="submit"
+            disabled={
+              isLoading || !newKey.trim() || !newValue.trim() || !isInitialized
+            }
+            className="w-full bg-blue-600/90 hover:bg-blue-500/90 text-white font-medium py-2 px-4 rounded-md shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-700/50 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Add Variable"
+            )}
+          </button>
+        </form>
 
-            {/* Current env vars */}
-            <div className="bg-slate-800/50 rounded-md p-3 flex flex-col gap-2 border border-slate-700/50">
-              <div className="flex items-center gap-2">
-                <Key className="h-5 w-5 text-green-400" />
-                <span className="font-medium">Environment Variables</span>
-              </div>
+        {/* Current env vars */}
+        <div className="bg-slate-800/50 rounded-md overflow-hidden border border-slate-700/50">
+          <div className="p-3">
+            <div className="flex items-center gap-2">
+              <Key className="h-5 w-5 text-green-400" />
+              <span className="font-medium text-slate-200">
+                Environment Variables
+              </span>
+            </div>
+          </div>
 
-              <div className="flex flex-col gap-3 mt-2">
-                {isLoading && Object.keys(envVars).length === 0 ? (
-                  <LoadingSkeleton />
-                ) : (
-                  Object.entries(envVars).map(([key, value]) => {
-                    const isEditing = editingKey === key;
-                    const isLoading = loadingKeys.has(key);
-                    const isHidden = hiddenValues.has(key);
+          <div className="flex flex-col gap-0 mt-0">
+            {!isInitialized && Object.keys(envVars).length === 0 ? (
+              <LoadingSkeleton />
+            ) : (
+              <div className="flex flex-col gap-0">
+                {Object.entries(envVars).map(([key, value]) => {
+                  const isEditing = editingKey === key;
+                  const isLoading = loadingKeys.has(key);
+                  const isHidden = hiddenValues.has(key);
 
-                    return (
-                      <div
-                        key={key}
-                        className="flex flex-wrap items-center gap-2 text-sm bg-slate-900/30 p-2 rounded-md group relative"
-                      >
-                        <input
-                          type="text"
-                          value={key}
-                          disabled={true}
-                          className="font-medium text-slate-300 bg-transparent border-none outline-none min-w-[100px] flex-shrink-0"
-                        />
-                        <span className="text-slate-400">=</span>
-                        <div className="flex-1 flex items-center gap-2 min-w-[200px]">
-                          <input
+                  return (
+                    <div
+                      key={key}
+                      className={`flex items-center justify-between p-2 border-t border-slate-700`}
+                    >
+                      <div className="flex items-center space-x-2 flex-grow mr-2 overflow-hidden">
+                        <span className="font-medium text-base whitespace-nowrap text-slate-300">
+                          {key}:
+                        </span>
+                        <div className="flex-grow min-w-0">
+                          <Input
                             type={isHidden ? "password" : "text"}
                             value={isEditing ? editedValue : value}
-                            onChange={(e) =>
-                              isEditing && setEditedValue(e.target.value)
-                            }
-                            disabled={!isEditing}
-                            className="flex-1 text-slate-300 bg-transparent disabled:border-transparent border border-slate-700 rounded px-2 py-1 disabled:cursor-default"
+                            onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>,
+                            ) => isEditing && setEditedValue(e.target.value)}
+                            readOnly={!isEditing}
+                            className="h-8 w-full text-base py-0 px-1 bg-slate-900/50 border border-slate-700 text-slate-300 rounded-md"
                           />
-                          <button
-                            type="button"
-                            onClick={() => toggleValueVisibility(key)}
-                            className="text-slate-500 hover:text-slate-300 p-1 rounded-md"
-                            title={isHidden ? "Show value" : "Hide value"}
-                          >
-                            {isHidden ? (
-                              <EyeOff className="h-4 w-4" />
-                            ) : (
-                              <Eye className="h-4 w-4" />
-                            )}
-                          </button>
                         </div>
-
-                        <div className="flex items-center gap-1 ml-auto">
-                          {isEditing ? (
-                            <button
-                              onClick={() => handleSave(key)}
-                              disabled={isLoading}
-                              className="p-1.5 hover:bg-green-500/20 rounded-md text-green-400"
-                              title="Save"
-                            >
-                              {isLoading ? (
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                              ) : (
-                                <Save className="h-4 w-4" />
-                              )}
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => startEditing(key, value)}
-                              disabled={isLoading}
-                              className="p-1.5 hover:bg-blue-500/20 rounded-md text-blue-400"
-                              title="Edit"
-                            >
-                              <Edit2 className="h-4 w-4" />
-                            </button>
-                          )}
-                          <button
-                            onClick={() => handleDelete(key)}
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-slate-500 hover:text-slate-300"
+                          onClick={() => toggleValueVisibility(key)}
+                          aria-label={isHidden ? "Show value" : "Hide value"}
+                        >
+                          {isHidden ? <EyeOff size={14} /> : <Eye size={14} />}
+                        </Button>
+                        {isEditing ? (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-green-400 hover:text-green-300"
+                            onClick={() => handleSave(key)}
                             disabled={isLoading}
-                            className="p-1.5 hover:bg-red-500/20 rounded-md text-red-400"
-                            title="Delete"
+                            aria-label="Save"
                           >
                             {isLoading ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              <Trash2 className="h-4 w-4" />
+                              <Save size={14} />
                             )}
-                          </button>
-                        </div>
+                          </Button>
+                        ) : (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-blue-400 hover:text-blue-300"
+                            onClick={() => startEditing(key, value)}
+                            disabled={isLoading}
+                            aria-label="Edit"
+                          >
+                            <Edit2 size={14} />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-red-400 hover:text-red-300"
+                          onClick={() => handleDelete(key)}
+                          disabled={isLoading}
+                          aria-label="Delete"
+                        >
+                          {isLoading ? (
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 size={14} />
+                          )}
+                        </Button>
                       </div>
-                    );
-                  })
-                )}
-                {!isLoading && Object.keys(envVars).length === 0 && (
-                  <span className="text-sm text-slate-500">
-                    No variables set
-                  </span>
-                )}
+                    </div>
+                  );
+                })}
               </div>
-            </div>
-          </>
-        )}
+            )}
+            {!isLoading &&
+              isInitialized &&
+              Object.keys(envVars).length === 0 && (
+                <span className="text-base text-slate-500 p-3">
+                  No variables set
+                </span>
+              )}
+          </div>
+        </div>
       </div>
     </div>
   );
