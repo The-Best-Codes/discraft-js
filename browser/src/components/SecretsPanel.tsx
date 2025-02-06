@@ -315,11 +315,11 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
                       key={key}
                       className={`flex items-center justify-between p-2 border-t border-slate-700`}
                     >
-                      <div className="flex items-center space-x-2 flex-grow mr-2 overflow-hidden">
-                        <span className="font-medium text-base whitespace-nowrap text-slate-300">
+                      <div className="flex items-center justify-between space-x-2 flex-grow mr-2 overflow-hidden">
+                        <span className="font-medium text-base whitespace-nowrap text-slate-300 max-w-1/2 overflow-auto">
                           {key}:
                         </span>
-                        <div className="flex-grow min-w-0">
+                        <div className="flex-grow max-w-1/2 min-w-0">
                           <input
                             type={isHidden ? "password" : "text"}
                             value={isEditing ? editedValue : value}

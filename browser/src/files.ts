@@ -34,8 +34,8 @@ for (const [key, value] of Object.entries(process.env)) {
   console.log(chalk.yellow(key) + '=' + chalk.white(value));
 }
 
-console.log(chalk.yellow('\\nThe process will exit in 10 minutes.'));
-await new Promise(resolve => setTimeout(resolve, 10 * 60 * 1000));
+console.log(chalk.yellow('\\nThe process will exit in 1 minute.'));
+await new Promise(resolve => setTimeout(resolve, 1 * 60 * 1000));
 console.log("Bye!");
 `.trim(),
     },
