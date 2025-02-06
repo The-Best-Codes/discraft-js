@@ -30,7 +30,26 @@ bunx @tailwindcss/cli -i "./$SRC_DIR/index.css" -o "./$SRC_DIR/index.css"
 
 # Build with Bun
 echo "Building with Bun..."
-bun build --experimental-html "$INDEX_HTML" --outdir dist --minify
+bun build "$INDEX_HTML" --outdir dist
+
+###
+# We have the two minify steps below because Bun won't properly minify HTML,
+# So we have to do the CSS and JS minification separately.
+###
+
+# Minify the built JS file
+echo "Minifying JS files..."
+find dist -name "*.js" -print0 | while IFS= read -r -d $'\0' file; do
+  echo "Minifying: $file"
+  bun build "$file" --outfile "$file" --minify
+done
+
+# Minify the built CSS file
+echo "Minifying CSS files..."
+find dist -name "*.css" -print0 | while IFS= read -r -d $'\0' file; do
+  echo "Minifying: $file"
+  bun build "$file" --outfile "$file" --minify
+done
 
 # Navigate back to the parent directory
 cd .. || exit 1

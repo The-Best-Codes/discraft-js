@@ -7,7 +7,6 @@
     "dev": "vite",
     "build": "bash build.sh",
     "vite-build": "vite build",
-    "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
