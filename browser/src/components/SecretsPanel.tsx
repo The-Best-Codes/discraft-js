@@ -28,7 +28,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
       try {
         // Load from localStorage
         const storedVars = JSON.parse(
-          localStorage.getItem(STORAGE_KEY) || "{}",
+          localStorage.getItem(STORAGE_KEY) || "{}"
         );
         setEnvVars(storedVars);
 
@@ -110,6 +110,48 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
       <div className="flex flex-col gap-3">
         <h2 className="text-lg font-medium text-slate-200">Secrets</h2>
 
+        {/* Add new env var form */}
+        <form
+          onSubmit={handleSubmit}
+          className="bg-slate-800/50 rounded-md p-3 flex flex-col gap-3 border border-slate-700/50"
+        >
+          <div className="flex items-center gap-2">
+            <Plus className="h-5 w-5 text-blue-400" />
+            <span className="font-medium">Add Variable</span>
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <input
+              type="text"
+              value={newKey}
+              onChange={(e) => setNewKey(e.target.value)}
+              placeholder="Name"
+              className="bg-slate-900/50 border border-slate-700/50 rounded-md px-2 py-1.5"
+              disabled={isLoading}
+            />
+            <input
+              type="text"
+              value={newValue}
+              onChange={(e) => setNewValue(e.target.value)}
+              placeholder="Value"
+              className="bg-slate-900/50 border border-slate-700/50 rounded-md px-2 py-1.5"
+              disabled={isLoading}
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isLoading || !newKey.trim() || !newValue.trim()}
+            className="w-full bg-blue-600/90 hover:bg-blue-500/90 text-white font-medium py-2 px-4 rounded-md shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-700/50 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900"
+          >
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Add Variable"
+            )}
+          </button>
+        </form>
+
         {/* Current env vars */}
         <div className="bg-slate-800/50 rounded-md p-3 flex flex-col gap-2 border border-slate-700/50">
           <div className="flex items-center gap-2">
@@ -135,48 +177,6 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
             )}
           </div>
         </div>
-
-        {/* Add new env var form */}
-        <form
-          onSubmit={handleSubmit}
-          className="bg-slate-800/50 rounded-md p-3 flex flex-col gap-3 border border-slate-700/50"
-        >
-          <div className="flex items-center gap-2">
-            <Plus className="h-5 w-5 text-blue-400" />
-            <span className="font-medium">Add Variable</span>
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <input
-              type="text"
-              value={newKey}
-              onChange={(e) => setNewKey(e.target.value)}
-              placeholder="Name"
-              className="bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-sm"
-              disabled={isLoading}
-            />
-            <input
-              type="text"
-              value={newValue}
-              onChange={(e) => setNewValue(e.target.value)}
-              placeholder="Value"
-              className="bg-slate-900/50 border border-slate-700/50 rounded px-2 py-1 text-sm"
-              disabled={isLoading}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={isLoading || !newKey.trim() || !newValue.trim()}
-            className="w-full bg-blue-600/90 hover:bg-blue-500/90 text-white font-medium py-2 px-4 rounded-md shadow-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-slate-700/50 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:ring-offset-2 focus:ring-offset-slate-900"
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              "Add Variable"
-            )}
-          </button>
-        </form>
       </div>
     </div>
   );
