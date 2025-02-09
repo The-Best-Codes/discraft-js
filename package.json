@@ -6,9 +6,10 @@
   "packageManager": "bun@1.2.2",
   "scripts": {
     "prepublish": "bun run build",
-    "build": "cd package && bun build.ts",
+    "build": "cd package && bun build.ts && bun run sentry:sourcemaps",
     "lint": "eslint . --no-cache",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject --org bestcodes-official --project discraft-npm ./package/dist && sentry-cli sourcemaps upload --org bestcodes-official --project discraft-npm ./package/dist"
   },
   "bin": {
     "discraft": "package/dist/cli.js"
@@ -61,6 +62,7 @@
   },
   "dependencies": {
     "@inquirer/core": "^10.1.6",
+    "@sentry/cli": "^2.41.1",
     "@sentry/node": "^8.54.0",
     "@sentry/profiling-node": "^8.54.0",
     "chokidar": "^4.0.3",

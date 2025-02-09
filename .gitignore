@@ -6,3 +6,6 @@ pnpm-lock.yaml
 bun.lockb
 editing/minified
 testing
+
+# Sentry Config File
+.sentryclirc
