@@ -41,6 +41,6 @@ jobs:
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
       - name: Publish to npm
-        run: npm publish --provenance --tag ${{ steps.npm_tag.outputs.tag }}
+        run: npm run build && npm publish --provenance --tag ${{ steps.npm_tag.outputs.tag }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

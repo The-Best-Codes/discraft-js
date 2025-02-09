@@ -22,3 +22,5 @@ await build({
   target: "node",
   sourcemap: "external",
 });
+
+console.log("Build complete.");
