@@ -21,6 +21,15 @@ jobs:
         with:
           node-version: "22.x"
           registry-url: "https://registry.npmjs.org"
+
+      - name: Set Sentry Auth Token
+        run: echo "SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}" >> $GITHUB_ENV
+
+      - name: Create .sentryclirc file
+        run: |
+          echo "[auth]" > .sentryclirc
+          echo "token=${{ secrets.SENTRY_AUTH_TOKEN }}" >> .sentryclirc
+
       - run: bun install
       - run: bun run prepublish
       - name: Determine npm publish tag
