@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
+import "./instrument";
 import { CancelPromptError } from "@inquirer/core";
+import Sentry from "./instrument";
 import { program } from "commander";
 import consola from "consola";
 import { version } from "../../package.json";
@@ -28,12 +30,13 @@ program
         process.exit(1);
       }
       return value;
-    },
+    }
   )
   .action((options) => {
     start({ runner: options.runner }).catch((error) => {
+      Sentry.captureException(error);
       consola.error(
-        "An error occurred while starting the bot. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+        "An error occurred while starting the bot. Set the CONSOLA_LEVEL to 'verbose' to see more details."
       );
       consola.verbose(error);
       process.exit(1);
@@ -52,12 +55,13 @@ program
         process.exit(1);
       }
       return value;
-    },
+    }
   )
   .action((options) => {
     build({ builder: options.builder }).catch((error) => {
+      Sentry.captureException(error);
       consola.error(
-        "An error occurred during build. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+        "An error occurred during build. Set the CONSOLA_LEVEL to 'verbose' to see more details."
       );
       consola.verbose(error);
       process.exit(1);
@@ -80,17 +84,18 @@ program
             process.exit(1);
           }
           return value;
-        },
+        }
       )
       .action((options) => {
         vercelBuild({ builder: options.builder }).catch((error) => {
+          Sentry.captureException(error);
           consola.error(
-            "An error occurred during the vercel build. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+            "An error occurred during the vercel build. Set the CONSOLA_LEVEL to 'verbose' to see more details."
           );
           consola.verbose(error);
           process.exit(1);
         });
-      }),
+      })
   );
 
 program
@@ -108,14 +113,14 @@ Supported targets:
 - linux-arm64
 - windows-x64
 - darwin-x64
-- darwin-arm64`,
+- darwin-arm64`
       )
       .option("--entry <entry>", "Custom entry point", "dist/index.js")
       .option("--outfile <outfile>", "Output file name", "dist/discraft-bot")
       .action((options) => {
         if (!options.target) {
           consola.error(
-            "The --target option is required for `discraft exec build`.",
+            "The --target option is required for `discraft exec build`."
           );
           process.exit(1);
         }
@@ -128,7 +133,9 @@ Supported targets:
         ];
         if (!supportedTargets.includes(options.target)) {
           consola.error(
-            `Invalid target: ${options.target}. Supported targets are:\n${supportedTargets.join("\n")}`,
+            `Invalid target: ${
+              options.target
+            }. Supported targets are:\n${supportedTargets.join("\n")}`
           );
           process.exit(1);
         }
@@ -138,13 +145,14 @@ Supported targets:
           entry: options.entry,
           outfile: options.outfile,
         }).catch((error) => {
+          Sentry.captureException(error);
           consola.error(
-            "An error occurred during the executable build. Set CONSOLA_LEVEL to 'verbose' for details.",
+            "An error occurred during the executable build. Set CONSOLA_LEVEL to 'verbose' for details."
           );
           consola.verbose(error);
           process.exit(1);
         });
-      }),
+      })
   );
 
 program
@@ -159,7 +167,7 @@ program
         process.exit(1);
       }
       return value;
-    },
+    }
   )
   .option(
     "-r, --runner <runner>",
@@ -170,7 +178,7 @@ program
         process.exit(1);
       }
       return value;
-    },
+    }
   )
   .option("-c, --clear-console", "Clear the console on each rebuild.", false)
   .action((options) => {
@@ -179,8 +187,9 @@ program
       clearConsole: options.clearConsole,
       runner: options.runner,
     }).catch((error) => {
+      Sentry.captureException(error);
       consola.error(
-        "An error occurred during development. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+        "An error occurred during development. Set the CONSOLA_LEVEL to 'verbose' to see more details."
       );
       consola.verbose(error);
       process.exit(1);
@@ -192,7 +201,7 @@ program
   .description("Initialize a new Discraft project")
   .option(
     "-d, --dir <directory>",
-    "Project directory (defaults to current directory)",
+    "Project directory (defaults to current directory)"
   )
   .option(
     "-p, --package-manager <pm>",
@@ -200,12 +209,12 @@ program
     (value) => {
       if (value && !["npm", "yarn", "pnpm", "bun", "none"].includes(value)) {
         consola.error(
-          "Invalid package manager value. Must be 'npm', 'yarn', 'pnpm', 'bun', or 'none'.",
+          "Invalid package manager value. Must be 'npm', 'yarn', 'pnpm', 'bun', or 'none'."
         );
         process.exit(1);
       }
       return value;
-    },
+    }
   )
   .option("--skip-install", "Skip dependency installation")
   .option(
@@ -214,12 +223,12 @@ program
     (value) => {
       if (value && !["js", "ts", "vercel-ts-ai"].includes(value)) {
         consola.error(
-          "Invalid template value. Must be 'js', 'ts', or 'vercel-ts-ai'.",
+          "Invalid template value. Must be 'js', 'ts', or 'vercel-ts-ai'."
         );
         process.exit(1);
       }
       return value;
-    },
+    }
   )
   .action(async (options) => {
     try {
@@ -229,8 +238,9 @@ program
         consola.info("Initialization cancelled by user.");
         process.exit(0);
       } else {
+        Sentry.captureException(error);
         consola.error(
-          "An error occurred during initialization. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+          "An error occurred during initialization. Set the CONSOLA_LEVEL to 'verbose' to see more details."
         );
         consola.verbose(error);
         process.exit(1);

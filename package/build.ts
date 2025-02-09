@@ -20,4 +20,5 @@ await build({
   packages: "external",
   outdir: outDir,
   target: "node",
+  sourcemap: "external",
 });

@@ -47,12 +47,12 @@
   },
   "homepage": "https://github.com/The-Best-Codes/discraft-js#readme",
   "devDependencies": {
-    "@eslint/js": "^9.19.0",
+    "@eslint/js": "^9.20.0",
     "@types/bun": "^1.2.2",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.1",
     "bun": "^1.2.2",
-    "eslint": "^9.19.0",
+    "eslint": "^9.20.0",
     "globals": "^15.14.0",
     "typescript-eslint": "^8.23.0"
   },
@@ -61,10 +61,12 @@
   },
   "dependencies": {
     "@inquirer/core": "^10.1.6",
+    "@sentry/node": "^8.54.0",
+    "@sentry/profiling-node": "^8.54.0",
     "chokidar": "^4.0.3",
     "commander": "^13.1.0",
     "consola": "^3.4.0",
-    "esbuild": "^0.24.2",
+    "esbuild": "^0.25.0",
     "esbuild-node-externals": "^1.16.0",
     "fs-extra": "^11.3.0",
     "glob": "^11.0.1",
