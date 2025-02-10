@@ -72,7 +72,10 @@ export default function App() {
         logger.start("node_modules does not exist, installing...");
         setProcessStatus("installing");
         if (!webcontainer) throw new Error("WebContainer not initialized");
-        const installProcess = await webcontainer.spawn("npm", ["install"]);
+        const installProcess = await webcontainer.spawn("npm", [
+          "install",
+          "--legacy-peer-deps",
+        ]);
 
         installProcess.output.pipeTo(
           new WritableStream({
