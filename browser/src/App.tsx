@@ -11,6 +11,7 @@ type ProcessStatus =
   | "initializing"
   | "idle"
   | "installing"
+  | "building"
   | "running"
   | "stopped"
   | "error";
@@ -100,7 +101,23 @@ export default function App() {
         try {
           if (!webcontainer) throw new Error("WebContainer not initialized");
 
+          setProcessStatus("building");
+
+          logger.start("Building project...");
+          try {
+            const buildProcess = await webcontainer.spawn("npm", [
+              "run",
+              "build",
+            ]);
+            await buildProcess.exit;
+            logger.success("Build finished.");
+          } catch (error) {
+            logger.error("Build failed:", error);
+            throw error;
+          }
+
           setProcessStatus("running");
+
           logger.start("Starting process...");
 
           // Clean up any existing input writer

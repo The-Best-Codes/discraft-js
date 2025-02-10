@@ -6,7 +6,7 @@ export const initialFiles = {
   },
   "package.json": {
     file: {
-      contents: `{\n  \"name\": \"webcontainer-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"start\": \"node index.js\"\n  }\n}`,
+      contents: `{\n  \"name\": \"webcontainer-app\",\n  \"type\": \"module\",\n  \"scripts\": {\n    \"start\": \"node index.js\",\n    \"build\": \"echo 'Building...'\"\n  }\n}`,
     },
   },
   "index.js": {

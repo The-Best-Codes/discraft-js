@@ -14,6 +14,7 @@ interface ControlPanelProps {
     | "initializing"
     | "idle"
     | "installing"
+    | "building"
     | "running"
     | "stopped"
     | "error";
@@ -37,6 +38,7 @@ export function ControlPanel({
             disabled={
               !isInitialized ||
               processStatus === "running" ||
+              processStatus === "building" ||
               processStatus === "installing" ||
               processStatus === "initializing"
             }
@@ -76,6 +78,9 @@ export function ControlPanel({
           {processStatus === "installing" && (
             <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
           )}
+          {processStatus === "building" && (
+            <Loader2 className="h-5 w-5 animate-spin text-blue-400" />
+          )}
           {processStatus === "running" && (
             <Activity className="h-5 w-5 text-green-400" />
           )}
@@ -92,6 +97,7 @@ export function ControlPanel({
             <span className="font-medium">
               {processStatus === "initializing" && "Initializing..."}
               {processStatus === "installing" && "Installing..."}
+              {processStatus === "building" && "Building..."}
               {processStatus === "running" && "Running"}
               {processStatus === "stopped" && "Stopped"}
               {processStatus === "idle" && "Ready"}
@@ -100,6 +106,7 @@ export function ControlPanel({
             <span className="text-sm text-slate-400">
               {processStatus === "initializing" && "Setting up environment"}
               {processStatus === "installing" && "Setting up dependencies"}
+              {processStatus === "building" && "Building project"}
               {processStatus === "running" && "Process is active"}
               {processStatus === "stopped" && "Process terminated"}
               {processStatus === "idle" && "Ready to start"}

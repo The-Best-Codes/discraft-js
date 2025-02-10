@@ -17,6 +17,7 @@ type ProcessStatus =
   | "initializing"
   | "idle"
   | "installing"
+  | "building"
   | "running"
   | "stopped"
   | "error";
