@@ -37,7 +37,7 @@ export default function App() {
     async function initialize() {
       if (!terminal || !webcontainer) return;
 
-      setProcessStatus("installing");
+      setProcessStatus("initializing");
 
       try {
         // Write files
@@ -70,6 +70,7 @@ export default function App() {
 
         // Any other error means node_modules doesn't exist
         logger.start("node_modules does not exist, installing...");
+        setProcessStatus("installing");
         if (!webcontainer) throw new Error("WebContainer not initialized");
         const installProcess = await webcontainer.spawn("npm", ["install"]);
 
