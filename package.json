@@ -7,7 +7,7 @@
   "scripts": {
     "prepublish": "bun run build",
     "build": "cd package && bun build.ts",
-    "lint": "eslint . --no-cache",
+    "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "bin": {
@@ -21,6 +21,7 @@
     "discord",
     "bot",
     "framework",
+    "browser",
     "cli"
   ],
   "files": [
@@ -54,7 +55,7 @@
     "bun": "^1.2.2",
     "eslint": "^9.20.0",
     "globals": "^15.14.0",
-    "typescript-eslint": "^8.23.0"
+    "typescript-eslint": "^8.24.0"
   },
   "peerDependencies": {
     "typescript": "^5.7.3"
