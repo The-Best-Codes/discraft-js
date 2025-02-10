@@ -1,3 +1,4 @@
+import { createConsola } from "consola/browser";
 import {
   Edit2,
   Eye,
@@ -10,6 +11,8 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useWebContainer } from "react-webcontainers";
+
+const logger = createConsola();
 
 const STORAGE_KEY = "webcontainer_env_vars";
 
@@ -70,7 +73,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
 
         await webcontainer.fs.writeFile(".env", envContent);
       } catch (error) {
-        console.error("Error loading environment variables:", error);
+        logger.error("Error loading environment variables:", error);
       } finally {
         setIsLoading(false);
       }
@@ -129,7 +132,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
       setNewKey("");
       setNewValue("");
     } catch (error) {
-      console.error("Error updating environment variables:", error);
+      logger.error("Error updating environment variables:", error);
     } finally {
       setIsLoading(false);
     }
@@ -157,7 +160,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
         .join("\n");
       await webcontainer.fs.writeFile(".env", envContent);
     } catch (error) {
-      console.error("Error deleting environment variable:", error);
+      logger.error("Error deleting environment variable:", error);
     } finally {
       // Remove from loading set
       setLoadingKeys((prev) => {
@@ -215,7 +218,7 @@ export function SecretsPanel({ isInitialized }: SecretsPanelProps) {
       setEditingKey(null);
       setEditedValue("");
     } catch (error) {
-      console.error("Error updating environment variable:", error);
+      logger.error("Error updating environment variable:", error);
     } finally {
       setLoadingKeys((prev) => {
         const next = new Set(prev);

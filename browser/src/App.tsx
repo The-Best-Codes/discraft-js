@@ -1,7 +1,10 @@
+import { createConsola } from "consola/browser";
 import { useEffect, useRef, useState } from "react";
 import { useWebContainer } from "react-webcontainers";
 import { useXTerm } from "react-xtermjs";
 import { initialFiles } from "./files";
+
+const logger = createConsola();
 
 // Define Process Status Types
 type ProcessStatus =
@@ -39,12 +42,16 @@ export default function App() {
       try {
         // Write files
         for (const [path, { file }] of Object.entries(initialFiles)) {
-          await webcontainer.fs.writeFile(path, file.contents);
-          console.log(`Successfully wrote ${path}`);
+          try {
+            await webcontainer.fs.writeFile(path, file.contents);
+            logger.info(`Successfully wrote ${path}`);
+          } catch (error) {
+            logger.error(`Error writing ${path}:`, error);
+          }
         }
-        console.log("All initial files written successfully.");
+        logger.success("All initial files written successfully.");
       } catch (error) {
-        console.error("Error during initialization:", error);
+        logger.error("Error during initialization:", error);
         setProcessStatus("error");
         return;
       }
@@ -53,7 +60,7 @@ export default function App() {
       try {
         if (!webcontainer) throw new Error("WebContainer not initialized");
         await webcontainer.fs.readdir("node_modules");
-        console.log("node_modules already exists.");
+        logger.info("node_modules already exists.");
       } catch (error: unknown) {
         if (
           error instanceof Error &&
@@ -62,7 +69,7 @@ export default function App() {
           throw error;
 
         // Any other error means node_modules doesn't exist
-        console.log("node_modules does not exist, installing...");
+        logger.start("node_modules does not exist, installing...");
         if (!webcontainer) throw new Error("WebContainer not initialized");
         const installProcess = await webcontainer.spawn("npm", ["install"]);
 
@@ -75,11 +82,11 @@ export default function App() {
         );
 
         if ((await installProcess.exit) !== 0) {
-          console.error("npm install exited with a non-zero code.");
+          logger.error("npm install exited with a non-zero code.");
         }
 
         await installProcess.exit;
-        console.log("npm install finished.");
+        logger.success("npm install finished.");
       } finally {
         // Installation complete
       }
@@ -90,7 +97,7 @@ export default function App() {
           if (!webcontainer) throw new Error("WebContainer not initialized");
 
           setProcessStatus("running");
-          console.log("Starting process...");
+          logger.start("Starting process...");
 
           // Clean up any existing input writer
           if (inputWriter.current) {
@@ -109,22 +116,22 @@ export default function App() {
                 terminal?.write(data);
               },
               close() {
-                console.log("Process output stream closed");
+                logger.info("Process output stream closed");
               },
               abort(reason: Error) {
-                console.error("Process output stream aborted:", reason);
+                logger.error("Process output stream aborted:", reason);
               },
             }),
           );
 
           // Monitor process exit
           const exitCode = await shellProcess.exit;
-          console.log("Process finished with code:", exitCode);
+          logger.info("Process finished with code:", exitCode);
           setProcessStatus(
             exitCode === 0 || exitCode === 130 ? "stopped" : "error",
           );
         } catch (error) {
-          console.error("Error starting process:", error);
+          logger.error("Error starting process:", error);
           setProcessStatus("error");
           throw error;
         }
@@ -135,7 +142,7 @@ export default function App() {
           if (!webcontainer) throw new Error("WebContainer not initialized");
 
           setProcessStatus("stopped");
-          console.log("Stopping process...");
+          logger.start("Stopping process...");
 
           if (inputWriter.current) {
             // Send Ctrl+C (ASCII code 3)
@@ -145,9 +152,9 @@ export default function App() {
             inputWriter.current = null;
           }
 
-          console.log("Process stopped successfully");
+          logger.success("Process stopped successfully");
         } catch (error) {
-          console.error("Error stopping process:", error);
+          logger.error("Error stopping process:", error);
           setProcessStatus("error");
           throw error;
         }
@@ -156,7 +163,7 @@ export default function App() {
       setProcess({ start: startProcess, stop: stopProcess });
       setProcessStatus("idle"); // Set to idle after initial setup is done
       setIsInitialized(true); // Mark as initialized
-      console.log("Initialization complete.");
+      logger.success("Initialization complete.");
     }
 
     initialize();

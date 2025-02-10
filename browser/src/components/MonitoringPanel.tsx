@@ -1,3 +1,4 @@
+import { createConsola } from "consola/browser";
 import { BarChart2, Cpu, Loader2, Timer } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useWebContainer } from "react-webcontainers";
@@ -9,6 +10,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+const logger = createConsola();
 
 type ProcessStatus =
   | "initializing"
@@ -141,7 +144,7 @@ export function MonitoringPanel({ processStatus }: MonitoringPanelProps) {
           setIsSupported(false);
         }
       } catch (error) {
-        console.error("Error monitoring memory usage:", error);
+        logger.error("Error monitoring memory usage:", error);
         setCurrentMemory(undefined);
       }
       if (!signal.aborted) {
