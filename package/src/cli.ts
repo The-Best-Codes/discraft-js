@@ -4,6 +4,7 @@ import { CancelPromptError } from "@inquirer/core";
 import { program } from "commander";
 import consola from "consola";
 import { version } from "../../package.json";
+import { buildBrowser } from "./cli/browser/build";
 import { build } from "./cli/build";
 import { dev } from "./cli/dev";
 import { build as execBuild } from "./cli/exec/build";
@@ -140,6 +141,29 @@ Supported targets:
         }).catch((error) => {
           consola.error(
             "An error occurred during the executable build. Set CONSOLA_LEVEL to 'verbose' for details.",
+          );
+          consola.verbose(error);
+          process.exit(1);
+        });
+      }),
+  );
+
+program
+  .command("browser")
+  .description("Commands for browser interface")
+  .addCommand(
+    program
+      .createCommand("build")
+      .description("Build the browser interface")
+      .option(
+        "--target-dir <targetDir>",
+        "Target directory for the build",
+        "dist",
+      )
+      .action((options) => {
+        buildBrowser({ targetDir: options.targetDir }).catch((error) => {
+          consola.error(
+            "An error occurred during the browser build. Set CONSOLA_LEVEL to 'verbose' for details.",
           );
           consola.verbose(error);
           process.exit(1);

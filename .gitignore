@@ -4,5 +4,6 @@ node_modules/
 package-lock.json
 pnpm-lock.yaml
 bun.lockb
+bun.lock
 editing/minified
 testing
