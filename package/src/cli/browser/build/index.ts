@@ -5,6 +5,7 @@ import kleur from "kleur";
 import path from "path";
 import { fileURLToPath } from "url";
 import { runSubprocess } from "../../utils";
+import { getCompactRelativePath } from "../../utils/relativePath";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -43,8 +44,12 @@ async function buildBrowser(options: ExecBrowserOptions = {}) {
   const browserPath = path.join(distPath, "browser");
   const packageRoot = path.join(__dirname, "..", "..");
   const browserTemplatePath = path.join(packageRoot, "browser");
+  const uxBrowserPath = getCompactRelativePath(
+    currentWorkingDirectory,
+    browserPath,
+  );
 
-  consola.info(`Building browser interface in ${kleur.cyan(browserPath)}...`);
+  consola.info(`Building browser interface in ${kleur.cyan(uxBrowserPath)}...`);
 
   // Validate dist package.json and index.js
   const distPackageJsonPath = path.join(distPath, "package.json");
@@ -56,11 +61,11 @@ async function buildBrowser(options: ExecBrowserOptions = {}) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {
     consola.error(
-      `Missing required files in ${kleur.cyan(distPath)}.  Ensure ${kleur.cyan(
-        "package.json",
-      )} and ${kleur.cyan(
+      `Missing required files in ${kleur.cyan(distPath)}. Run ${kleur.cyan(
+        "npm run build",
+      )} and make sure ${kleur.cyan("package.json")} and ${kleur.cyan(
         "index.js",
-      )} exist after running the main build process.`,
+      )} exist.`,
     );
     process.exit(1);
   }
