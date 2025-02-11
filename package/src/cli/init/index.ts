@@ -5,6 +5,7 @@ import kleur from "kleur";
 import path from "path";
 import { fileURLToPath } from "url";
 import { runSubprocess } from "../utils";
+import { getCompactRelativePath } from "../utils/relativePath";
 import { loadTemplateConfig, type TemplateConfig } from "./config";
 import { detectPackageManager } from "./detectPm";
 import { copyTemplateFiles } from "./template";
@@ -93,7 +94,12 @@ async function init(options: InitOptions = {}) {
     packageManager = pmChoice.pm;
   }
 
-  consola.info(`Initializing project in ${kleur.cyan(projectDir)}...`);
+  const uxProjectDir = getCompactRelativePath(
+    currentWorkingDirectory,
+    projectDir,
+  );
+
+  consola.info(`Initializing project in ${kleur.cyan(uxProjectDir)}...`);
 
   let templateConfig: TemplateConfig;
   try {
