@@ -15,11 +15,11 @@ export function getCompactRelativePath(
   try {
     // Validate input
     if (!path.isAbsolute(cwd)) {
-      consola.warn("cwd must be an absolute path.");
+      consola.warn("cwd must be an absolute path. [internal warning]");
       return targetPath; // Return original path on error
     }
     if (!path.isAbsolute(targetPath)) {
-      consola.warn("targetPath must be an absolute path.");
+      consola.warn("targetPath must be an absolute path. [internal warning]");
       return targetPath; // Return original path on error
     }
 
