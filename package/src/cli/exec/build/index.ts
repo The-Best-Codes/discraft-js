@@ -1,7 +1,9 @@
 import consola from "consola";
 import fs from "fs";
+import kleur from "kleur";
 import path from "path";
 import { isBunInstalled, runSubprocess } from "../../utils";
+import { getCompactRelativePath } from "../../utils/relativePath";
 
 interface ExecBuildOptions {
   target: string;
@@ -16,8 +18,14 @@ async function build(options: ExecBuildOptions) {
   const outputFile = options.outfile || "dist/discraft-bot";
   const target = options.target;
 
-  const entryFullPath = path.join(process.cwd(), entryPoint);
-  const outputFullPath = path.join(process.cwd(), outputFile);
+  const currentWorkingDirectory = process.cwd();
+  const entryFullPath = path.join(currentWorkingDirectory, entryPoint);
+  const outputFullPath = path.join(currentWorkingDirectory, outputFile);
+  const uxOutputFullPath = getCompactRelativePath(
+    currentWorkingDirectory,
+    outputFullPath,
+  );
+
   const distDir = path.dirname(outputFullPath);
 
   consola.info(`Building executable for target: ${target}`);
@@ -55,12 +63,12 @@ async function build(options: ExecBuildOptions) {
       `--outfile=${outputFullPath}`,
     ];
     await runSubprocess(bunArgs[0], bunArgs.slice(1));
-    consola.success(`Executable built to \`${outputFullPath}\``);
+    consola.success(`Executable built to \`${uxOutputFullPath}\``);
 
     const tips = [
-      "Run the executable from the terminal (not by clicking on it) so you don't create duplicate processes",
-      "The `.env` file should be in the same directory as the executable or the bot won't start",
-      "Run `chmod +x <executable>` if the executable needs permission to run",
+      `Run the executable from the terminal (${kleur.bold("not by clicking on it")}) so you don't create duplicate processes`,
+      `The \`.env\` file should be in the same directory as the executable or the bot won't start`,
+      `Run \`chmod +x ${uxOutputFullPath}\` if the executable needs permission to run`,
     ];
 
     consola.log("Important notes:");

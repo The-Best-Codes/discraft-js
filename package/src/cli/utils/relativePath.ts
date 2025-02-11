@@ -1,3 +1,4 @@
+import consola from "consola";
 import path from "path";
 
 /**
@@ -14,11 +15,11 @@ export function getCompactRelativePath(
   try {
     // Validate input
     if (!path.isAbsolute(cwd)) {
-      console.warn("cwd must be an absolute path.");
+      consola.warn("cwd must be an absolute path.");
       return targetPath; // Return original path on error
     }
     if (!path.isAbsolute(targetPath)) {
-      console.warn("targetPath must be an absolute path.");
+      consola.warn("targetPath must be an absolute path.");
       return targetPath; // Return original path on error
     }
 
@@ -35,7 +36,7 @@ export function getCompactRelativePath(
 
     return relativePath;
   } catch (error) {
-    console.error("Error calculating compact relative path:", error);
+    consola.error("Error calculating compact relative path:", error);
     return targetPath; // Return the original path as a fallback.  Important for robustness.
   }
 }
