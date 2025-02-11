@@ -1,6 +1,6 @@
 {
   "name": "discraft",
-  "version": "1.6.9-beta.7",
+  "version": "1.6.9",
   "description": "Create and deploy production Discord bots in minutes",
   "type": "module",
   "packageManager": "bun@1.2.2",
