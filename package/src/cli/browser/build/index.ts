@@ -116,7 +116,7 @@ async function buildBrowser(options: ExecBrowserOptions = {}) {
     await runSubprocess("npm", ["install", "--legacy-peer-deps"], {
       cwd: browserPath,
     });
-    consola.success(
+    consola.verbose(
       "Dependencies installed successfully in browser directory.",
     );
   } catch (error: any) {
@@ -129,7 +129,7 @@ async function buildBrowser(options: ExecBrowserOptions = {}) {
 
   // Update src/files.ts
   try {
-    consola.info("Updating src/files.ts...");
+    consola.info("Updating files...");
     const files: { [key: string]: { file: { contents: string } } } = {};
     const distFiles = await fs.readdir(distPath);
 
@@ -159,7 +159,7 @@ async function buildBrowser(options: ExecBrowserOptions = {}) {
     )};`;
     const filesTsPath = path.join(browserPath, "src", "files.ts");
     await fs.writeFile(filesTsPath, filesTsContent);
-    consola.success("src/files.ts updated successfully.");
+    consola.verbose("src/files.ts updated successfully.");
   } catch (error: any) {
     consola.error(`Failed to update src/files.ts: ${error.message}`);
     consola.verbose(error);
@@ -170,7 +170,7 @@ async function buildBrowser(options: ExecBrowserOptions = {}) {
   try {
     consola.info("Building browser application...");
     await runSubprocess("npm", ["run", "build"], { cwd: browserPath });
-    consola.success("Browser application built successfully.");
+    consola.info("Built successfully.");
   } catch (error: any) {
     consola.error(`Failed to build browser application: ${error.message}`);
     consola.verbose(error);
@@ -178,7 +178,10 @@ async function buildBrowser(options: ExecBrowserOptions = {}) {
   }
 
   consola.success(
-    `Browser interface built successfully in ${kleur.cyan(browserPath)}`,
+    `Browser interface built successfully in ${kleur.cyan(uxBrowserPath)}.`,
+  );
+  consola.info(
+    `Run ${kleur.cyan("discraft browser serve")} to serve the browser interface files.`,
   );
 }
 
