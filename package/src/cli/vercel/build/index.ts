@@ -5,12 +5,14 @@ import { nodeExternalsPlugin } from "esbuild-node-externals";
 import { promises as fs } from "fs";
 import path from "path";
 
+import kleur from "kleur";
 import {
   getEntryPoint,
   isBunInstalled,
   isTypeScriptProject,
   runSubprocess,
 } from "../../utils";
+import { getCompactRelativePath } from "../../utils/relativePath";
 import { generateVercelCommandsIndex } from "./index-files/commands";
 
 type Builder = "esbuild" | "bun";
@@ -21,10 +23,19 @@ interface BuildOptions {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function compileAndRunRegisterScript(isTS: boolean) {
-  const registerTsPath = path.join(process.cwd(), "scripts", "register.ts");
-  const registerJsPath = path.join(process.cwd(), "scripts", "register.js");
+  const currentWorkingDirectory = process.cwd();
+  const registerTsPath = path.join(
+    currentWorkingDirectory,
+    "scripts",
+    "register.ts",
+  );
+  const registerJsPath = path.join(
+    currentWorkingDirectory,
+    "scripts",
+    "register.js",
+  );
   const outPath = path.join(
-    process.cwd(),
+    currentWorkingDirectory,
     ".discraft",
     "commands",
     "register.js",
@@ -151,7 +162,9 @@ async function startBuild(options?: BuildOptions) {
     }
   }
 
-  consola.info("Build output: " + outputDir);
+  const uxOutDir = getCompactRelativePath(currentWorkingDirectory, outputDir);
+
+  consola.info(`Build output: ${kleur.cyan(uxOutDir)}`);
   consola.success("Vercel build completed!");
 }
 
