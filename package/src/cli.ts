@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-import { CancelPromptError } from "@inquirer/core";
 import { program } from "commander";
 import consola from "consola";
 import { version } from "../../package.json";
@@ -284,16 +283,11 @@ program
     try {
       await init(options);
     } catch (error) {
-      if (error instanceof CancelPromptError) {
-        consola.info("Initialization cancelled by user.");
-        process.exit(0);
-      } else {
-        consola.error(
-          "An error occurred during initialization. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
-        );
-        consola.verbose(error);
-        process.exit(1);
-      }
+      consola.error(
+        "An error occurred during initialization. Set the CONSOLA_LEVEL to 'verbose' to see more details.",
+      );
+      consola.verbose(error);
+      process.exit(1);
     }
   });
 
