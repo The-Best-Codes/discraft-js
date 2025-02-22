@@ -5,7 +5,7 @@ import { program } from "commander";
 import consola from "consola";
 import { version } from "../../package.json";
 import { buildBrowser } from "./cli/browser/build";
-import { serveBrowser } from "./cli/browser/serve"; // Import serveBrowser
+import { serveBrowser } from "./cli/browser/serve";
 import { build } from "./cli/build";
 import { dev } from "./cli/dev";
 import { build as execBuild } from "./cli/exec/build";
