@@ -1,6 +1,6 @@
+import { intro, note, outro, select, text } from "@clack/prompts";
 import consola from "consola";
 import fs from "fs-extra";
-import inquirer from "inquirer";
 import kleur from "kleur";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -23,84 +23,122 @@ interface InitOptions {
 async function init(options: InitOptions = {}) {
   const currentWorkingDirectory = process.cwd();
   const packageRoot = path.join(__dirname, "..", "..");
+
+  intro("Welcome to Discraft.js Project Setup");
+
+  // Template selection
   const template =
     options.template ??
-    (
-      await inquirer.prompt({
-        type: "list",
-        name: "template",
-        message: "Select a template:",
-        choices: [
-          { name: "TypeScript", value: "ts" },
-          { name: "JavaScript", value: "js" },
-          { name: "Vercel + TypeScript + Google AI", value: "vercel-ts-ai" },
-        ],
-        default: "ts",
-      })
-    ).template;
+    ((await select({
+      message: "Select a template for your project",
+      options: [
+        { label: "TypeScript", value: "ts", hint: "Recommended" },
+        { label: "JavaScript", value: "js" },
+        {
+          label: "Vercel + TypeScript + Google AI",
+          value: "vercel-ts-ai",
+          hint: "Advanced",
+        },
+      ],
+    })) as InitOptions["template"]);
+
+  if (!template) {
+    outro("Setup cancelled");
+    process.exit(0);
+  }
+
   const templatePath = path.join(packageRoot, "templates", template);
   let projectDir: string;
 
+  // Project location selection
   if (options.dir) {
     projectDir = path.isAbsolute(options.dir)
       ? options.dir
       : path.join(currentWorkingDirectory, options.dir);
   } else {
-    const locationChoice = await inquirer.prompt([
-      {
-        type: "list",
-        name: "location",
-        message: "Where would you like to create your project?",
-        choices: [
-          { name: "Current directory", value: "current" },
-          { name: "Custom directory", value: "custom" },
-        ],
-      },
-    ]);
+    const locationChoice = await select({
+      message: "Where would you like to create your project?",
+      options: [
+        { label: "Current directory", value: "current" },
+        { label: "Custom directory", value: "custom" },
+      ],
+    });
 
-    if (locationChoice.location === "current") {
+    if (!locationChoice) {
+      outro("Setup cancelled");
+      process.exit(0);
+    }
+
+    if (locationChoice === "current") {
       projectDir = currentWorkingDirectory;
     } else {
-      const { customDir } = await inquirer.prompt([
-        {
-          type: "input",
-          name: "customDir",
-          message: "Enter the project directory name:",
-          default: "my-discord-bot",
+      const customDir = await text({
+        message: "Enter the project directory name",
+        placeholder: "my-discord-bot",
+        validate: (value) => {
+          if (!value) return "Please enter a directory name";
+          if (fs.existsSync(path.join(currentWorkingDirectory, value))) {
+            return "Directory already exists";
+          }
         },
-      ]);
-      projectDir = path.join(currentWorkingDirectory, customDir);
+      });
+
+      if (!customDir) {
+        outro("Setup cancelled");
+        process.exit(0);
+      }
+
+      projectDir = path.join(currentWorkingDirectory, customDir as string);
     }
   }
 
+  // Package manager selection
   let packageManager = options.packageManager;
   if (!packageManager && !options.skipInstall) {
     const detectedPm = await detectPackageManager();
-    const pmChoice = await inquirer.prompt([
-      {
-        type: "list",
-        name: "pm",
-        message: "Select a package manager:",
-        choices: [
-          { name: "npm", value: "npm" },
-          { name: "yarn", value: "yarn" },
-          { name: "pnpm", value: "pnpm" },
-          { name: "bun", value: "bun" },
-          { name: "Don't install dependencies", value: "none" },
-        ],
-        default: detectedPm ?? "npm",
-      },
-    ]);
-    packageManager = pmChoice.pm;
+    const pmChoice = (await select({
+      message: "Select a package manager",
+      options: [
+        {
+          label: "npm",
+          value: "npm",
+          hint: detectedPm === "npm" ? "detected" : undefined,
+        },
+        {
+          label: "yarn",
+          value: "yarn",
+          hint: detectedPm === "yarn" ? "detected" : undefined,
+        },
+        {
+          label: "pnpm",
+          value: "pnpm",
+          hint: detectedPm === "pnpm" ? "detected" : undefined,
+        },
+        {
+          label: "bun",
+          value: "bun",
+          hint: detectedPm === "bun" ? "detected" : undefined,
+        },
+        { label: "Don't install dependencies", value: "none" },
+      ],
+      initialValue: detectedPm ?? "npm",
+    })) as string;
+
+    if (!pmChoice) {
+      outro("Setup cancelled");
+      process.exit(0);
+    }
+
+    packageManager = pmChoice;
   }
 
   const uxProjectDir = getCompactRelativePath(
     currentWorkingDirectory,
     projectDir,
   );
+  note(`Initializing project in ${kleur.cyan(uxProjectDir)}`);
 
-  consola.info(`Initializing project in ${kleur.cyan(uxProjectDir)}...`);
-
+  // Load and process template config
   let templateConfig: TemplateConfig;
   try {
     templateConfig = await loadTemplateConfig(templatePath);
@@ -120,21 +158,18 @@ async function init(options: InitOptions = {}) {
       ],
     };
   }
+
   try {
     await fs.ensureDir(projectDir);
     await copyTemplateFiles(templatePath, projectDir, templateConfig);
-    consola.success("Template files copied successfully!");
+    note("Template files copied successfully!");
 
     if (packageManager && packageManager !== "none" && !options.skipInstall) {
-      consola.info(
-        `Installing dependencies with ${kleur.cyan(packageManager)}...`,
-      );
       try {
         await runSubprocess(packageManager, ["install"], {
           cwd: projectDir,
         });
-        consola.success("Dependencies installed successfully!");
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
+        note("Dependencies installed successfully!");
       } catch (error: any) {
         consola.error("Could not install dependencies.");
       }
@@ -150,48 +185,29 @@ async function init(options: InitOptions = {}) {
     const defaultProduction = templateConfig?.postCopy?.defaultProduction;
     const defaultStart = templateConfig?.postCopy?.defaultStart;
 
-    console.log(
-      "\n" + kleur.bold("🎉 Project initialized successfully!") + "\n",
+    note(
+      kleur.bold("Next steps:\n") +
+        (!isCurrentDir
+          ? `${kleur.gray("─")} cd ${kleur.cyan(path.relative(currentWorkingDirectory, projectDir))}\n`
+          : "") +
+        postCopyInstructions
+          .map((instruction) => `${kleur.gray("─")} ${instruction}`)
+          .join("\n") +
+        (defaultDevelopment !== false
+          ? `\n${kleur.underline("Development")}\n${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run dev`)} to start the development server`
+          : "") +
+        (defaultProduction !== false
+          ? `\n${kleur.underline("Production")}\n${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run build`)} to compile your bot code${
+              defaultStart !== false
+                ? `\n${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run start`)} to launch your bot in production`
+                : ""
+            }`
+          : "") +
+        "\n\n" +
+        kleur.bold("Happy bot building! 🚀"),
     );
-    console.log(kleur.bold("Next steps:"));
 
-    if (!isCurrentDir) {
-      console.log(
-        `${kleur.gray("─")} cd ${kleur.cyan(
-          path.relative(currentWorkingDirectory, projectDir),
-        )}`,
-      );
-    }
-
-    const nextSteps = [
-      ...postCopyInstructions.map(
-        (instruction) => `${kleur.gray("─")} ${instruction}`,
-      ),
-    ];
-
-    if (defaultDevelopment !== false) {
-      nextSteps.push(`${kleur.underline("Development")}`);
-      nextSteps.push(
-        `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run dev`)} to start the development server`,
-      );
-    }
-
-    if (defaultProduction !== false) {
-      nextSteps.push(`${kleur.underline("Production")}`);
-      nextSteps.push(
-        `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run build`)} to compile your bot code`,
-      );
-
-      if (defaultStart !== false) {
-        nextSteps.push(
-          `${kleur.gray("─")} ${kleur.yellow(`${pmCommand} run start`)} to launch your bot in production`,
-        );
-      }
-    }
-
-    console.log(nextSteps.join("\n"));
-
-    console.log("\n" + kleur.bold("Happy bot building! 🚀") + "\n");
+    outro(kleur.bold("🎉 Project initialized successfully!"));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     consola.error(`Failed to initialize project: ${error.message}`);

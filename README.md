@@ -446,7 +446,7 @@ Discraft relies on the following key dependencies:
 - `chokidar`: File watcher.
 - `fs-extra`: Extra file system methods.
 - `glob`: File globbing.
-- `inquirer`: Interactive CLI prompts.
+- `clack`: Interactive CLI prompts.
 - `kleur`: Colorful console output.
   - All of these are included as dependencies to discraft itself.
 
