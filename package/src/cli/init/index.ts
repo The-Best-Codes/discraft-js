@@ -1,4 +1,4 @@
-import { intro, note, outro, select, text } from "@clack/prompts";
+import { intro, isCancel, note, outro, select, text } from "@clack/prompts";
 import consola from "consola";
 import fs from "fs-extra";
 import kleur from "kleur";
@@ -27,20 +27,31 @@ async function init(options: InitOptions = {}) {
   intro("Welcome to Discraft.js Project Setup");
 
   // Template selection
-  const template =
-    options.template ??
-    ((await select({
-      message: "Select a template for your project",
-      options: [
-        { label: "TypeScript", value: "ts", hint: "Recommended" },
-        { label: "JavaScript", value: "js" },
-        {
-          label: "Vercel + TypeScript + Google AI",
-          value: "vercel-ts-ai",
-          hint: "Advanced",
-        },
-      ],
-    })) as InitOptions["template"]);
+  let template: InitOptions["template"] | symbol | undefined;
+  try {
+    template =
+      options.template ??
+      (await select({
+        message: "Select a template for your project",
+        options: [
+          { label: "TypeScript", value: "ts", hint: "Recommended" },
+          { label: "JavaScript", value: "js" },
+          {
+            label: "Vercel + TypeScript + Google AI",
+            value: "vercel-ts-ai",
+            hint: "Advanced",
+          },
+        ],
+      }));
+
+    if (isCancel(template)) {
+      outro("Setup cancelled");
+      process.exit(0);
+    }
+  } catch (e) {
+    outro("Setup cancelled");
+    process.exit(0);
+  }
 
   if (!template) {
     outro("Setup cancelled");
@@ -56,13 +67,24 @@ async function init(options: InitOptions = {}) {
       ? options.dir
       : path.join(currentWorkingDirectory, options.dir);
   } else {
-    const locationChoice = await select({
-      message: "Where would you like to create your project?",
-      options: [
-        { label: "Current directory", value: "current" },
-        { label: "Custom directory", value: "custom" },
-      ],
-    });
+    let locationChoice: string | symbol | undefined;
+    try {
+      locationChoice = await select({
+        message: "Where would you like to create your project?",
+        options: [
+          { label: "Current directory", value: "current" },
+          { label: "Custom directory", value: "custom" },
+        ],
+      });
+
+      if (isCancel(locationChoice)) {
+        outro("Setup cancelled");
+        process.exit(0);
+      }
+    } catch (e) {
+      outro("Setup cancelled");
+      process.exit(0);
+    }
 
     if (!locationChoice) {
       outro("Setup cancelled");
@@ -72,16 +94,27 @@ async function init(options: InitOptions = {}) {
     if (locationChoice === "current") {
       projectDir = currentWorkingDirectory;
     } else {
-      const customDir = await text({
-        message: "Enter the project directory name",
-        placeholder: "my-discord-bot",
-        validate: (value) => {
-          if (!value) return "Please enter a directory name";
-          if (fs.existsSync(path.join(currentWorkingDirectory, value))) {
-            return "Directory already exists";
-          }
-        },
-      });
+      let customDir: string | symbol | undefined;
+      try {
+        customDir = await text({
+          message: "Enter the project directory name",
+          placeholder: "my-discord-bot",
+          validate: (value) => {
+            if (!value) return "Please enter a directory name";
+            if (fs.existsSync(path.join(currentWorkingDirectory, value))) {
+              return "Directory already exists";
+            }
+          },
+        });
+
+        if (isCancel(customDir)) {
+          outro("Setup cancelled");
+          process.exit(0);
+        }
+      } catch (e) {
+        outro("Setup cancelled");
+        process.exit(0);
+      }
 
       if (!customDir) {
         outro("Setup cancelled");
@@ -96,40 +129,52 @@ async function init(options: InitOptions = {}) {
   let packageManager = options.packageManager;
   if (!packageManager && !options.skipInstall) {
     const detectedPm = await detectPackageManager();
-    const pmChoice = (await select({
-      message: "Select a package manager",
-      options: [
-        {
-          label: "npm",
-          value: "npm",
-          hint: detectedPm === "npm" ? "detected" : undefined,
-        },
-        {
-          label: "yarn",
-          value: "yarn",
-          hint: detectedPm === "yarn" ? "detected" : undefined,
-        },
-        {
-          label: "pnpm",
-          value: "pnpm",
-          hint: detectedPm === "pnpm" ? "detected" : undefined,
-        },
-        {
-          label: "bun",
-          value: "bun",
-          hint: detectedPm === "bun" ? "detected" : undefined,
-        },
-        { label: "Don't install dependencies", value: "none" },
-      ],
-      initialValue: detectedPm ?? "npm",
-    })) as string;
+    let pmChoice: string | symbol | undefined;
+
+    try {
+      pmChoice = await select({
+        message: "Select a package manager",
+        options: [
+          {
+            label: "npm",
+            value: "npm",
+            hint: detectedPm === "npm" ? "detected" : undefined,
+          },
+          {
+            label: "yarn",
+            value: "yarn",
+            hint: detectedPm === "yarn" ? "detected" : undefined,
+          },
+          {
+            label: "pnpm",
+            value: "pnpm",
+            hint: detectedPm === "pnpm" ? "detected" : undefined,
+          },
+          {
+            label: "bun",
+            value: "bun",
+            hint: detectedPm === "bun" ? "detected" : undefined,
+          },
+          { label: "Don't install dependencies", value: "none" },
+        ],
+        initialValue: detectedPm ?? "npm",
+      });
+
+      if (isCancel(pmChoice)) {
+        outro("Setup cancelled");
+        process.exit(0);
+      }
+    } catch (e) {
+      outro("Setup cancelled");
+      process.exit(0);
+    }
 
     if (!pmChoice) {
       outro("Setup cancelled");
       process.exit(0);
     }
 
-    packageManager = pmChoice;
+    packageManager = pmChoice as string;
   }
 
   const uxProjectDir = getCompactRelativePath(
