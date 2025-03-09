@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { intro, isCancel, note, outro, select, text } from "@clack/prompts";
 import consola from "consola";
 import fs from "fs-extra";
@@ -187,7 +189,6 @@ async function init(options: InitOptions = {}) {
   let templateConfig: TemplateConfig;
   try {
     templateConfig = await loadTemplateConfig(templatePath);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
     consola.error("Could not load template config, using defaults");
     templateConfig = {
@@ -253,7 +254,6 @@ async function init(options: InitOptions = {}) {
     );
 
     outro(kleur.bold("🎉 Project initialized successfully!"));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     consola.error(`Failed to initialize project: ${error.message}`);
     process.exit(1);
