@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import WebContainerProvider from "react-webcontainers";
 
 interface ProvidersProps {
-  children: ReactNode;
+	children: ReactNode;
 }
 
 export default function Providers({ children }: ProvidersProps) {
-  return <WebContainerProvider>{children}</WebContainerProvider>;
+	return <WebContainerProvider>{children}</WebContainerProvider>;
 }

@@ -2,49 +2,49 @@
 
 /* Base styles */
 @layer base {
-    :root {
-        --glass-bg: rgba(15, 23, 42, 0.8);
-        --glass-border: rgba(148, 163, 184, 0.1);
-    }
+	:root {
+		--glass-bg: rgba(15, 23, 42, 0.8);
+		--glass-border: rgba(148, 163, 184, 0.1);
+	}
 
-    body {
-        @apply bg-slate-900 text-slate-200 antialiased;
-    }
+	body {
+		@apply bg-slate-900 text-slate-200 antialiased;
+	}
 }
 
 /* Custom scrollbar for dark mode */
 ::-webkit-scrollbar {
-    @apply w-2 h-2;
+	@apply w-2 h-2;
 }
 
 ::-webkit-scrollbar-track {
-    @apply bg-slate-900;
+	@apply bg-slate-900;
 }
 
 ::-webkit-scrollbar-thumb {
-    @apply bg-slate-700 hover:bg-slate-600 rounded-full border-2 border-slate-900;
+	@apply bg-slate-700 hover:bg-slate-600 rounded-full border-2 border-slate-900;
 }
 
 /* Terminal styles */
 .terminal-container {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    @apply backdrop-blur-md rounded-lg shadow-2xl;
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	@apply backdrop-blur-md rounded-lg shadow-2xl;
 }
 
 .xterm-viewport *::selection {
-    @apply bg-slate-500/30;
+	@apply bg-slate-500/30;
 }
 
 /* Controls panel */
 .controls-panel {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    @apply backdrop-blur-md rounded-lg shadow-lg p-4;
+	background: var(--glass-bg);
+	border: 1px solid var(--glass-border);
+	@apply backdrop-blur-md rounded-lg shadow-lg p-4;
 }
 
 /* Interactive elements */
 button:not(:disabled),
 [role="button"]:not(:disabled) {
-    @apply cursor-pointer;
+	@apply cursor-pointer;
 }
