@@ -1,8 +1,10 @@
 name: Format Code
 
 on:
-  pull_request_target:
-    branches: [main]
+  pull_request:
+    branches:
+      - main
+
 jobs:
   format:
     runs-on: ubuntu-latest
@@ -10,9 +12,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
 
-      - name: Setup Bun
+      - name: Set up Bun
         uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
       - name: Install dependencies
         run: bun install
@@ -20,13 +27,16 @@ jobs:
       - name: Format code
         run: bun run format
 
-      - name: Commit changes
+      - name: Check for changes
+        id: check_changes
         run: |
-          git diff --check && git diff --quiet || (
-            git config --local user.name "github-actions[bot]"
-            git config --local user.email "github-actions[bot]@users.noreply.github.com"
-            git remote set-url origin "https://x-access-token:${{ secrets.FORMAT_BOT_PAT }}@github.com/${{ github.repository }}"
-            git add .
-            git commit -m "fix: format code with biome"
-            git push origin HEAD:${{ github.head_ref }}
-          )
+          git diff --exit-code || echo "::set-output name=has_changes::true"
+
+      - name: Commit and push changes (if any)
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .
+          git commit -m "ci: Format code with biome"
+          git push origin HEAD:${{ github.head_ref }} # Push to the PR branch
