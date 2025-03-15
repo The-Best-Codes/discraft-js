@@ -12,11 +12,11 @@
   "devDependencies": {
     "discraft": "latest",
     "typescript": "^5.8.2",
-    "vercel": "^41.3.2"
+    "vercel": "^41.4.1"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
-    "@vercel/node": "^5.1.12",
+    "@vercel/node": "^5.1.14",
     "consola": "^3.4.0",
     "discord-api-types": "^0.37.119",
     "discord-interactions": "^4.1.1",
