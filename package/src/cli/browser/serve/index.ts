@@ -27,6 +27,7 @@ async function serveBrowser(options: ServeBrowserOptions = {}) {
 	// Check if the browser directory exists.
 	try {
 		await fs.access(browserPath);
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	} catch (error: any) {
 		consola.error(
 			`Browser directory not found: ${kleur.cyan(
