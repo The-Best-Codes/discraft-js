@@ -22,6 +22,7 @@ jobs:
           node-version: "22.x"
           registry-url: "https://registry.npmjs.org"
       - run: bun install
+      - run: bun run build
       - run: bun run prepublish
       - name: Determine npm publish tag
         id: npm_tag
