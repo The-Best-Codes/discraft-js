@@ -1,0 +1,31 @@
+name: Format Code
+
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Format code
+        run: bun run format
+
+      - name: Commit changes
+        run: |
+          git diff --check && git diff --quiet || (
+            git config --local user.name "github-actions[bot]"
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "fix: format code with biome"
+            git push origin HEAD:${{ github.head_ref }}
+          )
