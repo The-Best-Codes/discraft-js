@@ -8,7 +8,7 @@
     "prepublish": "bun run build",
     "build": "cd package && bun build.ts",
     "lint": "eslint .",
-    "format": "biome format --write ./package/** ./browser/src/**",
+    "format": "biome format --write .",
     "typecheck": "tsc --noEmit"
   },
   "bin": {
