@@ -1,7 +1,7 @@
 name: Format Code
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
 jobs:
   format:
@@ -25,6 +25,7 @@ jobs:
           git diff --check && git diff --quiet || (
             git config --local user.name "github-actions[bot]"
             git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git remote set-url origin https://x-access-token:${{ secrets.FORMAT_BOT_PAT }}@github.com/${{ github.repository }}
             git add .
             git commit -m "fix: format code with biome"
             git push origin HEAD:${{ github.head_ref }}
