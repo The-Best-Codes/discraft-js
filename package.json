@@ -50,13 +50,13 @@
   "homepage": "https://github.com/The-Best-Codes/discraft-js#readme",
   "devDependencies": {
     "@eslint/js": "^9.22.0",
-    "@types/bun": "^1.2.4",
+    "@types/bun": "^1.2.5",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.13.10",
-    "bun": "^1.2.4",
+    "bun": "^1.2.5",
     "eslint": "^9.22.0",
     "globals": "^16.0.0",
-    "typescript-eslint": "^8.26.0",
+    "typescript-eslint": "^8.26.1",
     "typescript": "^5.8.2"
   },
   "dependencies": {
@@ -65,7 +65,7 @@
     "chokidar": "^4.0.3",
     "commander": "^13.1.0",
     "consola": "^3.4.0",
-    "esbuild": "^0.25.0",
+    "esbuild": "^0.25.1",
     "esbuild-node-externals": "^1.18.0",
     "fs-extra": "^11.3.0",
     "glob": "^11.0.1",
