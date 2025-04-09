@@ -15,7 +15,7 @@
     "@xterm/xterm": "^5.5.0",
     "babel-plugin-react-compiler": "^19.0.0-beta-bafa41b-20250307",
     "consola": "^3.4.0",
-    "lucide-react": "^0.482.0",
+    "lucide-react": "^0.483.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-webcontainers": "^1.0.1",
