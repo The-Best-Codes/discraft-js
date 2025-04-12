@@ -1,13 +1,13 @@
 import type { ModuleInfo } from "../types";
 
 export function buildEventsTsIndex(modules: ModuleInfo[]): string {
-	let imports = "";
-	let moduleList = "";
-	for (const mod of modules) {
-		imports += `import ${mod.name}Event from '${mod.importPath}';\n`;
-		moduleList += `${mod.name}Event, `;
-	}
-	return `
+  let imports = "";
+  let moduleList = "";
+  for (const mod of modules) {
+    imports += `import ${mod.name}Event from '${mod.importPath}';\n`;
+    moduleList += `${mod.name}Event, `;
+  }
+  return `
 import { Client } from "discord.js";
 import { logger } from "../../utils/logger";
 
