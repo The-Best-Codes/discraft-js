@@ -1,3 +1,4 @@
+import { cancel, intro, note, outro, spinner } from "@clack/prompts";
 import consola from "consola";
 import kleur from "kleur";
 import path from "path";
@@ -14,45 +15,65 @@ interface BuildOptions {
 }
 
 async function startBuild(options?: BuildOptions) {
-  consola.info(`Starting production build...`);
-  const currentWorkingDirectory = process.cwd();
-  const outputPath = path.join(currentWorkingDirectory, "dist");
-  let entryPoint;
   try {
-    entryPoint = await getEntryPoint();
-  } catch (e) {
-    consola.error("Could not get entrypoint file");
-    throw e;
-  }
+    intro("Starting production build...");
+    const currentWorkingDirectory = process.cwd();
+    const outputPath = path.join(currentWorkingDirectory, "dist");
+    let entryPoint;
+    try {
+      entryPoint = await getEntryPoint();
+    } catch (e) {
+      cancel("Could not get entrypoint file");
+      throw e;
+    }
 
-  consola.info("Performing pre-build setup...");
-  consola.verbose("Generating index files...");
-  await generateIndexFiles();
-  consola.verbose("Index files generated.");
-  consola.verbose("Copying files...");
-  await copyFiles(currentWorkingDirectory, outputPath);
-  consola.verbose("Files copied.");
-  consola.verbose("Pre-build setup complete.");
+    const prebuildSpinner = spinner();
+    prebuildSpinner.start("Performing pre-build setup...");
+    consola.verbose("Generating index files...");
+    await generateIndexFiles();
+    consola.verbose("Index files generated.");
+    consola.verbose("Copying files...");
+    await copyFiles(currentWorkingDirectory, outputPath);
+    consola.verbose("Files copied.");
+    prebuildSpinner.stop("Pre-build setup complete.");
 
-  consola.info(`Creating production build...`);
-  try {
-    await buildFn("prod", entryPoint, outputPath, options?.builder);
-    const uxOutputPath = getCompactRelativePath(
-      currentWorkingDirectory,
-      outputPath,
-    );
-    consola.success(
-      `Build finished successfully! Output: ${kleur.cyan(uxOutputPath)}.`,
-    );
-    consola.info(
-      `Run ${kleur.cyan(`discraft start`)} or ${
-        kleur.cyan(`npm run start`)
-      } to start your bot.`,
-    );
+    const buildSpinner = spinner();
+    buildSpinner.start("Creating production build...");
+
+    try {
+      await buildFn("prod", entryPoint, outputPath, options?.builder);
+      const uxOutputPath = getCompactRelativePath(
+        currentWorkingDirectory,
+        outputPath,
+      );
+      buildSpinner.stop(
+        `Build finished successfully! Output: ${kleur.cyan(uxOutputPath)}.`,
+      );
+      note(
+        `Run ${kleur.cyan(`discraft start`)} or ${kleur.cyan(
+          `npm run start`,
+        )} to start your bot.`,
+      );
+      outro(
+        `Feedback or issues?\n${kleur.cyan(`https://github.com/The-Best-Codes/discraft-js/discussions`)}`,
+      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      consola.verbose(error);
+      buildSpinner.stop(
+        `Build failed: ${error?.message || "Unknown error"}`,
+        1,
+      );
+      throw error;
+    }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
-    consola.error(`Build failed: ${error.message}`);
-    throw error; // Re-throw the error to stop the process
+    consola.verbose(error);
+    consola.error("An error occurred during build.");
+    outro(
+      `Having trouble? Submit an issue here:\n${kleur.cyan(`https://github.com/The-Best-Codes/discraft-js/issues`)}`,
+    );
+    throw error;
   }
 }
 
