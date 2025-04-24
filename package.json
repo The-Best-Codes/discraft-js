@@ -3,7 +3,7 @@
   "version": "1.7.2",
   "description": "Create and deploy production Discord bots in minutes",
   "type": "module",
-  "packageManager": "bun@1.2.5",
+  "packageManager": "bun@1.2.10",
   "scripts": {
     "prepublish": "bun run build",
     "build": "cd package && bun build.ts",
