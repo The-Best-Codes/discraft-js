@@ -16,7 +16,7 @@ Think of it as a "batteries-included" approach, letting you get started quickly 
 
 ## Table of Contents
 
-> **Looking for instructions on how to deploy to Vercel?** Check out the [Vercel Deployment Guide](https://dev.to/best_codes/make-a-free-ai-chatbot-with-discord-vercel-373l).
+> **Looking for instructions on how to deploy to Vercel?** Check out the [Vercel Deployment Guide](https://bestcodes.dev/blog/how-to-deploy-a-discord-bot-to-vercel).
 
 - [🚀 Getting Started](#-getting-started)
   - [Installation](#installation)
@@ -379,7 +379,7 @@ discraft exec build --target linux-x64
 
 ## 🚀 Deploying to Vercel
 
-**Check out the [Vercel Deployment Guide](https://dev.to/best_codes/make-a-free-ai-chatbot-with-discord-vercel-373l) for a more detailed, step-by-step guide.**
+**Check out the [Vercel Deployment Guide](https://bestcodes.dev/blog/how-to-deploy-a-discord-bot-to-vercel) for a more detailed, step-by-step guide.**
 
 To deploy your Discraft bot to Vercel, follow these steps:
 
