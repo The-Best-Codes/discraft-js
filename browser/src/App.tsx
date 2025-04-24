@@ -41,16 +41,9 @@ export default function App() {
 			setProcessStatus("initializing");
 
 			try {
-				// Write files
-				for (const [path, { file }] of Object.entries(initialFiles)) {
-					try {
-						await webcontainer.fs.writeFile(path, file.contents);
-						logger.info(`Successfully wrote ${path}`);
-					} catch (error) {
-						logger.error(`Error writing ${path}:`, error);
-					}
-				}
-				logger.success("All initial files written successfully.");
+				// Mount all files at once for optimal performance (per WebContainers docs)
+				await webcontainer.mount(initialFiles);
+				logger.success("All initial files mounted successfully.");
 			} catch (error) {
 				logger.error("Error during initialization:", error);
 				setProcessStatus("error");
