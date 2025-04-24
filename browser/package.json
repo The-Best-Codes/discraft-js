@@ -9,25 +9,25 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.0.14",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@tailwindcss/vite": "^4.1.4",
+    "@vitejs/plugin-react": "^4.4.1",
     "@xterm/addon-fit": "^0.10.0",
     "@xterm/xterm": "^5.5.0",
-    "babel-plugin-react-compiler": "^19.0.0-beta-bafa41b-20250307",
-    "consola": "^3.4.0",
-    "lucide-react": "^0.487.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "babel-plugin-react-compiler": "^19.1.0-rc.1",
+    "consola": "^3.4.2",
+    "lucide-react": "^0.503.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "react-webcontainers": "^1.0.1",
     "react-xtermjs": "^1.0.9",
-    "recharts": "^2.15.1",
-    "tailwindcss": "^4.0.14"
+    "recharts": "^2.15.3",
+    "tailwindcss": "^4.1.4"
   },
   "devDependencies": {
-    "@types/node": "^22.13.10",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.2"
+    "@types/node": "^22.14.1",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "typescript": "~5.8.3",
+    "vite": "^6.3.3"
   }
 }

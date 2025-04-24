@@ -9,7 +9,8 @@
     "build": "cd package && bun build.ts",
     "lint": "eslint .",
     "format": "biome format --write .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "update-deps": "bun update --latest && cd templates/ && for dir in */; do echo \"Updating dependencies in templates/$dir\" && cd \"$dir\" && bun update --latest && cd ..; done && echo \"Updating dependencies in browser/\" && cd ../browser/ && bun update --latest"
   },
   "bin": {
     "discraft": "package/dist/cli.js"
