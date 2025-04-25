@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "format": "biome format --write .",
     "typecheck": "tsc --noEmit",
-    "update-deps": "bun update --latest && cd templates/ && for dir in */; do echo \"Updating dependencies in templates/$dir\" && cd \"$dir\" && bun update --latest && cd ..; done && echo \"Updating dependencies in browser/\" && cd ../browser/ && bun update --latest"
+    "update-deps": "bun update --latest && cd templates/ && for dir in */; do echo \"Updating dependencies in templates/$dir\" && cd \"$dir\" && bun update --latest && cd ..; done"
   },
   "bin": {
     "discraft": "package/dist/cli.js"
@@ -23,12 +23,10 @@
     "discord",
     "bot",
     "framework",
-    "browser",
     "cli"
   ],
   "files": [
     "package/dist",
-    "browser",
     "templates",
     "README.md",
     "LICENSE"
@@ -55,7 +53,7 @@
     "@eslint/js": "^9.25.1",
     "@types/bun": "^1.2.10",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.14.1",
+    "@types/node": "^22.15.2",
     "bun": "^1.2.10",
     "eslint": "^9.25.1",
     "globals": "^16.0.0",
