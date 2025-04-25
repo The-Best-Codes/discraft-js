@@ -1,13 +1,56 @@
 ---
-title: Hello World
-description: Your first document
+title: Discraft Docs
+description: Comprehensive documentation for Discraft, a modern developer-friendly framework for building Discord bots with ease.
 ---
 
-Welcome to the docs! You can start writing documents in `/content/docs`.
+# What is Discraft?
 
-## What is Next?
+Welcome to Discraft!
+Discraft is a modern, developer-friendly framework for building Discord bots with ease. Think of it as "Next.js for Discord bots" — batteries included, ready to go.
 
-<Cards>
-  <Card title="Learn more about Next.js" href="https://nextjs.org/docs" />
-  <Card title="Learn more about Fumadocs" href="https://fumadocs.vercel.app" />
-</Cards>
+## Philosophy
+
+Discraft is built for speed, simplicity, and flexibility. Whether you're prototyping or deploying at scale, Discraft gives you a powerful CLI, sensible conventions, and first-class support for modern workflows (including serverless and Vercel deploys).
+
+- **Zero-config to start**: Get going with a single command.
+- **TypeScript-first**: Full TS support out of the box.
+- **Hot reload/dev mode**: Iterate quickly.
+- **Production builds**: Optimized output for fast, reliable bots.
+- **Serverless ready**: Deploy to Vercel in minutes.
+
+## Quickstart
+
+1. **Create a new project:**
+   ```bash
+   npx discraft init
+   cd my-bot
+   npx discraft dev
+   ```
+2. **Build for production:**
+   ```bash
+   npx discraft build
+   npx discraft start
+   ```
+3. **Deploy to Vercel:**
+   ```bash
+   npx discraft vercel build
+   # Push to your Vercel-connected repo
+   ```
+
+## Docs & Guides
+
+- [CLI Reference](/docs/cli)
+- [Initialize a Project](/docs/init)
+- [Development Mode](/docs/dev)
+- [Production Build](/docs/build)
+- [Start in Production](/docs/start)
+- [Standalone Executable](/docs/exec-build)
+- [Deploying to Vercel](/docs/vercel-build)
+
+## Deploying to Vercel
+
+Discraft supports seamless deployment to [Vercel](https://vercel.com/) for serverless Discord bots. Use `discraft vercel build` to generate API routes and bundle your bot for Vercel’s platform. See the [Deploying to Vercel guide](/docs/vercel-build) for full instructions and troubleshooting.
+
+---
+
+Need help? Check the guides above or open an issue on GitHub!

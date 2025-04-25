@@ -1,0 +1,12 @@
+{
+    "pages": [
+        "index",
+        "cli",
+        "init",
+        "dev",
+        "build",
+        "start",
+        "vercel-build",
+        "exec-build"
+    ]
+}

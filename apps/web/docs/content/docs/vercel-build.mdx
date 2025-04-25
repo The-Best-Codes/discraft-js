@@ -1,0 +1,49 @@
+---
+title: discraft vercel build
+description: Prepare your Discraft bot for Vercel serverless deployment
+---
+
+# `discraft vercel build`
+
+Prepares your bot for deployment on Vercel by generating serverless API routes and bundling your code for Vercel’s platform.
+
+For a full tutorial, see the [Deploy a Discord bot to Vercel Blog Post](https://bestcodes.dev/blog/how-to-deploy-a-discord-bot-to-vercel).
+
+## Usage
+
+```bash
+# Using npx
+npx discraft vercel build [options]
+
+# Globally installed
+discraft vercel build [options]
+```
+
+## Options
+
+| Flag                      | Description                         | Default |
+| ------------------------- | ----------------------------------- | ------- |
+| `-b, --builder <builder>` | Builder to use: `esbuild` or `bun`. | auto    |
+
+## What It Does
+
+- Detects your main script (entry point).
+- Generates command registry files for API routing.
+- Optionally compiles and runs a register script to sync commands with Discord.
+- Bundles your bot into Vercel’s `api/` directory for serverless deployment.
+
+## Example
+
+```bash
+# Force Bun bundler
+npx discraft vercel build -b bun
+```
+
+## Tips
+
+- Use this for Vercel/serverless deployments (not needed for self-hosted bots).
+- See the [Deploying to Vercel](/docs/vercel-build) section for full instructions and troubleshooting.
+
+---
+
+See the [CLI Reference](/docs/cli) for command overview.
