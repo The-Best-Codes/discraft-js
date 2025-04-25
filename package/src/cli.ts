@@ -3,8 +3,6 @@
 import { program } from "commander";
 import consola from "consola";
 import { version } from "../../package.json";
-import { buildBrowser } from "./cli/browser/build";
-import { serveBrowser } from "./cli/browser/serve";
 import { build } from "./cli/build";
 import { dev } from "./cli/dev";
 import { build as execBuild } from "./cli/exec/build";
@@ -143,63 +141,6 @@ Supported targets:
 				}).catch((error) => {
 					consola.error(
 						"An error occurred during the executable build. Set CONSOLA_LEVEL to 'verbose' for details.",
-					);
-					consola.verbose(error);
-					process.exit(1);
-				});
-			}),
-	);
-
-program
-	.command("browser")
-	.description("Commands for browser interface")
-	.addCommand(
-		program
-			.createCommand("build")
-			.description("Build the browser interface")
-			.option(
-				"--target-dir <targetDir>",
-				"Target directory for the build",
-				"dist",
-			)
-			.action((options) => {
-				buildBrowser({ targetDir: options.targetDir }).catch((error) => {
-					consola.error(
-						"An error occurred during the browser build. Set CONSOLA_LEVEL to 'verbose' for details.",
-					);
-					consola.verbose(error);
-					process.exit(1);
-				});
-			}),
-	)
-	.addCommand(
-		program
-			.createCommand("serve")
-			.description("Serve the browser interface")
-			.option(
-				"--target-dir <targetDir>",
-				"Target directory for the build",
-				"dist",
-			)
-			.option(
-				"--port <port>",
-				"Port to serve the browser interface on",
-				(value) => {
-					const port = parseInt(value, 10);
-					if (isNaN(port) || port < 1 || port > 65535) {
-						consola.error("Invalid port number. Must be between 1 and 65535.");
-						process.exit(1);
-					}
-					return port;
-				},
-			)
-			.action((options) => {
-				serveBrowser({
-					targetDir: options.targetDir,
-					port: options.port,
-				}).catch((error) => {
-					consola.error(
-						"An error occurred while serving the browser interface. Set CONSOLA_LEVEL to 'verbose' for details.",
 					);
 					consola.verbose(error);
 					process.exit(1);
