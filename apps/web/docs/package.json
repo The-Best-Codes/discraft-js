@@ -14,7 +14,8 @@
     "react-dom": "^19.1.0",
     "fumadocs-ui": "15.2.11",
     "fumadocs-core": "15.2.11",
-    "fumadocs-mdx": "11.6.1"
+    "fumadocs-mdx": "11.6.1",
+    "escape-html": "^1.0.3"
   },
   "devDependencies": {
     "@types/node": "22.15.2",

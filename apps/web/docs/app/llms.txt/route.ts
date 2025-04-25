@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 import remarkStringify from "remark-stringify";
 import remarkMdx from "remark-mdx";
 import { remarkInclude } from "fumadocs-mdx/config";
-
+import escapeHtml from "escape-html";
 export const revalidate = false;
 
 const processor = remark()
@@ -31,8 +31,8 @@ export async function GET() {
 			value: content,
 		});
 
-		return `file: ${file}
-meta: ${JSON.stringify(data, null, 2)}
+		return `file: ${escapeHtml(file)}
+meta: ${escapeHtml(JSON.stringify(data, null, 2))}
         
 ${processed}`;
 	});
