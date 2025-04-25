@@ -9,18 +9,18 @@ import Image from "next/image";
  * Docs Layout: app/docs/layout.tsx
  */
 export const baseOptions: BaseLayoutProps = {
-  nav: {
-    title: (
-      <>
-        <Image
-          width={24}
-          height={24}
-          src="/discraft-logo.png"
-          alt="Discraft Logo"
-          className="rounded-lg"
-        />
-        Discraft
-      </>
-    ),
-  },
+	nav: {
+		title: (
+			<>
+				<Image
+					width={24}
+					height={24}
+					src="/discraft-logo.png"
+					alt="Discraft Logo"
+					className="rounded-lg"
+				/>
+				Discraft
+			</>
+		),
+	},
 };
