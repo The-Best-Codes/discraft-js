@@ -1,0 +1,44 @@
+---
+title: discraft start
+description: Start your Discraft bot in production mode
+---
+
+# `discraft start`
+
+Runs your built Discraft bot in production mode, launching the compiled files in `dist/`.
+
+## Usage
+
+```bash
+# If installed locally in a project directory
+npx discraft start [options]
+
+# If installed globally
+discraft start [options]
+```
+
+## Options
+
+| Flag                    | Description                     | Default |
+| ----------------------- | ------------------------------- | ------- |
+| `-r, --runner <runner>` | Runner to use: `node` or `bun`. | auto    |
+
+## What It Does
+
+- Finds your built entrypoint in `dist/`.
+- Starts your bot using the specified runner.
+- Designed for production/stable environments.
+
+## Example
+
+```bash
+# Explicitly use Node
+discraft start --runner node
+```
+
+## Tips
+
+- Always run `discraft build` before this to ensure your bot is up to date.
+- For serverless or Vercel deploys, see [discraft vercel build](/docs/vercel-build).
+
+---

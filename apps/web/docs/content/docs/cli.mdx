@@ -1,0 +1,33 @@
+---
+title: CLI Reference
+description: Comprehensive reference for the Discraft CLI and its commands.
+---
+
+# CLI Reference
+
+Discraft's command-line interface is built with [Commander.js](https://github.com/tj/commander.js) and provides a suite of tools to initialize, develop, build, and deploy your Discord bots efficiently.
+
+## Global Usage
+
+```bash
+# View version
+npx discraft --version
+
+# View global help
+npx discraft --help
+```
+
+## Commands Overview
+
+| Command                   | Description                                   | Details                              |
+| ------------------------- | --------------------------------------------- | ------------------------------------ |
+| **discraft init**         | Initialize a new Discraft project             | [Init Guide →](/docs/init)           |
+| **discraft dev**          | Start bot in development mode with hot reload | [Dev Guide →](/docs/dev)             |
+| **discraft build**        | Build the bot for production                  | [Build Guide →](/docs/build)         |
+| **discraft start**        | Start a built bot in production mode          | [Start Guide →](/docs/start)         |
+| **discraft vercel build** | Generate API routes for Vercel deployments    | [Vercel Guide →](/docs/vercel-build) |
+| **discraft exec build**   | Build a standalone executable of your bot     | [Exec Guide →](/docs/exec-build)     |
+
+---
+
+Each command has its own detailed guide explaining options, flags, and underlying behavior. Select one above to learn more.
