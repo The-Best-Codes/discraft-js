@@ -2,9 +2,9 @@ import { configDotenv } from "dotenv";
 configDotenv();
 
 import {
-    REST,
-    type RESTPostAPIApplicationCommandsJSONBody,
-    Routes,
+  REST,
+  type RESTPostAPIApplicationCommandsJSONBody,
+  Routes,
 } from "discord.js";
 import commands from "../.discraft/commands/index.ts";
 

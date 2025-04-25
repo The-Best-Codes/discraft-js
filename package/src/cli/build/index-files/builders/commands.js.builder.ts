@@ -1,13 +1,13 @@
 import type { ModuleInfo } from "../types";
 
 export function buildCommandsJsIndex(modules: ModuleInfo[]): string {
-	let imports = "";
-	let moduleList = "";
-	for (const mod of modules) {
-		imports += `import ${mod.name}Command from '${mod.importPath}';\n`;
-		moduleList += `${mod.name}Command, `;
-	}
-	return `
+  let imports = "";
+  let moduleList = "";
+  for (const mod of modules) {
+    imports += `import ${mod.name}Command from '${mod.importPath}';\n`;
+    moduleList += `${mod.name}Command, `;
+  }
+  return `
 import {
     Client,
     Collection,

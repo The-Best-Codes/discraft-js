@@ -1,14 +1,14 @@
 import type { ModuleInfo } from "../types";
 
 export function buildCommandsTsIndex(modules: ModuleInfo[]): string {
-	let imports = "";
-	let moduleList = "";
-	for (const mod of modules) {
-		imports += `import ${mod.name}Command from '${mod.importPath}';\n`;
-		moduleList += `${mod.name}Command, `;
-	}
+  let imports = "";
+  let moduleList = "";
+  for (const mod of modules) {
+    imports += `import ${mod.name}Command from '${mod.importPath}';\n`;
+    moduleList += `${mod.name}Command, `;
+  }
 
-	return `
+  return `
 import {
     ChatInputCommandInteraction,
     Client,

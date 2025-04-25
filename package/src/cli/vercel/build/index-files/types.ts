@@ -1,5 +1,5 @@
 export interface ModuleInfo {
-	name: string;
-	importPath: string;
-	isValid: boolean;
+  name: string;
+  importPath: string;
+  isValid: boolean;
 }
