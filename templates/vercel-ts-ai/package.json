@@ -12,15 +12,15 @@
   "devDependencies": {
     "discraft": "^1.7.3",
     "typescript": "^5.8.3",
-    "vercel": "^41.6.2"
+    "vercel": "^41.7.2"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.0",
-    "@vercel/node": "^5.1.14",
+    "@google/generative-ai": "^0.24.1",
+    "@vercel/node": "^5.1.15",
     "consola": "^3.4.2",
-    "discord-api-types": "^0.38.1",
+    "discord-api-types": "^0.38.3",
     "discord-interactions": "^4.1.1",
-    "discord.js": "^14.18.0",
+    "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
     "raw-body": "^3.0.0"
   }
