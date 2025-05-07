@@ -80,7 +80,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // Handle different interaction types
     if (message.type === InteractionType.PING) {
       logger.debug("Handling Ping request");
-      return res.status(200).json({ type: 1 });
+      return res.status(200).json({ type: InteractionResponseType.Pong });
     } else if (message.type === InteractionType.APPLICATION_COMMAND) {
       const commandName = message.data.name.toLowerCase();
       logger.debug("Handling application command", { commandName });
