@@ -15,10 +15,10 @@ import {
 // Discraft will handle the registration and interactions with the API
 
 export default {
-  data: { // Define the command data
+  data: {
     name: "chat", // The name of the command
     description: "Chat with Gemini AI", // The description of the command
-    options: [ // Define the command options
+    options: [
       {
         name: "prompt", // The name of the prompt option
         description: "The prompt for the AI", // The description of the prompt option
@@ -33,7 +33,7 @@ export default {
       },
     ],
   } as RESTPostAPIApplicationCommandsJSONBody,
-  async execute(data: { // The main execution function for the command
+  async execute(data: {
     interaction: APIApplicationCommandInteraction;
   }): Promise<APIInteractionResponse> {
     // Initialize the Google Generative AI client
