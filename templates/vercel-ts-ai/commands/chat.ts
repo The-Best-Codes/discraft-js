@@ -5,6 +5,7 @@ import {
   type APIChatInputApplicationCommandInteraction,
   type APIInteractionResponse,
   ApplicationCommandOptionType,
+  ApplicationCommandType,
   InteractionResponseType,
   MessageFlags,
   type RESTPostAPIApplicationCommandsJSONBody,
@@ -38,7 +39,7 @@ export default {
     });
     const interaction = data.interaction;
 
-    if (interaction.data.type !== 1) {
+    if (interaction.data.type !== ApplicationCommandType.ChatInput) {
       return {
         type: InteractionResponseType.ChannelMessageWithSource,
         data: {
