@@ -19,7 +19,7 @@
     "@vercel/node": "^5.1.15",
     "axios": "^1.9.0",
     "consola": "^3.4.2",
-    "discord-api-types": "^0.38.3",
+    "discord-api-types": "^0.38.4",
     "discord-interactions": "^4.1.1",
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
