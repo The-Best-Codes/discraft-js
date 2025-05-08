@@ -84,21 +84,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (command) {
         // Immediately defer the command
-        await fetch(
-          `https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
+        try {
+          await axios.post(
+            `https://discord.com/api/v10/interactions/${message.id}/${message.token}/callback`,
+            {
               type: InteractionResponseType.DeferredChannelMessageWithSource,
               data: {
                 flags: command.data.initialEphemeral
                   ? MessageFlags.Ephemeral
                   : 0,
               },
-            }),
-          },
-        );
+            },
+            {
+              headers: { "Content-Type": "application/json" },
+            },
+          );
+        } catch (deferError) {
+          logger.error("Failed to defer command", { deferError });
+          return res.status(500).json({ error: "Failed to defer command" });
+        }
 
         // Process the command asynchronously
         let commandResult: CommandExecuteUnpromised;

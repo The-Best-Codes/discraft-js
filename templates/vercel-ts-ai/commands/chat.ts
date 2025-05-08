@@ -108,7 +108,7 @@ export default {
       const truncatedResponse =
         response.length > 1900
           ? response.slice(0, 1900) +
-            "[truncated to keep below 2000 characters]"
+            "\n...[truncated to keep below 2000 characters]"
           : response;
 
       // Return the AI's response
