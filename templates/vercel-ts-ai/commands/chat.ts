@@ -1,15 +1,15 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
-  type APIApplicationCommandInteraction,
   type APIApplicationCommandOption,
-  type APIChatInputApplicationCommandInteraction,
-  type APIInteractionResponse,
   ApplicationCommandOptionType,
   ApplicationCommandType,
-  InteractionResponseType,
   MessageFlags,
-  type RESTPostAPIApplicationCommandsJSONBody,
 } from "discord-api-types/v10";
+import type {
+  CommandData,
+  CommandExecuteResult,
+  SimplifiedInteraction,
+} from "../utils/types";
 
 // Here you define your command data
 // Discraft will handle the registration and interactions with the API
@@ -32,10 +32,10 @@ export default {
         required: false,
       },
     ],
-  } as RESTPostAPIApplicationCommandsJSONBody,
+  } as CommandData,
   async execute(data: {
-    interaction: APIApplicationCommandInteraction;
-  }): Promise<APIInteractionResponse> {
+    interaction: SimplifiedInteraction;
+  }): CommandExecuteResult {
     // Initialize the Google Generative AI client
     const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || "");
     // Get the generative model instance
@@ -48,18 +48,14 @@ export default {
     // Check if the interaction is a chat input command
     if (interaction.data.type !== ApplicationCommandType.ChatInput) {
       return {
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          content:
-            "This command can only be used as a chat input (slash) command.",
-          flags: MessageFlags.Ephemeral, // Make the response visible only to the user
-        },
+        content:
+          "This command can only be used as a chat input (slash) command.",
+        flags: MessageFlags.Ephemeral, // Make the response visible only to the user
       };
     }
 
     // Cast the interaction to the correct type
-    const chatInteraction =
-      interaction as APIChatInputApplicationCommandInteraction;
+    const chatInteraction = interaction;
 
     // Find the 'prompt' option from the interaction
     const promptOption = chatInteraction.data.options?.find(
@@ -76,11 +72,8 @@ export default {
     // Check if the prompt exceeds the maximum length
     if (prompt.length > 2000) {
       return {
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          content: "Prompt must be less than 2000 characters.",
-          flags: MessageFlags.Ephemeral, // Make the response visible only to the user
-        },
+        content: "Prompt must be less than 2000 characters.",
+        flags: MessageFlags.Ephemeral,
       };
     }
 
@@ -114,21 +107,15 @@ export default {
 
       // Return the AI's response
       return {
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          content: response,
-        },
+        content: response,
       };
     } catch (error) {
       // Log any errors that occur during the AI chat process
       console.error("Error during AI chat:", error);
       // Return an error message to the user
       return {
-        type: InteractionResponseType.ChannelMessageWithSource,
-        data: {
-          content: "An error occurred while processing your request.",
-          flags: MessageFlags.Ephemeral, // Make the error message visible only to the user
-        },
+        content: "An error occurred while processing your request.",
+        flags: MessageFlags.Ephemeral,
       };
     }
   },
