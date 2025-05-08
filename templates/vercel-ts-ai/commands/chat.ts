@@ -105,9 +105,15 @@ export default {
       // Extract the text response from the result
       const response = result.response.text();
 
+      const truncatedResponse =
+        response.length > 1900
+          ? response.slice(0, 1900) +
+            "[truncated to keep below 2000 characters]"
+          : response;
+
       // Return the AI's response
       return {
-        content: response,
+        content: truncatedResponse,
       };
     } catch (error) {
       // Log any errors that occur during the AI chat process
