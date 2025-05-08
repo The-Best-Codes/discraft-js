@@ -135,13 +135,21 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
             },
           );
           logger.debug("Original response edited successfully");
+
+          /**
+           * If you encounter issues where the bot never gets past "Bot is thinking...",
+           * you may want to replace the below with `return;`. It will cause the function
+           * to timeout, but it will also allow it to run for the full allotted runtime.
+           */
+          return res.status(200).end();
         } catch (patchError) {
           logger.error("Failed to edit original response", {
             patchError,
           });
+          return res
+            .status(500)
+            .json({ error: "Failed to update the message." });
         }
-
-        return;
       }
 
       logger.warn("Unknown command", { commandName });
