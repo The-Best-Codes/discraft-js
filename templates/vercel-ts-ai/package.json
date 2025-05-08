@@ -10,7 +10,7 @@
     "build": "discraft vercel build"
   },
   "devDependencies": {
-    "discraft": "^1.7.4",
+    "discraft": "^1.7.5",
     "typescript": "^5.8.3",
     "vercel": "^41.7.3"
   },
