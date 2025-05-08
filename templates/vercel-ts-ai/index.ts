@@ -101,47 +101,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         );
 
         // Process the command asynchronously
-        (async () => {
-          let commandResult: CommandExecuteUnpromised;
-          try {
-            commandResult = await command.execute({ interaction: message });
-            logger.debug("Command executed successfully", { commandName });
-          } catch (error) {
-            logger.error("Error executing command", {
-              commandName,
-              error,
-            });
-            commandResult = {
-              content: "An error occurred while processing your request.",
-              flags: MessageFlags.Ephemeral,
-            };
-          }
+        let commandResult: CommandExecuteUnpromised;
+        try {
+          commandResult = await command.execute({ interaction: message });
+          logger.debug("Command executed successfully", { commandName });
+        } catch (error) {
+          logger.error("Error executing command", {
+            commandName,
+            error,
+          });
+          commandResult = {
+            content: "An error occurred while processing your request.",
+            flags: MessageFlags.Ephemeral,
+          };
+        }
 
-          // PATCH the original response
-          try {
-            await axios.patch(
-              `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
-              {
-                content: commandResult.content ?? "",
-                flags: commandResult.flags,
+        // PATCH the original response
+        try {
+          await axios.patch(
+            `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
+            {
+              content: commandResult.content ?? "",
+              flags: commandResult.flags,
+            },
+            {
+              headers: {
+                "Content-Type": "application/json",
               },
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              },
-            );
-            logger.debug("Original response edited successfully");
-          } catch (patchError) {
-            logger.error("Failed to edit original response", {
-              patchError,
-            });
-          }
-        })();
+            },
+          );
+          logger.debug("Original response edited successfully");
+        } catch (patchError) {
+          logger.error("Failed to edit original response", {
+            patchError,
+          });
+        }
 
-        return res
-          .status(204)
-          .json({ message: "Command executed successfully" });
+        return;
       }
 
       logger.warn("Unknown command", { commandName });
