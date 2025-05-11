@@ -1,0 +1,11 @@
+dist
+api
+.discraft
+node_modules
+.env
+bun.lockb
+bun.lock
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.vercel
