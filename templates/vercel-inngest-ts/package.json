@@ -23,6 +23,7 @@
     "discord-interactions": "^4.1.1",
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
+    "inngest": "^3.35.1",
     "raw-body": "^3.0.0"
   }
 }
