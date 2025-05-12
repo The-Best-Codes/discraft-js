@@ -4,6 +4,7 @@ import { InteractionResponseType, MessageFlags } from "discord-api-types/v10";
 import { InteractionType, verifyKey } from "discord-interactions";
 import getRawBody from "raw-body";
 import commands from "./.discraft/commands/index";
+import { inngest } from "./inngest/instance";
 import { logger } from "./utils/logger";
 import {
   type Command,
@@ -104,51 +105,64 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           return res.status(500).json({ error: "Failed to defer command" });
         }
 
-        // Process the command asynchronously
-        let commandResult: CommandExecuteUnpromised;
+        // Instead of processing directly, send to Inngest
         try {
-          commandResult = await command.execute({ interaction: message });
-          logger.debug("Command executed successfully", { commandName });
-        } catch (error) {
-          logger.error("Error executing command", {
+          await inngest.send({
+            name: "discord/command.execute",
+            data: {
+              interaction: message,
+              commandName,
+            },
+          });
+
+          logger.debug("Command sent to Inngest for processing", {
             commandName,
-            error,
           });
-          commandResult = {
-            content: "An error occurred while processing your request.",
-            flags: MessageFlags.Ephemeral,
-          };
-        }
-
-        // PATCH the original response
-        try {
-          await axios.patch(
-            `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
-            {
-              content: commandResult.content ?? "",
-              flags: commandResult.flags,
-            },
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          );
-          logger.debug("Original response edited successfully");
-
-          /**
-           * If you encounter issues where the bot never gets past "Bot is thinking...",
-           * you may want to replace the below with `return;`. It will cause the function
-           * to timeout, but it will also allow it to run for the full allotted runtime.
-           */
           return res.status(200).end();
-        } catch (patchError) {
-          logger.error("Failed to edit original response", {
-            patchError,
+        } catch (inngestError) {
+          logger.error("Failed to send command to Inngest", {
+            inngestError,
           });
-          return res
-            .status(500)
-            .json({ error: "Failed to update the message." });
+
+          // Fallback to direct execution if Inngest fails
+          let commandResult: CommandExecuteUnpromised;
+          try {
+            commandResult = await command.execute({ interaction: message });
+          } catch (error) {
+            logger.error("Error executing command directly", {
+              commandName,
+              error,
+            });
+            commandResult = {
+              content: "An error occurred while processing your request.",
+              flags: MessageFlags.Ephemeral,
+            };
+          }
+
+          // Update the original response
+          try {
+            await axios.patch(
+              `https://discord.com/api/v10/webhooks/${message.application_id}/${message.token}/messages/@original`,
+              {
+                content: commandResult.content ?? "",
+                flags: commandResult.flags,
+              },
+              {
+                headers: {
+                  "Content-Type": "application/json",
+                },
+              },
+            );
+            logger.debug("Original response edited successfully");
+            return res.status(200).end();
+          } catch (patchError) {
+            logger.error("Failed to edit original response", {
+              patchError,
+            });
+            return res
+              .status(500)
+              .json({ error: "Failed to update the message." });
+          }
         }
       }
 
