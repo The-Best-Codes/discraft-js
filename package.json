@@ -51,10 +51,10 @@
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@eslint/js": "^9.26.0",
-    "@types/bun": "^1.2.12",
+    "@types/bun": "^1.2.13",
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.15.17",
-    "bun": "^1.2.12",
+    "bun": "^1.2.13",
     "eslint": "^9.26.0",
     "globals": "^16.1.0",
     "typescript": "^5.8.3",
