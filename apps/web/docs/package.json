@@ -21,7 +21,7 @@
     "@tailwindcss/postcss": "^4.1.4",
     "@types/escape-html": "^1.0.4",
     "@types/mdx": "^2.0.13",
-    "@types/node": "22.15.2",
+    "@types/node": "22.15.18",
     "@types/react": "^19.1.2",
     "@types/react-dom": "^19.1.2",
     "eslint": "^9.25.1",
