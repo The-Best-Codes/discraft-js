@@ -15,7 +15,18 @@ function sanitizeName(name: string): string {
 
 async function findModules(extension: string): Promise<ModuleInfo[]> {
   try {
-    const files = await glob(path.join(COMMANDS_DIR, `*.${extension}`));
+    // Use normalized path for glob pattern and ensure proper Windows compatibility
+    const pattern = path.normalize(path.join(COMMANDS_DIR, `*.${extension}`));
+    logger.verbose(`Looking for command files with pattern: ${pattern}`);
+    
+    const files = await glob(pattern, { windowsPathsNoEscape: true });
+    
+    if (files.length === 0) {
+      logger.verbose(`No command files found matching ${pattern}`);
+    } else {
+      logger.verbose(`Found ${files.length} command files`);
+    }
+    
     return files.map((filePath) => {
       const fileName = path.basename(filePath, `.${extension}`);
       const sanitizedName = sanitizeName(fileName);
@@ -25,22 +36,26 @@ async function findModules(extension: string): Promise<ModuleInfo[]> {
           `Filename "${fileName}" has invalid characters, using "${sanitizedName}" instead.`,
         );
       }
+      
+      const targetPath = path.join(DISCRAFT_DIR, "commands", `index.${extension}`);
+      const targetDir = path.dirname(targetPath);
+      
+      // Compute relative path and ensure forward slashes for imports
+      let importPath = path.relative(targetDir, filePath);
+      importPath = importPath.replace(/\\/g, "/");
+      importPath = importPath.replace(new RegExp(`\\.${extension}$`), "");
+      
+      logger.verbose(`Generated import path for ${fileName}: ${importPath}`);
+      
       return {
         name: sanitizedName,
-        importPath: path
-          .relative(
-            path.dirname(
-              path.join(DISCRAFT_DIR, "commands", `index.${extension}`),
-            ),
-            filePath,
-          )
-          .replace(/\\/g, "/")
-          .replace(new RegExp(`\\.${extension}$`), ""),
+        importPath,
         isValid: true,
       };
     });
   } catch (err) {
     logger.error(`Error finding files in ${COMMANDS_DIR}.`, err);
+    logger.verbose(`Error details: ${err}`);
     return [];
   }
 }
@@ -48,6 +63,13 @@ async function findModules(extension: string): Promise<ModuleInfo[]> {
 async function generateVercelCommandsIndex(extension: "ts" | "js") {
   // Create the `.discraft/commands` directory if it doesn't exist
   await fs.mkdir(path.join(DISCRAFT_DIR, "commands"), { recursive: true });
+
+  try {
+    // Ensure commands directory exists in source location too
+    await fs.mkdir(COMMANDS_DIR, { recursive: true });
+  } catch (err) {
+    logger.verbose(`Note: Commands directory already exists or couldn't be created: ${err}`);
+  }
 
   const OUTPUT_COMMANDS_FILE = path.join(
     DISCRAFT_DIR,
