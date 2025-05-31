@@ -7,6 +7,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/discraft.svg)](https://www.npmjs.com/package/discraft)
 [![Discord Server](https://img.shields.io/discord/1170475897174896650)](https://discord.gg/dKeuR9yfBs)
 [![CodeQL](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/The-Best-Codes/discraft-js)
 
 Discraft is a modern, developer-friendly framework for building Discord bots with ease.
 It provides a robust CLI and a set of tools to streamline the development process, allowing you to focus on creating amazing bot experiences.
