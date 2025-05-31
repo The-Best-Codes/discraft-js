@@ -1,6 +1,6 @@
 import { exec, spawn } from "child_process";
 import consola from "consola";
-import fs from "fs/promises";
+import fs, { stat } from "fs/promises";
 import path from "path";
 import { promisify } from "util";
 
@@ -82,7 +82,23 @@ async function isTypeScriptProject(): Promise<boolean> {
   }
 }
 
+// Utility function to check for vercel.json
+async function checkForVercelJson(): Promise<boolean> {
+  const vercelJsonPath = path.join(process.cwd(), "vercel.json");
+  try {
+    const stats = await stat(vercelJsonPath);
+    return stats.isFile();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (error: any) {
+    if (error.code === "ENOENT") {
+      return false;
+    }
+    throw error;
+  }
+}
+
 export {
+  checkForVercelJson,
   CWD,
   getEntryPoint,
   isBunInstalled,

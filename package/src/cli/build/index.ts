@@ -2,7 +2,7 @@ import { cancel, intro, outro, spinner } from "@clack/prompts";
 import consola from "consola";
 import kleur from "kleur";
 import path from "path";
-import { getEntryPoint } from "../utils";
+import { checkForVercelJson, getEntryPoint } from "../utils";
 import { getCompactRelativePath } from "../utils/relativePath";
 import { build as buildFn } from "./build";
 import { generateIndexFiles } from "./commandsAndEvents";
@@ -17,6 +17,16 @@ interface BuildOptions {
 async function startBuild(options?: BuildOptions) {
   try {
     intro("Starting production build...");
+
+    const vercelJsonExists = await checkForVercelJson();
+    if (vercelJsonExists) {
+      consola.warn(
+        `"vercel.json" file found in project. Did you mean to run ${kleur.cyan(
+          "discraft vercel build",
+        )}?`,
+      );
+    }
+
     const currentWorkingDirectory = process.cwd();
     const outputPath = path.join(currentWorkingDirectory, "dist");
     let entryPoint;
