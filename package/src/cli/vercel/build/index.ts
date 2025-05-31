@@ -3,9 +3,8 @@ import consola from "consola";
 import { build as esbuild } from "esbuild";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
 import { promises as fs } from "fs";
-import path from "path";
-
 import kleur from "kleur";
+import path from "path";
 import {
   getEntryPoint,
   isBunInstalled,
@@ -22,7 +21,7 @@ interface BuildOptions {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-async function compileAndRunRegisterScript(isTS: boolean) {
+async function compileAndRunRegisterScript(_isTS: boolean) {
   const currentWorkingDirectory = process.cwd();
   const registerTsPath = path.join(
     currentWorkingDirectory,
