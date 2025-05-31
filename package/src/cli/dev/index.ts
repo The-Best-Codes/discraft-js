@@ -68,8 +68,35 @@ async function startDev(options?: DevOptions) {
     if (botProcess) {
       consola.info("🔄 Restarting bot...");
       botProcess.kill("SIGINT");
-      await new Promise((resolve) => botProcess.on("exit", resolve));
-      consola.info("Old bot process terminated.");
+
+      const exitPromise = new Promise<void>((resolve) => {
+        botProcess.on("exit", () => {
+          consola.info("Old bot process terminated gracefully.");
+          resolve();
+        });
+      });
+
+      const timeout = 1000; // 1 second
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Process did not exit in time")),
+          timeout,
+        ),
+      );
+
+      try {
+        await Promise.race([exitPromise, timeoutPromise]);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (error: any) {
+        consola.warn(
+          `Old bot process did not terminate after ${timeout}ms. Attempting to force kill...`,
+        );
+        botProcess.kill("SIGTERM");
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second
+        consola.info("Old bot process terminated forcefully.");
+      }
+
+      botProcess = null;
     }
 
     try {
