@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { cancel, intro, log, outro, spinner } from "@clack/prompts";
 import consola from "consola";
 import { build as esbuild } from "esbuild";
 import { nodeExternalsPlugin } from "esbuild-node-externals";
@@ -56,7 +57,8 @@ async function compileAndRunRegisterScript(_isTS: boolean) {
     }
   }
 
-  consola.info("Compiling and running register script...");
+  const registerSpinner = spinner();
+  registerSpinner.start("Compiling and running register script...");
 
   try {
     if (registerFile?.endsWith(".ts")) {
@@ -78,93 +80,108 @@ async function compileAndRunRegisterScript(_isTS: boolean) {
 
     // Run register.js
     await runSubprocess("node", [outPath]);
-    consola.success("Command registration script ran successfully.");
+    registerSpinner.stop("Command registration script ran successfully.");
   } catch (error: any) {
-    consola.error(`Error during register script execution.`);
+    registerSpinner.stop(`Error during register script execution.`, 1);
     consola.verbose(error);
     consola.warn("Continuing build process.");
   }
 }
 
 async function startBuild(options?: BuildOptions) {
-  consola.info("Starting Vercel build...");
-  const currentWorkingDirectory = process.cwd();
-  const outputDir = path.join(currentWorkingDirectory, "api");
-
-  let entryPoint: string;
   try {
-    entryPoint = await getEntryPoint();
-  } catch (e: any) {
-    consola.error("Could not get entrypoint file");
-    throw e;
-  }
+    intro("Starting Vercel build...");
+    const currentWorkingDirectory = process.cwd();
+    const outputDir = path.join(currentWorkingDirectory, "api");
 
-  consola.info("Generating command index file...");
-  const isTS = await isTypeScriptProject();
-  await generateVercelCommandsIndex(isTS ? "ts" : "js");
-  consola.success("Command index file generated.");
+    let entryPoint: string;
+    try {
+      entryPoint = await getEntryPoint();
+    } catch (e: any) {
+      cancel("Could not get entrypoint file");
+      throw e;
+    }
 
-  // Compile & Run register.ts or register.js if it exists.
-  await compileAndRunRegisterScript(isTS);
+    const indexSpinner = spinner();
+    indexSpinner.start("Generating command index file...");
+    const isTS = await isTypeScriptProject();
+    await generateVercelCommandsIndex(isTS ? "ts" : "js");
+    indexSpinner.stop("Command index file generated.");
 
-  let runner: Builder = options?.builder || "esbuild";
+    // Compile & Run register.ts or register.js if it exists.
+    await compileAndRunRegisterScript(isTS);
 
-  if (!options?.builder) {
-    if (await isBunInstalled()) {
-      runner = "bun";
-      consola.verbose("Bun detected. Using Bun CLI for build.");
+    let runner: Builder = options?.builder || "esbuild";
+
+    if (!options?.builder) {
+      if (await isBunInstalled()) {
+        runner = "bun";
+        consola.verbose("Bun detected. Using Bun CLI for build.");
+      } else {
+        consola.verbose("Bun not detected. Using esbuild for build.");
+      }
     } else {
-      consola.verbose("Bun not detected. Using esbuild for build.");
+      consola.info(`Using ${options.builder} instead of auto-detect.`);
     }
-  } else {
-    consola.info(`Using ${options.builder} instead of auto-detect.`);
-  }
 
-  consola.info(`Creating Vercel build with ${runner}...`);
-  if (runner === "bun") {
+    const buildSpinner = spinner();
+    buildSpinner.start(`Creating Vercel build with ${runner}...`);
+
     try {
-      const bunArgs = [
-        "bun",
-        "build",
-        entryPoint,
-        "--outdir",
+      if (runner === "bun") {
+        const bunArgs = [
+          "bun",
+          "build",
+          entryPoint,
+          "--outdir",
+          outputDir,
+          "--target",
+          "node",
+          "--packages",
+          "external",
+          "--format",
+          "esm",
+          //"--minify",
+        ];
+        await runSubprocess(bunArgs[0], bunArgs.slice(1));
+        buildSpinner.stop("Build complete using Bun.");
+      } else {
+        await esbuild({
+          entryPoints: [entryPoint],
+          outdir: outputDir,
+          platform: "node",
+          format: "esm",
+          bundle: true,
+          //minify: true,
+          plugins: [nodeExternalsPlugin()],
+        });
+        buildSpinner.stop("Build complete using esbuild.");
+      }
+
+      const uxOutDir = getCompactRelativePath(
+        currentWorkingDirectory,
         outputDir,
-        "--target",
-        "node",
-        "--packages",
-        "external",
-        "--format",
-        "esm",
-        //"--minify",
-      ];
-      await runSubprocess(bunArgs[0], bunArgs.slice(1));
-      consola.success("Build complete using Bun.");
+      );
+      outro(`Vercel build completed! Output: ${kleur.cyan(uxOutDir)}`); // Final outro with output path
     } catch (error: any) {
-      consola.error(`Error during bun build: ${error.message}`);
+      buildSpinner.stop(
+        `Build failed: ${error?.message || "Unknown error"}`,
+        1,
+      );
+      consola.verbose(error);
+      cancel("An error occurred during build.");
       throw error;
     }
-  } else {
-    try {
-      await esbuild({
-        entryPoints: [entryPoint],
-        outdir: outputDir,
-        platform: "node",
-        format: "esm",
-        bundle: true,
-        //minify: true,
-        plugins: [nodeExternalsPlugin()],
-      });
-      consola.success("Build complete using esbuild.");
-    } catch (error: any) {
-      consola.error(`Error during esbuild: ${error.message}`);
-      throw error;
-    }
+  } catch (error: any) {
+    // This catches errors from getEntryPoint or the re-thrown build error
+    consola.verbose(error);
+    log.error(
+      "An error occurred during the Vercel build. Set the `CONSOLA_LEVEL` to `verbose` to see more details.",
+    );
+    outro(
+      `Having trouble? Submit an issue here:\n${kleur.cyan(`https://github.com/The-Best-Codes/discraft-js/issues`)}`,
+    );
   }
-
-  const uxOutDir = getCompactRelativePath(currentWorkingDirectory, outputDir);
-
-  consola.info(`Build output: ${kleur.cyan(uxOutDir)}`);
-  consola.success("Vercel build completed!");
 }
 
 export { startBuild as build };
