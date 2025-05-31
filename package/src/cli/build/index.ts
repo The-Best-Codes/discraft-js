@@ -1,4 +1,4 @@
-import { cancel, intro, note, outro, spinner } from "@clack/prompts";
+import { cancel, intro, outro, spinner } from "@clack/prompts";
 import consola from "consola";
 import kleur from "kleur";
 import path from "path";
@@ -49,13 +49,10 @@ async function startBuild(options?: BuildOptions) {
       buildSpinner.stop(
         `Build finished successfully! Output: ${kleur.cyan(uxOutputPath)}.`,
       );
-      note(
+      outro(
         `Run ${kleur.cyan(`discraft start`)} or ${kleur.cyan(
           `npm run start`,
         )} to start your bot.`,
-      );
-      outro(
-        `Feedback or issues?\n${kleur.cyan(`https://github.com/The-Best-Codes/discraft-js/discussions`)}`,
       );
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
