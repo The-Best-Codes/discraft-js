@@ -49,16 +49,16 @@
   },
   "homepage": "https://github.com/The-Best-Codes/discraft-js#readme",
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
-    "@eslint/js": "^9.28.0",
-    "@types/bun": "^1.2.15",
+    "@biomejs/biome": "^2.0.0",
+    "@eslint/js": "^9.29.0",
+    "@types/bun": "^1.2.16",
     "@types/fs-extra": "^11.0.4",
-    "@types/node": "^22.15.29",
-    "bun": "^1.2.15",
-    "eslint": "^9.28.0",
+    "@types/node": "^24.0.3",
+    "bun": "^1.2.16",
+    "eslint": "^9.29.0",
     "globals": "^16.2.0",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.33.0"
+    "typescript-eslint": "^8.34.1"
   },
   "dependencies": {
     "@clack/core": "^0.5.0",
@@ -69,7 +69,7 @@
     "esbuild": "^0.25.5",
     "esbuild-node-externals": "^1.18.0",
     "fs-extra": "^11.3.0",
-    "glob": "^11.0.2",
+    "glob": "^11.0.3",
     "kleur": "^4.1.5"
   },
   "trustedDependencies": [
