@@ -1,8 +1,15 @@
 {
+  "files": {
+    "includes": [
+      "!**/dist/**",
+      "!**/node_modules/**",
+      "!**/*.next/**",
+      "!**/*.min.js"
+    ]
+  },
   "formatter": {
     "enabled": true,
     "formatWithErrors": false,
-    "ignore": ["dist", "node_modules", "*.json", ".next"],
     "attributePosition": "auto",
     "indentStyle": "space",
     "indentWidth": 2,
