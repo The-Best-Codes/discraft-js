@@ -3,13 +3,12 @@ title: TypeScript Template
 description: Learn about the TypeScript template for Discraft Discord bots.
 ---
 
-# TypeScript Template
-
 The TypeScript template provides a strongly-typed foundation for building robust Discord bots with Discraft. This template leverages TypeScript's type system to catch errors during development and provide better IDE support.
 
 ## Overview
 
 The TypeScript template includes:
+
 - Type-safe command and event handling
 - Preconfigured TypeScript settings
 - Example commands and events
@@ -56,6 +55,7 @@ discraft init
 ### Configuration
 
 1. Copy `.env.example` to `.env` and add your Discord bot token:
+
    ```
    DISCORD_TOKEN=your_bot_token_here
    ```
@@ -82,6 +82,7 @@ pnpm dev
 ```
 
 This will:
+
 1. Compile your TypeScript code
 2. Start your bot
 3. Watch for changes and automatically restart when files are modified
@@ -236,11 +237,12 @@ The template includes a preconfigured `tsconfig.json`:
 To add a new command:
 
 1. Create a new file in the `commands/` directory:
+
    ```typescript
    // commands/hello.ts
    import { CommandInteraction } from "discord.js";
    import { Command } from "../types";
-   
+
    const command: Command = {
      name: "hello",
      description: "Greets the user",
@@ -248,7 +250,7 @@ To add a new command:
        await interaction.reply(`Hello, ${interaction.user.username}!`);
      },
    };
-   
+
    export default command;
    ```
 
@@ -259,11 +261,12 @@ To add a new command:
 To add a new event handler:
 
 1. Create a new file in the `events/` directory:
+
    ```typescript
    // events/guildCreate.ts
    import { Client } from "discord.js";
    import { logger } from "../utils/logger";
-   
+
    export default (client: Client): void => {
      client.on("guildCreate", (guild) => {
        logger.info(`Joined a new guild: ${guild.name}`);

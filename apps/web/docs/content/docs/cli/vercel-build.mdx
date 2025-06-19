@@ -3,8 +3,6 @@ title: vercel-build Command
 description: Learn how to use the 'discraft vercel-build' command to prepare your bot for deployment on Vercel.
 ---
 
-# vercel-build Command
-
 The `discraft vercel-build` command prepares your Discord bot for deployment on Vercel's serverless platform, optimizing it for webhook-based interactions.
 
 ## Overview
@@ -26,13 +24,13 @@ This builds your bot for Vercel deployment.
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
-| `--out-dir`, `-o` | Specify the output directory |
-| `--source-maps`, `-s` | Generate source maps |
-| `--minify`, `-m` | Minify the output code |
-| `--clean`, `-c` | Clean the output directory before building |
-| `--help`, `-h` | Display help information |
+| Option                | Description                                |
+| --------------------- | ------------------------------------------ |
+| `--out-dir`, `-o`     | Specify the output directory               |
+| `--source-maps`, `-s` | Generate source maps                       |
+| `--minify`, `-m`      | Minify the output code                     |
+| `--clean`, `-c`       | Clean the output directory before building |
+| `--help`, `-h`        | Display help information                   |
 
 ## Prerequisites
 
@@ -56,15 +54,12 @@ Unlike traditional Discord bots that maintain a persistent WebSocket connection,
 The `vercel-build` command generates or updates these files:
 
 1. **`vercel.json`**: Configuration for Vercel deployment
+
    ```json
    {
      "version": 2,
-     "builds": [
-       { "src": "index.ts", "use": "@vercel/node" }
-     ],
-     "routes": [
-       { "src": "/(.*)", "dest": "index.ts" }
-     ]
+     "builds": [{ "src": "index.ts", "use": "@vercel/node" }],
+     "routes": [{ "src": "/(.*)", "dest": "index.ts" }]
    }
    ```
 
@@ -117,7 +112,8 @@ After building your bot for Vercel:
 
 1. **Push to GitHub**: Push your code to a GitHub repository
 
-2. **Connect to Vercel**: 
+2. **Connect to Vercel**:
+
    - Go to [Vercel](https://vercel.com)
    - Create a new project
    - Import your GitHub repository
@@ -132,10 +128,10 @@ After building your bot for Vercel:
 
 Set these environment variables in your Vercel project settings:
 
-| Variable | Description |
-|----------|-------------|
-| `DISCORD_TOKEN` | Your Discord bot token |
-| `DISCORD_CLIENT_ID` | Your Discord application client ID |
+| Variable             | Description                                                    |
+| -------------------- | -------------------------------------------------------------- |
+| `DISCORD_TOKEN`      | Your Discord bot token                                         |
+| `DISCORD_CLIENT_ID`  | Your Discord application client ID                             |
 | `DISCORD_PUBLIC_KEY` | Your Discord application public key (for webhook verification) |
 
 ## Command Registration
@@ -159,6 +155,7 @@ Serverless Discord bots have some limitations:
 ## Best Practices for Serverless Bots
 
 1. **Use deferred responses**: For operations that take longer than 3 seconds
+
    ```typescript
    await interaction.deferReply();
    // Long operation...

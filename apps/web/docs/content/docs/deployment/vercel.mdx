@@ -3,13 +3,12 @@ title: Serverless Deployment (Vercel)
 description: Learn how to deploy your Discraft bot as serverless functions on Vercel.
 ---
 
-# Serverless Deployment (Vercel)
-
 This guide covers deploying your Discraft bot as serverless functions on Vercel, enabling a cost-effective, maintenance-free approach for Discord bots that primarily respond to interactions.
 
 ## Overview
 
 Serverless deployment on Vercel offers several advantages:
+
 - Zero server maintenance
 - Auto-scaling based on usage
 - Free tier for hobby projects
@@ -17,6 +16,7 @@ Serverless deployment on Vercel offers several advantages:
 - Built-in CI/CD pipeline
 
 However, it's important to understand that serverless Discord bots have limitations:
+
 - Cannot maintain persistent connections to Discord
 - Limited to responding to interactions (slash commands, buttons, etc.)
 - Cannot listen for events like message creation or reactions
@@ -44,27 +44,28 @@ discraft init
 If you have an existing project, you'll need to adapt it for serverless deployment:
 
 1. Create a Vercel configuration file (`vercel.json`):
+
    ```json
    {
      "version": 2,
-     "builds": [
-       { "src": "index.ts", "use": "@vercel/node" }
-     ],
-     "routes": [
-       { "src": "/(.*)", "dest": "index.ts" }
-     ]
+     "builds": [{ "src": "index.ts", "use": "@vercel/node" }],
+     "routes": [{ "src": "/(.*)", "dest": "index.ts" }]
    }
    ```
 
 2. Update your bot's entry point to handle HTTP requests:
+
    ```typescript
-   import { InteractionType, InteractionResponseType } from 'discord-interactions';
-   import { verifyKey } from 'discord-interactions';
+   import {
+     InteractionType,
+     InteractionResponseType,
+   } from "discord-interactions";
+   import { verifyKey } from "discord-interactions";
 
    export default async function handler(req, res) {
      // Verify the request is from Discord
-     const signature = req.headers['x-signature-ed25519'];
-     const timestamp = req.headers['x-signature-timestamp'];
+     const signature = req.headers["x-signature-ed25519"];
+     const timestamp = req.headers["x-signature-timestamp"];
      const isValidRequest = verifyKey(
        JSON.stringify(req.body),
        signature,
@@ -73,33 +74,33 @@ If you have an existing project, you'll need to adapt it for serverless deployme
      );
 
      if (!isValidRequest) {
-       return res.status(401).send('Bad request signature');
+       return res.status(401).send("Bad request signature");
      }
 
      // Handle the interaction
      const interaction = req.body;
-     
+
      if (interaction.type === InteractionType.PING) {
        return res.send({
-         type: InteractionResponseType.PONG
+         type: InteractionResponseType.PONG,
        });
      }
-     
+
      if (interaction.type === InteractionType.APPLICATION_COMMAND) {
        // Handle commands here
        const { name } = interaction.data;
-       
-       if (name === 'ping') {
+
+       if (name === "ping") {
          return res.send({
            type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
            data: {
-             content: 'Pong!'
-           }
+             content: "Pong!",
+           },
          });
        }
      }
-     
-     return res.status(400).send('Unknown interaction type');
+
+     return res.status(400).send("Unknown interaction type");
    }
    ```
 
@@ -113,6 +114,7 @@ discraft vercel build
 ```
 
 This command:
+
 1. Compiles your TypeScript code
 2. Optimizes the build for serverless deployment
 3. Creates the necessary API routes
@@ -123,11 +125,13 @@ This command:
 ### Option 1: Using the Vercel CLI
 
 1. Build your project:
+
    ```bash
    discraft vercel build
    ```
 
 2. Deploy to Vercel:
+
    ```bash
    vercel
    ```
@@ -161,6 +165,7 @@ DISCORD_TOKEN=your_discord_bot_token
 ```
 
 To add environment variables:
+
 1. Go to your Vercel project dashboard
 2. Navigate to "Settings" > "Environment Variables"
 3. Add each variable and its value
@@ -202,27 +207,28 @@ curl -X POST \
 Vercel functions have execution time limits (10-60 seconds depending on your plan). For operations that might take longer:
 
 1. Acknowledge the interaction immediately:
+
    ```typescript
    // Acknowledge the interaction
    res.send({
-     type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
+     type: InteractionResponseType.DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE,
    });
-   
+
    // Then use the followup URL to send the actual response
    const followupUrl = `https://discord.com/api/v10/webhooks/${interaction.application_id}/${interaction.token}/messages/@original`;
-   
+
    // Process your longer operation
    const result = await longRunningOperation();
-   
+
    // Send the result
    await fetch(followupUrl, {
-     method: 'PATCH',
+     method: "PATCH",
      headers: {
-       'Content-Type': 'application/json'
+       "Content-Type": "application/json",
      },
      body: JSON.stringify({
-       content: result
-     })
+       content: result,
+     }),
    });
    ```
 
@@ -241,16 +247,19 @@ To monitor your serverless bot:
 ### Common Issues
 
 1. **Discord reports invalid interactions endpoint**
+
    - Verify your endpoint URL is correct
    - Check that your `DISCORD_PUBLIC_KEY` is set correctly
    - Ensure your verification logic is working
 
 2. **Commands not appearing in Discord**
+
    - Verify command registration was successful
    - Check that your bot has the `applications.commands` scope
    - Try re-inviting the bot to your server
 
 3. **Function execution timeout**
+
    - Implement the deferred response pattern shown above
    - Optimize your code for faster execution
    - Consider upgrading your Vercel plan for longer timeouts

@@ -3,13 +3,12 @@ title: dev Command
 description: Learn how to use the 'discraft dev' command to run your bot in development mode with hot reloading.
 ---
 
-# dev Command
-
 The `discraft dev` command runs your Discord bot in development mode with hot reloading, allowing you to see changes in real-time as you edit your code.
 
 ## Overview
 
 Development mode is designed to provide a smooth development experience with:
+
 - Hot reloading when files change
 - Automatic command registration
 - Enhanced error reporting
@@ -25,24 +24,24 @@ This starts your bot in development mode and watches for file changes.
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
-| `--port`, `-p` | Specify the port for the development server |
-| `--no-watch` | Disable file watching and hot reloading |
-| `--watch-dir`, `-w` | Specify additional directories to watch |
-| `--verbose`, `-v` | Enable verbose logging |
-| `--help`, `-h` | Display help information |
+| Option              | Description                                 |
+| ------------------- | ------------------------------------------- |
+| `--port`, `-p`      | Specify the port for the development server |
+| `--no-watch`        | Disable file watching and hot reloading     |
+| `--watch-dir`, `-w` | Specify additional directories to watch     |
+| `--verbose`, `-v`   | Enable verbose logging                      |
+| `--help`, `-h`      | Display help information                    |
 
 ## Environment Variables
 
 The `dev` command uses these environment variables:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DISCORD_TOKEN` | Your Discord bot token | Required |
-| `DISCORD_CLIENT_ID` | Your Discord application client ID | Required |
-| `DISCORD_GUILD_ID` | Development server ID for testing | Optional |
-| `NODE_ENV` | Node environment | `"development"` |
+| Variable            | Description                        | Default         |
+| ------------------- | ---------------------------------- | --------------- |
+| `DISCORD_TOKEN`     | Your Discord bot token             | Required        |
+| `DISCORD_CLIENT_ID` | Your Discord application client ID | Required        |
+| `DISCORD_GUILD_ID`  | Development server ID for testing  | Optional        |
+| `NODE_ENV`          | Node environment                   | `"development"` |
 
 ## Development Server
 
@@ -111,6 +110,7 @@ npx discraft dev --verbose
 A typical development workflow with Discraft:
 
 1. Start development mode:
+
    ```bash
    npx discraft dev
    ```
@@ -118,11 +118,13 @@ A typical development workflow with Discraft:
 2. Edit your code (e.g., modify a command)
 
 3. Save the file
+
    - Discraft detects the change
    - The file is recompiled
    - The bot is updated with the new code
 
 4. Test the changes in Discord
+
    - Use the command or trigger the event you modified
    - See the changes take effect immediately
 

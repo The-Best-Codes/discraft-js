@@ -3,8 +3,6 @@ title: Configuration
 description: Learn how to configure your Discraft bot using environment variables and configuration files.
 ---
 
-# Configuration
-
 Discraft uses a combination of environment variables and optional configuration files to manage your bot's settings. This guide explains the various configuration options and best practices.
 
 ## Overview
@@ -17,11 +15,11 @@ Environment variables are the primary way to configure your Discraft bot. They'r
 
 ### Core Environment Variables
 
-| Variable | Description | Required |
-|----------|-------------|----------|
-| `DISCORD_TOKEN` | Your Discord bot token | Yes |
-| `DISCORD_CLIENT_ID` | Your Discord application client ID | Yes |
-| `DISCORD_GUILD_ID` | Development server ID for testing (dev mode only) | No |
+| Variable            | Description                                       | Required |
+| ------------------- | ------------------------------------------------- | -------- |
+| `DISCORD_TOKEN`     | Your Discord bot token                            | Yes      |
+| `DISCORD_CLIENT_ID` | Your Discord application client ID                | Yes      |
+| `DISCORD_GUILD_ID`  | Development server ID for testing (dev mode only) | No       |
 
 ### Setting Up Environment Variables
 
@@ -61,61 +59,63 @@ export default {
       activities: [
         {
           name: "with Discraft",
-          type: "PLAYING" // PLAYING, STREAMING, LISTENING, WATCHING, COMPETING
-        }
-      ]
+          type: "PLAYING", // PLAYING, STREAMING, LISTENING, WATCHING, COMPETING
+        },
+      ],
     },
-    
+
     // Intents configuration
     intents: [
       "Guilds",
       "GuildMessages",
-      "MessageContent"
+      "MessageContent",
       // Add other intents as needed
     ],
-    
+
     // Command registration options
     commands: {
       // Whether to register commands globally or to specific guilds
       global: process.env.NODE_ENV === "production",
-      
+
       // Guild IDs to register commands to in development
-      guilds: process.env.DISCORD_GUILD_ID ? [process.env.DISCORD_GUILD_ID] : [],
-      
+      guilds: process.env.DISCORD_GUILD_ID
+        ? [process.env.DISCORD_GUILD_ID]
+        : [],
+
       // Command directory (relative to project root)
-      directory: "./commands"
+      directory: "./commands",
     },
-    
+
     // Event handler options
     events: {
       // Event handler directory (relative to project root)
-      directory: "./events"
-    }
+      directory: "./events",
+    },
   },
-  
+
   // Development options
   development: {
     // Whether to enable verbose logging
     verbose: true,
-    
+
     // Files to watch for changes (glob patterns)
-    watch: ["commands/**/*", "events/**/*", "utils/**/*"]
+    watch: ["commands/**/*", "events/**/*", "utils/**/*"],
   },
-  
+
   // Build options
   build: {
     // Output directory for builds
     outDir: "./dist",
-    
+
     // Whether to include source maps
     sourceMaps: false,
-    
+
     // Files to include in the build (glob patterns)
     include: ["**/*.ts", "**/*.js"],
-    
+
     // Files to exclude from the build (glob patterns)
-    exclude: ["**/*.test.ts", "**/*.spec.ts"]
-  }
+    exclude: ["**/*.test.ts", "**/*.spec.ts"],
+  },
 };
 ```
 

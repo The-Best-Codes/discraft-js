@@ -3,8 +3,6 @@ title: Command System
 description: Understanding Discraft's command system and how to create effective Discord slash commands.
 ---
 
-# Command System
-
 Discraft's command system provides a structured way to create, manage, and handle Discord slash commands. This guide explains how the command system works and how to create effective commands for your bot.
 
 ## Overview
@@ -24,10 +22,9 @@ export default {
   data: new SlashCommandBuilder()
     .setName("example")
     .setDescription("An example command")
-    .addStringOption(option => 
-      option.setName("input")
-        .setDescription("Example input")
-        .setRequired(true)),
+    .addStringOption((option) =>
+      option.setName("input").setDescription("Example input").setRequired(true)
+    ),
 
   // Command execution logic (what happens when the command is used)
   async execute(data: { interaction: ChatInputCommandInteraction }) {
@@ -41,6 +38,7 @@ export default {
 ### Key Components
 
 1. **`data`**: Defines the command's structure using Discord.js's `SlashCommandBuilder`
+
    - Name
    - Description
    - Options (parameters)
@@ -61,6 +59,7 @@ Discraft automatically:
 4. Routes incoming interactions to the appropriate handler
 
 This happens:
+
 - During development when you run `discraft dev`
 - During the build process when you run `discraft build`
 
@@ -87,10 +86,12 @@ export default {
   data: new SlashCommandBuilder()
     .setName("echo")
     .setDescription("Echoes your input")
-    .addStringOption(option =>
-      option.setName("message")
+    .addStringOption((option) =>
+      option
+        .setName("message")
         .setDescription("The message to echo")
-        .setRequired(true)),
+        .setRequired(true)
+    ),
 
   async execute({ interaction }) {
     const message = interaction.options.getString("message");
@@ -106,26 +107,29 @@ export default {
   data: new SlashCommandBuilder()
     .setName("profile")
     .setDescription("User profile commands")
-    .addSubcommand(subcommand =>
+    .addSubcommand((subcommand) =>
       subcommand
         .setName("view")
         .setDescription("View a user's profile")
-        .addUserOption(option =>
-          option.setName("user")
+        .addUserOption((option) =>
+          option
+            .setName("user")
             .setDescription("The user to view")
-            .setRequired(true)))
-    .addSubcommand(subcommand =>
+            .setRequired(true)
+        )
+    )
+    .addSubcommand((subcommand) =>
       subcommand
         .setName("edit")
         .setDescription("Edit your profile")
-        .addStringOption(option =>
-          option.setName("bio")
-            .setDescription("Your new bio")
-            .setRequired(true))),
+        .addStringOption((option) =>
+          option.setName("bio").setDescription("Your new bio").setRequired(true)
+        )
+    ),
 
   async execute({ interaction }) {
     const subcommand = interaction.options.getSubcommand();
-    
+
     if (subcommand === "view") {
       const user = interaction.options.getUser("user");
       await interaction.reply(`Viewing ${user.username}'s profile...`);
@@ -144,28 +148,31 @@ export default {
   data: new SlashCommandBuilder()
     .setName("kick")
     .setDescription("Kick a user from the server")
-    .addUserOption(option =>
-      option.setName("user")
+    .addUserOption((option) =>
+      option
+        .setName("user")
         .setDescription("The user to kick")
-        .setRequired(true))
-    .addStringOption(option =>
-      option.setName("reason")
-        .setDescription("Reason for kicking"))
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option.setName("reason").setDescription("Reason for kicking")
+    )
     .setDefaultMemberPermissions("0"), // Requires administrator permission
 
   async execute({ interaction }) {
     if (!interaction.memberPermissions.has("KickMembers")) {
       return interaction.reply({
         content: "You don't have permission to use this command.",
-        ephemeral: true
+        ephemeral: true,
       });
     }
 
     const user = interaction.options.getUser("user");
-    const reason = interaction.options.getString("reason") || "No reason provided";
-    
+    const reason =
+      interaction.options.getString("reason") || "No reason provided";
+
     // Kick logic here...
-    
+
     await interaction.reply(`Kicked ${user.username} for: ${reason}`);
   },
 };
@@ -186,7 +193,7 @@ await interaction.reply("This is a regular response");
 ```typescript
 await interaction.reply({
   content: "This message is only visible to you",
-  ephemeral: true
+  ephemeral: true,
 });
 ```
 
@@ -206,7 +213,12 @@ await interaction.editReply("Here's the result!");
 ### Embeds and Components
 
 ```typescript
-import { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from "discord.js";
+import {
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+} from "discord.js";
 
 export default {
   data: new SlashCommandBuilder()
@@ -217,19 +229,18 @@ export default {
     const embed = new EmbedBuilder()
       .setTitle("Fancy Message")
       .setDescription("This is a fancy embed message")
-      .setColor(0x0099FF);
+      .setColor(0x0099ff);
 
-    const row = new ActionRowBuilder()
-      .addComponents(
-        new ButtonBuilder()
-          .setCustomId("primary_button")
-          .setLabel("Click me!")
-          .setStyle(ButtonStyle.Primary),
-      );
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("primary_button")
+        .setLabel("Click me!")
+        .setStyle(ButtonStyle.Primary)
+    );
 
     await interaction.reply({
       embeds: [embed],
-      components: [row]
+      components: [row],
     });
   },
 };

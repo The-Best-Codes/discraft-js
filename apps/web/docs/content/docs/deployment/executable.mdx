@@ -3,13 +3,12 @@ title: Standalone Executable
 description: Learn how to package your Discraft bot as a standalone executable for easy distribution and deployment.
 ---
 
-# Standalone Executable
-
 This guide covers packaging your Discraft bot as a standalone executable, allowing for easy distribution and deployment without requiring Node.js or other dependencies.
 
 ## Overview
 
 Creating a standalone executable of your bot offers several advantages:
+
 - Distribution to users without technical knowledge
 - No need to install Node.js or npm on the target system
 - Simplified installation and setup process
@@ -36,13 +35,13 @@ discraft exec build --target <target-platform>
 
 The `--target` parameter specifies which platform to build for:
 
-| Target | Description |
-|--------|-------------|
-| `linux-x64` | 64-bit Linux (most common Linux distributions) |
-| `linux-arm64` | ARM64 Linux (Raspberry Pi 4, AWS Graviton, etc.) |
-| `windows-x64` | 64-bit Windows |
-| `darwin-x64` | 64-bit macOS (Intel) |
-| `darwin-arm64` | ARM64 macOS (Apple Silicon M1/M2/M3) |
+| Target         | Description                                      |
+| -------------- | ------------------------------------------------ |
+| `linux-x64`    | 64-bit Linux (most common Linux distributions)   |
+| `linux-arm64`  | ARM64 Linux (Raspberry Pi 4, AWS Graviton, etc.) |
+| `windows-x64`  | 64-bit Windows                                   |
+| `darwin-x64`   | 64-bit macOS (Intel)                             |
+| `darwin-arm64` | ARM64 macOS (Apple Silicon M1/M2/M3)             |
 
 ### Example
 
@@ -58,12 +57,13 @@ discraft exec build --target darwin-arm64
 
 The `exec build` command supports additional options:
 
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--entry <path>` | Custom entry point | `dist/index.js` |
-| `--outfile <path>` | Output file name | `dist/discraft-bot` |
+| Option             | Description        | Default             |
+| ------------------ | ------------------ | ------------------- |
+| `--entry <path>`   | Custom entry point | `dist/index.js`     |
+| `--outfile <path>` | Output file name   | `dist/discraft-bot` |
 
 Example with custom options:
+
 ```bash
 discraft exec build --target linux-x64 --entry src/main.js --outfile my-bot
 ```
@@ -88,7 +88,7 @@ For production deployments, sensitive information should be loaded from environm
 // Load token from environment variable
 const token = process.env.DISCORD_TOKEN;
 if (!token) {
-  console.error('DISCORD_TOKEN environment variable is required');
+  console.error("DISCORD_TOKEN environment variable is required");
   process.exit(1);
 }
 ```
@@ -101,8 +101,8 @@ Remember that executables have different working directories than development en
 
 ```typescript
 // Use __dirname to reference files relative to your code
-import path from 'path';
-const configPath = path.join(__dirname, 'config.json');
+import path from "path";
+const configPath = path.join(__dirname, "config.json");
 ```
 
 ### Cross-Platform Compatibility
@@ -111,11 +111,11 @@ If you're distributing to multiple platforms, ensure your code is cross-platform
 
 ```typescript
 // Use path.join for cross-platform path handling
-import path from 'path';
-const logPath = path.join(process.cwd(), 'logs', 'bot.log');
+import path from "path";
+const logPath = path.join(process.cwd(), "logs", "bot.log");
 
 // Use cross-platform line endings
-const content = 'Line 1\n' + 'Line 2';
+const content = "Line 1\n" + "Line 2";
 ```
 
 ## Distribution
@@ -165,6 +165,7 @@ To run your bot as a Windows service:
 To run your bot as a systemd service on Linux:
 
 1. Create a service file at `/etc/systemd/system/discraft-bot.service`:
+
    ```ini
    [Unit]
    Description=Discraft Discord Bot
@@ -191,6 +192,7 @@ To run your bot as a systemd service on Linux:
 To run your bot as a launch daemon on macOS:
 
 1. Create a plist file at `~/Library/LaunchAgents/com.discraft.bot.plist`:
+
    ```xml
    <?xml version="1.0" encoding="UTF-8"?>
    <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -225,13 +227,16 @@ To run your bot as a launch daemon on macOS:
 ### Common Issues
 
 1. **"Permission denied" error on Linux/macOS**
+
    - Make the file executable: `chmod +x discraft-bot`
 
 2. **Missing environment variables**
+
    - Ensure environment variables are set before running the executable
    - Check for typos in variable names
 
 3. **Antivirus flagging the executable**
+
    - This can happen with packaged executables
    - Add an exception in your antivirus software
    - Consider code signing for production applications

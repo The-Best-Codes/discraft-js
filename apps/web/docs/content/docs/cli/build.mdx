@@ -3,13 +3,12 @@ title: build Command
 description: Learn how to use the 'discraft build' command to compile your bot for production deployment.
 ---
 
-# build Command
-
 The `discraft build` command compiles your Discord bot for production deployment, optimizing it for performance and reliability.
 
 ## Overview
 
 The build process:
+
 - Compiles TypeScript to JavaScript (if using TypeScript)
 - Optimizes code for production
 - Generates command and event registries
@@ -25,20 +24,20 @@ This builds your bot for production deployment.
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
-| `--out-dir`, `-o` | Specify the output directory |
-| `--source-maps`, `-s` | Generate source maps |
-| `--minify`, `-m` | Minify the output code |
-| `--clean`, `-c` | Clean the output directory before building |
-| `--help`, `-h` | Display help information |
+| Option                | Description                                |
+| --------------------- | ------------------------------------------ |
+| `--out-dir`, `-o`     | Specify the output directory               |
+| `--source-maps`, `-s` | Generate source maps                       |
+| `--minify`, `-m`      | Minify the output code                     |
+| `--clean`, `-c`       | Clean the output directory before building |
+| `--help`, `-h`        | Display help information                   |
 
 ## Environment Variables
 
 The `build` command uses these environment variables:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
+| Variable   | Description      | Default                            |
+| ---------- | ---------------- | ---------------------------------- |
 | `NODE_ENV` | Node environment | Set to `"production"` during build |
 
 ## Build Process
@@ -46,22 +45,27 @@ The `build` command uses these environment variables:
 When you run `discraft build`, the following steps occur:
 
 1. **Preparation**:
+
    - The output directory is created (or cleaned if using `--clean`)
    - Environment is set to production
 
 2. **Compilation**:
+
    - TypeScript files are compiled to JavaScript (if using TypeScript)
    - JavaScript files are processed and optimized
 
 3. **Command Processing**:
+
    - Command files are discovered
    - A command registry is generated
 
 4. **Event Processing**:
+
    - Event handlers are discovered
    - An event registry is generated
 
 5. **Optimization**:
+
    - Code is optimized for production
    - Unused code is removed (tree-shaking)
    - Code is minified (if using `--minify`)

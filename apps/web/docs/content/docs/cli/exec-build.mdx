@@ -3,13 +3,12 @@ title: exec-build Command
 description: Learn how to use the 'discraft exec-build' command to create standalone executables of your Discord bot.
 ---
 
-# exec-build Command
-
 The `discraft exec-build` command packages your Discord bot as a standalone executable that can run without Node.js installed, making deployment simpler on various platforms.
 
 ## Overview
 
 The `exec-build` command:
+
 - Compiles your bot code
 - Bundles it with a Node.js runtime
 - Creates a standalone executable for Windows, macOS, or Linux
@@ -27,23 +26,23 @@ This builds your bot as a standalone executable for your current platform.
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
+| Option             | Description                       |
+| ------------------ | --------------------------------- |
 | `--platform`, `-p` | Target platform (win, mac, linux) |
-| `--arch`, `-a` | Target architecture (x64, arm64) |
-| `--output`, `-o` | Output file name |
-| `--compress`, `-c` | Compression level (0-9) |
-| `--help`, `-h` | Display help information |
+| `--arch`, `-a`     | Target architecture (x64, arm64)  |
+| `--output`, `-o`   | Output file name                  |
+| `--compress`, `-c` | Compression level (0-9)           |
+| `--help`, `-h`     | Display help information          |
 
 ## Supported Platforms
 
 The `exec-build` command can create executables for:
 
-| Platform | Architecture | Output |
-|----------|--------------|--------|
-| Windows | x64 | `bot.exe` |
-| macOS | x64, arm64 | `bot-macos` |
-| Linux | x64, arm64 | `bot-linux` |
+| Platform | Architecture | Output      |
+| -------- | ------------ | ----------- |
+| Windows  | x64          | `bot.exe`   |
+| macOS    | x64, arm64   | `bot-macos` |
+| Linux    | x64, arm64   | `bot-linux` |
 
 ## Examples
 
@@ -125,6 +124,7 @@ After building, you can distribute your bot as a single file:
 3. **Linux**: `bot-linux`
 
 Users only need to:
+
 1. Download the executable
 2. Create a `.env` file with their Discord token (or set environment variables)
 3. Run the executable

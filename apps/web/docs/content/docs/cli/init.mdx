@@ -3,8 +3,6 @@ title: init Command
 description: Learn how to use the 'discraft init' command to create new Discord bot projects.
 ---
 
-# init Command
-
 The `discraft init` command creates a new Discraft project with all the necessary files and dependencies to start building your Discord bot.
 
 ## Overview
@@ -21,22 +19,22 @@ This launches an interactive setup process that guides you through creating a ne
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
-| `--template`, `-t` | Specify the template to use |
-| `--directory`, `-d` | Specify the directory to create the project in |
-| `--package-manager`, `-p` | Specify the package manager to use |
-| `--yes`, `-y` | Skip confirmation prompts and use defaults |
-| `--help`, `-h` | Display help information |
+| Option                    | Description                                    |
+| ------------------------- | ---------------------------------------------- |
+| `--template`, `-t`        | Specify the template to use                    |
+| `--directory`, `-d`       | Specify the directory to create the project in |
+| `--package-manager`, `-p` | Specify the package manager to use             |
+| `--yes`, `-y`             | Skip confirmation prompts and use defaults     |
+| `--help`, `-h`            | Display help information                       |
 
 ## Templates
 
 Discraft provides several project templates:
 
-| Template | Description |
-|----------|-------------|
-| `typescript` | TypeScript template with full type support (default) |
-| `javascript` | JavaScript template for those who prefer JS |
+| Template       | Description                                                             |
+| -------------- | ----------------------------------------------------------------------- |
+| `typescript`   | TypeScript template with full type support (default)                    |
+| `javascript`   | JavaScript template for those who prefer JS                             |
 | `vercel-ts-ai` | TypeScript template optimized for Vercel deployment with AI integration |
 
 ## Interactive Setup
@@ -108,12 +106,14 @@ my-discord-bot/
 After creating your project:
 
 1. **Configure environment variables**:
+
    ```bash
    cp .env.example .env
    # Edit .env with your Discord bot token
    ```
 
 2. **Start development mode**:
+
    ```bash
    cd my-discord-bot
    npx discraft dev

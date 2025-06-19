@@ -3,13 +3,12 @@ title: start Command
 description: Learn how to use the 'discraft start' command to run your bot in production mode.
 ---
 
-# start Command
-
 The `discraft start` command runs your Discord bot in production mode, using the optimized build created by the `build` command.
 
 ## Overview
 
 The `start` command is designed for running your bot in production environments. It:
+
 - Loads the compiled code from the build directory
 - Sets the environment to production
 - Optimizes for stability and performance
@@ -25,21 +24,21 @@ This starts your bot in production mode.
 
 ## Options
 
-| Option | Description |
-|--------|-------------|
-| `--dir`, `-d` | Specify the directory containing the built code |
+| Option              | Description                                               |
+| ------------------- | --------------------------------------------------------- |
+| `--dir`, `-d`       | Specify the directory containing the built code           |
 | `--log-level`, `-l` | Set the logging level (error, warn, info, verbose, debug) |
-| `--help`, `-h` | Display help information |
+| `--help`, `-h`      | Display help information                                  |
 
 ## Environment Variables
 
 The `start` command uses these environment variables:
 
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DISCORD_TOKEN` | Your Discord bot token | Required |
-| `DISCORD_CLIENT_ID` | Your Discord application client ID | Required |
-| `NODE_ENV` | Node environment | Set to `"production"` |
+| Variable            | Description                        | Default               |
+| ------------------- | ---------------------------------- | --------------------- |
+| `DISCORD_TOKEN`     | Your Discord bot token             | Required              |
+| `DISCORD_CLIENT_ID` | Your Discord application client ID | Required              |
+| `NODE_ENV`          | Node environment                   | Set to `"production"` |
 
 ## Production Mode
 
@@ -85,10 +84,12 @@ npx discraft start --log-level warn
 For production deployments, you should:
 
 1. **Set up environment variables**:
+
    - Use a `.env.production` file or environment variables in your hosting platform
    - Ensure `DISCORD_TOKEN` and `DISCORD_CLIENT_ID` are set
 
 2. **Build the bot**:
+
    ```bash
    npx discraft build
    ```

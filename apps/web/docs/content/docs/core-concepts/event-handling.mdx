@@ -3,8 +3,6 @@ title: Event Handling
 description: Learn how to respond to Discord events in your Discraft bot.
 ---
 
-# Event Handling
-
 Discraft provides a streamlined system for handling Discord events, allowing your bot to respond to various activities like messages, reactions, member joins, and more.
 
 ## Overview
@@ -22,18 +20,18 @@ import { Message } from "discord.js";
 export default {
   // Event name (must match Discord.js event names)
   name: "messageCreate",
-  
+
   // Whether to run once or every time (usually false)
   once: false,
-  
+
   // Event handler function
   execute(message: Message) {
     // Skip messages from bots to prevent loops
     if (message.author.bot) return;
-    
+
     // Event handling logic
     console.log(`Received message: ${message.content}`);
-    
+
     // Respond to specific messages
     if (message.content.toLowerCase() === "hello") {
       message.reply("Hello there!");
@@ -62,6 +60,7 @@ Discraft automatically:
 4. Calls the appropriate handler when events occur
 
 This happens:
+
 - During development when you run `discraft dev`
 - During the build process when you run `discraft build`
 
@@ -96,10 +95,14 @@ export default {
   once: false,
   execute(message: Message) {
     if (message.author.bot) return;
-    
+
     // Log all messages
-    console.log(`[${message.guild?.name ?? "DM"}] ${message.author.tag}: ${message.content}`);
-    
+    console.log(
+      `[${message.guild?.name ?? "DM"}] ${message.author.tag}: ${
+        message.content
+      }`
+    );
+
     // Respond to specific content
     if (message.content.includes("hello")) {
       message.reply("Hello!");
@@ -123,9 +126,9 @@ export default {
     if (channel) {
       channel.send(`Welcome to the server, ${member}!`);
     }
-    
+
     // Add default role
-    const role = member.guild.roles.cache.find(r => r.name === "Member");
+    const role = member.guild.roles.cache.find((r) => r.name === "Member");
     if (role) {
       member.roles.add(role);
     }
@@ -146,21 +149,21 @@ export default {
     // Handle button interactions
     if (interaction.isButton()) {
       const { customId } = interaction;
-      
+
       if (customId === "primary_button") {
         interaction.reply("You clicked the primary button!");
       }
     }
-    
+
     // Handle select menu interactions
     if (interaction.isStringSelectMenu()) {
       const { customId, values } = interaction;
-      
+
       if (customId === "color_select") {
         interaction.reply(`You selected: ${values.join(", ")}`);
       }
     }
-    
+
     // Note: Command interactions are handled by Discraft's command system
   },
 };
@@ -196,17 +199,27 @@ export const voiceStateUpdate = {
   execute(oldState: VoiceState, newState: VoiceState) {
     // User joined a voice channel
     if (!oldState.channelId && newState.channelId) {
-      console.log(`${newState.member.user.tag} joined voice channel ${newState.channel.name}`);
+      console.log(
+        `${newState.member.user.tag} joined voice channel ${newState.channel.name}`
+      );
     }
-    
+
     // User left a voice channel
     if (oldState.channelId && !newState.channelId) {
-      console.log(`${oldState.member.user.tag} left voice channel ${oldState.channel.name}`);
+      console.log(
+        `${oldState.member.user.tag} left voice channel ${oldState.channel.name}`
+      );
     }
-    
+
     // User switched voice channels
-    if (oldState.channelId && newState.channelId && oldState.channelId !== newState.channelId) {
-      console.log(`${newState.member.user.tag} switched from ${oldState.channel.name} to ${newState.channel.name}`);
+    if (
+      oldState.channelId &&
+      newState.channelId &&
+      oldState.channelId !== newState.channelId
+    ) {
+      console.log(
+        `${newState.member.user.tag} switched from ${oldState.channel.name} to ${newState.channel.name}`
+      );
     }
   },
 };
@@ -248,11 +261,11 @@ export default {
   once: false,
   execute(message: Message) {
     if (message.author.bot) return;
-    
+
     // Handle legacy prefix commands
     if (isCommand(message, "!")) {
       const { command, args } = parseCommand(message, "!");
-      
+
       if (command === "ping") {
         message.reply("Pong!");
       }

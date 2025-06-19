@@ -3,8 +3,6 @@ title: Deployment
 description: Learn about the various ways to deploy your Discraft bot to production.
 ---
 
-# Deployment
-
 This section covers the different methods for deploying your Discraft bot to production environments. Discraft supports multiple deployment strategies to fit various use cases and hosting environments.
 
 ## Overview
@@ -21,11 +19,11 @@ Discraft supports three main deployment strategies:
 
 Each approach has its own advantages and trade-offs:
 
-| Deployment Type | Pros | Cons | Best For |
-|-----------------|------|------|----------|
-| Traditional | Full feature support, persistent connection | Requires server management | Feature-rich bots, event listeners |
-| Serverless | Low cost, auto-scaling, zero maintenance | Limited to interactions, no persistent connection | Simple command bots, AI integrations |
-| Executable | Easy distribution, no Node.js required | Larger file size, manual updates | Distribution to non-technical users |
+| Deployment Type | Pros                                        | Cons                                              | Best For                             |
+| --------------- | ------------------------------------------- | ------------------------------------------------- | ------------------------------------ |
+| Traditional     | Full feature support, persistent connection | Requires server management                        | Feature-rich bots, event listeners   |
+| Serverless      | Low cost, auto-scaling, zero maintenance    | Limited to interactions, no persistent connection | Simple command bots, AI integrations |
+| Executable      | Easy distribution, no Node.js required      | Larger file size, manual updates                  | Distribution to non-technical users  |
 
 ## Choosing a Deployment Strategy
 
@@ -34,6 +32,7 @@ Consider these factors when choosing a deployment strategy:
 ### Traditional Deployment
 
 Choose traditional deployment if your bot:
+
 - Needs to listen for events (messages, reactions, etc.)
 - Maintains state between interactions
 - Performs background tasks or scheduled operations
@@ -42,6 +41,7 @@ Choose traditional deployment if your bot:
 ### Serverless Deployment
 
 Choose serverless deployment if your bot:
+
 - Primarily responds to slash commands
 - Doesn't need to listen for events
 - Has minimal state requirements
@@ -50,6 +50,7 @@ Choose serverless deployment if your bot:
 ### Executable Deployment
 
 Choose executable deployment if your bot:
+
 - Needs to be distributed to users without technical knowledge
 - Runs in environments without Node.js
 - Benefits from simplified installation
@@ -92,13 +93,15 @@ const logger = {
   warn: (msg) => console.warn(`[WARN] ${msg}`),
   info: (msg) => console.info(`[INFO] ${msg}`),
   // Only log debug in development
-  debug: (msg) => process.env.NODE_ENV !== "production" && console.debug(`[DEBUG] ${msg}`)
+  debug: (msg) =>
+    process.env.NODE_ENV !== "production" && console.debug(`[DEBUG] ${msg}`),
 };
 ```
 
 ### Monitoring
 
 Consider setting up monitoring for your bot:
+
 - Health checks
 - Performance metrics
 - Error alerts
@@ -107,6 +110,7 @@ Consider setting up monitoring for your bot:
 ### Scaling
 
 Plan for scaling as your bot grows:
+
 - Database connections
 - API rate limits
 - Memory usage

@@ -3,13 +3,12 @@ title: Vercel AI Template
 description: Learn about the Vercel AI template for Discraft Discord bots.
 ---
 
-# Vercel AI Template
-
 The Vercel AI template provides a starting point for building Discord bots that integrate with Vercel's AI SDK. This template is designed for developers who want to leverage AI capabilities in their Discord applications, such as generating text, images, or interacting with large language models.
 
 ## Overview
 
 The Vercel AI template includes:
+
 - Integration with Vercel AI SDK
 - Example AI command
 - Basic command and event handling
@@ -54,6 +53,7 @@ discraft init
 ### Configuration
 
 1. Copy `.env.example` to `.env` and add your Discord bot token and any necessary AI API keys (e.g., `OPENAI_API_KEY`):
+
    ```
    DISCORD_TOKEN=your_bot_token_here
    OPENAI_API_KEY=your_openai_api_key_here
@@ -100,9 +100,9 @@ The `commands/ai.js` file demonstrates a basic integration with the Vercel AI SD
 
 ```javascript
 // commands/ai.js
-const { SlashCommandBuilder } = require('discord.js');
-const { OpenAIStream, StreamingTextResponse } = require('ai');
-const OpenAI = require('openai');
+const { SlashCommandBuilder } = require("discord.js");
+const { OpenAIStream, StreamingTextResponse } = require("ai");
+const OpenAI = require("openai");
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -110,35 +110,41 @@ const openai = new OpenAI({
 
 const command = {
   data: new SlashCommandBuilder()
-    .setName('ai')
-    .setDescription('Interact with a large language model.')
-    .addStringOption(option =>
-      option.setName('prompt')
-        .setDescription('The prompt for the AI.')
+    .setName("ai")
+    .setDescription("Interact with a large language model.")
+    .addStringOption((option) =>
+      option
+        .setName("prompt")
+        .setDescription("The prompt for the AI.")
         .setRequired(true)
     ),
   execute: async (interaction) => {
-    const prompt = interaction.options.getString('prompt');
+    const prompt = interaction.options.getString("prompt");
 
     try {
       const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo',
-        messages: [{ role: 'user', content: prompt }],
+        model: "gpt-3.5-turbo",
+        messages: [{ role: "user", content: prompt }],
         stream: true,
       });
 
       const stream = OpenAIStream(response);
       // In a real Discord bot, you would process the stream and send messages to Discord
       // For this example, we'll just log it or send a simplified response.
-      let aiResponse = '';
+      let aiResponse = "";
       for await (const chunk of stream) {
-        aiResponse += chunk.choices[0]?.delta?.content || '';
+        aiResponse += chunk.choices[0]?.delta?.content || "";
       }
-      await interaction.reply(`AI Response: ${aiResponse.substring(0, 1500)}${aiResponse.length > 1500 ? '...' : ''}`);
-
+      await interaction.reply(
+        `AI Response: ${aiResponse.substring(0, 1500)}${
+          aiResponse.length > 1500 ? "..." : ""
+        }`
+      );
     } catch (error) {
-      console.error('AI Error:', error);
-      await interaction.reply('There was an error while trying to get an AI response.');
+      console.error("AI Error:", error);
+      await interaction.reply(
+        "There was an error while trying to get an AI response."
+      );
     }
   },
 };
@@ -156,7 +162,7 @@ npm install openai ai
 
 This template is designed to be deployed on Vercel. Ensure you have `vercel.json` configured correctly for serverless functions if you plan to host your bot's AI interactions on Vercel.
 
-For more details on deploying to Vercel, refer to the [Vercel Deployment Guide](/docs/deployment/vercel). 
+For more details on deploying to Vercel, refer to the [Vercel Deployment Guide](/docs/deployment/vercel).
 
 ## Next Steps
 

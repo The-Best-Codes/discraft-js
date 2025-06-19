@@ -3,8 +3,6 @@ title: Event API
 description: Detailed reference for Discraft's Event API, including structures and methods for handling Discord events.
 ---
 
-# Event API
-
 Discraft's Event API provides a streamlined way to listen for and respond to various events emitted by the Discord API. Built on top of [Discord.js's event system](https://discord.js.org/#/docs/discord.js/main/class/Client?tab=events), Discraft automatically loads your event handlers, allowing your bot to react to everything from new messages and member joins to reactions and presence updates.
 
 ## Event Handler Structure
@@ -22,13 +20,13 @@ type IEvent = (client: Client) => void;
 
 ### Exported Function
 
--   **Type:** `(client: Client) => void`
--   **Description:** This function is called by Discraft when your bot starts up. It receives the initialized `Discord.js Client` instance, allowing you to register event listeners using `client.on()`.
--   **Required:** Yes, for each event file.
+- **Type:** `(client: Client) => void`
+- **Description:** This function is called by Discraft when your bot starts up. It receives the initialized `Discord.js Client` instance, allowing you to register event listeners using `client.on()`.
+- **Required:** Yes, for each event file.
 
 #### Parameters:
 
--   `client`: The `Discord.js Client` object. This is your main interface for interacting with the Discord API, accessing cached data (guilds, channels, users), and emitting events.
+- `client`: The `Discord.js Client` object. This is your main interface for interacting with the Discord API, accessing cached data (guilds, channels, users), and emitting events.
 
 #### Usage:
 
@@ -44,6 +42,7 @@ module.exports = (client) => {
   });
 };
 ```
+
 In this example, the exported function is called once during bot startup. Inside it, `client.on("ready", ...)` registers a listener that executes a callback function whenever the `ready` event is emitted by the Discord client.
 
 ## Key Discord.js Events
@@ -52,8 +51,8 @@ Here are some of the most common Discord.js events you might handle:
 
 ### `ready`
 
--   **Description:** Emitted when the client becomes ready to start working. This is a good place to log that your bot is online, set its presence, or perform initial setup tasks.
--   **Parameters:** None (the `client` object is available via closure from the exported function).
+- **Description:** Emitted when the client becomes ready to start working. This is a good place to log that your bot is online, set its presence, or perform initial setup tasks.
+- **Parameters:** None (the `client` object is available via closure from the exported function).
 
 ```javascript
 discraft-js/templates/javascript/events/ready.js#L1-9
@@ -70,9 +69,9 @@ module.exports = (client) => {
 
 ### `messageCreate`
 
--   **Description:** Emitted whenever a message is created. This is crucial for bots that respond to text commands (though slash commands are preferred) or monitor chat content.
--   **Parameters:** `(message: Message)` - The message object.
--   **Important:** Requires the `MessageContent` [Gateway Intent](https://discord.com/developers/docs/topics/gateway#message-content-intent) to access message content.
+- **Description:** Emitted whenever a message is created. This is crucial for bots that respond to text commands (though slash commands are preferred) or monitor chat content.
+- **Parameters:** `(message: Message)` - The message object.
+- **Important:** Requires the `MessageContent` [Gateway Intent](https://discord.com/developers/docs/topics/gateway#message-content-intent) to access message content.
 
 ```javascript
 discraft-js/templates/javascript/events/messageCreate.js#L1-17
@@ -98,8 +97,8 @@ module.exports = (client) => {
 
 ### `interactionCreate`
 
--   **Description:** Emitted when an interaction is created (e.g., slash command, button click, select menu use). Discraft handles slash commands automatically, but you'll use this for other interaction types.
--   **Parameters:** `(interaction: Interaction)` - The interaction object.
+- **Description:** Emitted when an interaction is created (e.g., slash command, button click, select menu use). Discraft handles slash commands automatically, but you'll use this for other interaction types.
+- **Parameters:** `(interaction: Interaction)` - The interaction object.
 
 ```javascript
 /dev/null/events/interactionCreate.js#L1-17
@@ -124,9 +123,9 @@ module.exports = (client) => {
 
 ### `guildMemberAdd`
 
--   **Description:** Emitted whenever a user joins a guild (server). Useful for welcome messages, assigning default roles.
--   **Parameters:** `(member: GuildMember)` - The member object.
--   **Important:** Requires the `GuildMembers` [Gateway Intent](https://discord.com/developers/docs/topics/gateway#guild-members-intent).
+- **Description:** Emitted whenever a user joins a guild (server). Useful for welcome messages, assigning default roles.
+- **Parameters:** `(member: GuildMember)` - The member object.
+- **Important:** Requires the `GuildMembers` [Gateway Intent](https://discord.com/developers/docs/topics/gateway#guild-members-intent).
 
 ```javascript
 /dev/null/events/guildMemberAdd.js#L1-10
@@ -188,7 +187,7 @@ module.exports = (client) => {
 
 ## Related Resources
 
--   [Discord.js Documentation - Events](https://discord.js.org/#/docs/discord.js/main/class/Client?tab=events): The official and comprehensive source for all Discord.js events.
--   [Discord Developer Portal - Gateway Intents](https://discord.com/developers/docs/topics/gateway#gateway-intents): Understand the different intents and their requirements.
--   [Core Concepts: Event Handling](/docs/core-concepts/event-handling): A more conceptual overview of how Discraft handles events.
--   [Advanced Topics: Custom Events](/docs/advanced-topics/custom-events): Guidance on implementing and using custom events.
+- [Discord.js Documentation - Events](https://discord.js.org/#/docs/discord.js/main/class/Client?tab=events): The official and comprehensive source for all Discord.js events.
+- [Discord Developer Portal - Gateway Intents](https://discord.com/developers/docs/topics/gateway#gateway-intents): Understand the different intents and their requirements.
+- [Core Concepts: Event Handling](/docs/core-concepts/event-handling): A more conceptual overview of how Discraft handles events.
+- [Advanced Topics: Custom Events](/docs/advanced-topics/custom-events): Guidance on implementing and using custom events.

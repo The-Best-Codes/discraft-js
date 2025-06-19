@@ -3,13 +3,12 @@ title: Traditional Deployment
 description: Learn how to deploy your Discraft bot on traditional hosting platforms like VPS or dedicated servers.
 ---
 
-# Traditional Deployment
-
 This guide covers deploying your Discraft bot on traditional hosting platforms like VPS (Virtual Private Servers), dedicated servers, or cloud instances.
 
 ## Overview
 
 Traditional deployment involves running your bot on a server that's online 24/7. This approach:
+
 - Provides full feature support for all Discord.js capabilities
 - Maintains a persistent connection to Discord
 - Allows for background tasks and scheduled operations
@@ -194,14 +193,14 @@ If your bot is in many servers (>2500), you'll need sharding:
 
 ```typescript
 // index.ts
-import { ShardingManager } from 'discord.js';
+import { ShardingManager } from "discord.js";
 
-const manager = new ShardingManager('./dist/index.js', {
+const manager = new ShardingManager("./dist/index.js", {
   token: process.env.DISCORD_TOKEN,
-  totalShards: 'auto',
+  totalShards: "auto",
 });
 
-manager.on('shardCreate', shard => {
+manager.on("shardCreate", (shard) => {
   console.log(`Launched shard ${shard.id}`);
 });
 
@@ -214,11 +213,12 @@ For persistent data storage:
 
 ```typescript
 // Example with MongoDB
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+mongoose
+  .connect(process.env.MONGODB_URI)
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 ```
 
 ### Caching Strategies
@@ -227,13 +227,10 @@ Optimize memory usage with custom caching:
 
 ```typescript
 // clients/discord.ts
-import { Client, GatewayIntentBits } from 'discord.js';
+import { Client, GatewayIntentBits } from "discord.js";
 
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-  ],
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
   // Optimize caching
   makeCache: Options.cacheWithLimits({
     MessageManager: {
@@ -258,12 +255,12 @@ Implement a simple HTTP server for health checks:
 
 ```typescript
 // health.ts
-import http from 'http';
+import http from "http";
 
 const server = http.createServer((req, res) => {
-  if (req.url === '/health') {
+  if (req.url === "/health") {
     res.writeHead(200);
-    res.end('OK');
+    res.end("OK");
   } else {
     res.writeHead(404);
     res.end();
@@ -271,7 +268,7 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(3000, () => {
-  console.log('Health check server running on port 3000');
+  console.log("Health check server running on port 3000");
 });
 ```
 
@@ -281,18 +278,18 @@ Set up proper logging:
 
 ```typescript
 // utils/logger.ts
-import winston from 'winston';
+import winston from "winston";
 
 export const logger = winston.createLogger({
-  level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+  level: process.env.NODE_ENV === "production" ? "info" : "debug",
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
   ),
   transports: [
     new winston.transports.Console(),
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'combined.log' }),
+    new winston.transports.File({ filename: "error.log", level: "error" }),
+    new winston.transports.File({ filename: "combined.log" }),
   ],
 });
 ```
@@ -321,6 +318,7 @@ mongodump --uri="$MONGODB_URI" --out="backup_$TIMESTAMP"
 ### Bot Disconnects Frequently
 
 Check for:
+
 - Network issues on your server
 - Memory leaks in your code
 - Discord API rate limits
@@ -328,8 +326,8 @@ Check for:
 Solution: Implement reconnection logic:
 
 ```typescript
-client.on('disconnect', (event) => {
-  console.error('Bot disconnected:', event);
+client.on("disconnect", (event) => {
+  console.error("Bot disconnected:", event);
   setTimeout(() => client.login(process.env.DISCORD_TOKEN), 5000);
 });
 ```
@@ -337,6 +335,7 @@ client.on('disconnect', (event) => {
 ### High Memory Usage
 
 Check for:
+
 - Memory leaks
 - Excessive caching
 - Large dependencies
@@ -346,7 +345,9 @@ Solution: Monitor and optimize memory usage:
 ```typescript
 setInterval(() => {
   const memoryUsage = process.memoryUsage();
-  console.log(`Memory usage: ${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB`);
+  console.log(
+    `Memory usage: ${Math.round(memoryUsage.heapUsed / 1024 / 1024)}MB`
+  );
 }, 60000);
 ```
 

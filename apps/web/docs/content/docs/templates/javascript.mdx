@@ -3,13 +3,12 @@ title: JavaScript Template
 description: Learn about the JavaScript template for Discraft Discord bots.
 ---
 
-# JavaScript Template
-
 The JavaScript template provides a straightforward foundation for building Discord bots with Discraft. This template is ideal for developers who prefer JavaScript or are new to Discord bot development.
 
 ## Overview
 
 The JavaScript template includes:
+
 - Simple command and event handling
 - Example commands and events
 - Logging utilities
@@ -55,6 +54,7 @@ discraft init
 ### Configuration
 
 1. Copy `.env.example` to `.env` and add your Discord bot token:
+
    ```
    DISCORD_TOKEN=your_bot_token_here
    ```
@@ -192,6 +192,7 @@ client.login(process.env.DISCORD_TOKEN);
 To add a new command:
 
 1. Create a new file in the `commands/` directory:
+
    ```javascript
    // commands/hello.js
    const command = {
@@ -201,7 +202,7 @@ To add a new command:
        await interaction.reply(`Hello, ${interaction.user.username}!`);
      },
    };
-   
+
    module.exports = command;
    ```
 
@@ -212,10 +213,11 @@ To add a new command:
 To add a new event handler:
 
 1. Create a new file in the `events/` directory:
+
    ```javascript
    // events/guildCreate.js
    const { logger } = require("../utils/logger");
-   
+
    module.exports = (client) => {
      client.on("guildCreate", (guild) => {
        logger.info(`Joined a new guild: ${guild.name}`);
@@ -237,8 +239,9 @@ const command = {
   data: new SlashCommandBuilder()
     .setName("greet")
     .setDescription("Greets someone")
-    .addUserOption(option => 
-      option.setName("user")
+    .addUserOption((option) =>
+      option
+        .setName("user")
         .setDescription("The user to greet")
         .setRequired(true)
     ),
@@ -263,29 +266,28 @@ const command = {
   data: new SlashCommandBuilder()
     .setName("profile")
     .setDescription("User profile commands")
-    .addSubcommand(subcommand =>
+    .addSubcommand((subcommand) =>
       subcommand
         .setName("view")
         .setDescription("View a user's profile")
-        .addUserOption(option => 
-          option.setName("user")
+        .addUserOption((option) =>
+          option
+            .setName("user")
             .setDescription("The user to view")
             .setRequired(true)
         )
     )
-    .addSubcommand(subcommand =>
+    .addSubcommand((subcommand) =>
       subcommand
         .setName("edit")
         .setDescription("Edit your profile")
-        .addStringOption(option =>
-          option.setName("bio")
-            .setDescription("Your new bio")
-            .setRequired(true)
+        .addStringOption((option) =>
+          option.setName("bio").setDescription("Your new bio").setRequired(true)
         )
     ),
   execute: async (interaction) => {
     const subcommand = interaction.options.getSubcommand();
-    
+
     if (subcommand === "view") {
       const user = interaction.options.getUser("user");
       await interaction.reply(`Viewing ${user.username}'s profile`);

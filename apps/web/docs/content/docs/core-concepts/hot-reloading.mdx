@@ -3,8 +3,6 @@ title: Hot Reloading
 description: Understanding Discraft's hot reloading system for efficient development.
 ---
 
-# Hot Reloading
-
 Discraft's hot reloading system allows you to see changes to your bot in real-time during development, significantly speeding up the development process.
 
 ## Overview
@@ -32,6 +30,7 @@ Discraft intelligently reloads different components of your bot:
 ### Commands
 
 When you modify a command file:
+
 - The command is recompiled
 - The command definition is updated in Discord's API (if the structure changed)
 - The command handler is updated in memory
@@ -41,6 +40,7 @@ Example: If you change the response message in your `ping.ts` command, the next 
 ### Events
 
 When you modify an event handler:
+
 - The event handler is recompiled
 - The old handler is removed
 - The new handler is registered
@@ -50,6 +50,7 @@ Example: If you update your `messageCreate.ts` event to respond to different key
 ### Utility Files
 
 When you modify utility files or other modules:
+
 - The files are recompiled
 - Any modules that import them will use the updated code
 
@@ -62,6 +63,7 @@ Hot reloading is specifically designed for development and includes several feat
 ### Enhanced Logging
 
 Development mode provides more detailed logs, including:
+
 - Command registration status
 - Event handler registration
 - File change detection
@@ -70,6 +72,7 @@ Development mode provides more detailed logs, including:
 ### Error Handling
 
 When errors occur during development:
+
 - Detailed error messages are displayed in the console
 - The bot continues running when possible
 - Stack traces show the exact location of errors
@@ -77,6 +80,7 @@ When errors occur during development:
 ### Command Registration Optimization
 
 During development:
+
 - Commands are registered to a specific guild (server) for instant updates
 - This bypasses Discord's global command registration delay (which can be up to an hour)
 - You can set the development guild with the `DISCORD_GUILD_ID` environment variable
@@ -141,6 +145,7 @@ In these cases, you'll need to stop and restart the development server.
 ### Commands Not Updating
 
 If your command changes aren't appearing:
+
 - Ensure you've set `DISCORD_GUILD_ID` for development
 - Check the console for registration errors
 - Try restarting development mode
@@ -148,6 +153,7 @@ If your command changes aren't appearing:
 ### Hot Reload Errors
 
 If you see errors during hot reloading:
+
 - Check for syntax errors in your code
 - Ensure your file structure follows Discraft conventions
 - Check for circular dependencies
@@ -155,6 +161,7 @@ If you see errors during hot reloading:
 ### Slow Reloads
 
 If reloads are taking too long:
+
 - Check for large dependencies in your changed files
 - Consider splitting large files into smaller modules
 - Ensure you're not performing heavy operations on import

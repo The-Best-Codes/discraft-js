@@ -3,8 +3,6 @@ title: Quick Start Guide
 description: A step-by-step guide to creating your first Discord bot with Discraft.
 ---
 
-# Quick Start Guide
-
 This guide will walk you through creating, configuring, and running your first Discord bot with Discraft.
 
 ## Step 1: Create a New Project
@@ -18,11 +16,13 @@ npx discraft init
 Follow the interactive prompts:
 
 1. **Select a template**:
+
    - `TypeScript` (recommended)
    - `JavaScript`
    - `Vercel + TypeScript + Google AI` (for serverless deployments with AI capabilities)
 
 2. **Choose a project location**:
+
    - Current directory
    - Custom directory (you'll be prompted for a name)
 
@@ -57,6 +57,7 @@ npx discraft dev
 ```
 
 This will:
+
 - Build your bot
 - Start it in development mode
 - Watch for file changes and automatically restart when you make updates
@@ -68,8 +69,12 @@ Let's create a simple "hello" command:
 1. Create a new file in the `commands` directory:
 
    **TypeScript** (`commands/hello.ts`):
+
    ```typescript
-   import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+   import {
+     ChatInputCommandInteraction,
+     SlashCommandBuilder,
+   } from "discord.js";
 
    export default {
      data: new SlashCommandBuilder()
@@ -85,6 +90,7 @@ Let's create a simple "hello" command:
    ```
 
    **JavaScript** (`commands/hello.js`):
+
    ```javascript
    import { SlashCommandBuilder } from "discord.js";
 
@@ -105,6 +111,7 @@ Let's create a simple "hello" command:
 ## Step 5: Test Your Bot
 
 1. **Invite your bot to a server**:
+
    - Go to the [Discord Developer Portal](https://discord.com/developers/applications)
    - Select your application
    - Go to OAuth2 > URL Generator
