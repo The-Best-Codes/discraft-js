@@ -1,0 +1,194 @@
+---
+title: Event API
+description: Detailed reference for Discraft's Event API, including structures and methods for handling Discord events.
+---
+
+# Event API
+
+Discraft's Event API provides a streamlined way to listen for and respond to various events emitted by the Discord API. Built on top of [Discord.js's event system](https://discord.js.org/#/docs/discord.js/main/class/Client?tab=events), Discraft automatically loads your event handlers, allowing your bot to react to everything from new messages and member joins to reactions and presence updates.
+
+## Event Handler Structure
+
+In Discraft, each event handler is typically defined in its own file (e.g., `ready.js`, `messageCreate.js`) within the `events/` directory of your project. Each event file is expected to export a function that takes the `Discord.js Client` instance as its sole argument. Inside this function, you attach listeners to specific Discord.js events using the `client.on()` method.
+
+## `IEvent` Function (Conceptual)
+
+Conceptually, an event handler in Discraft conforms to the following structure:
+
+```typescript
+// Conceptual IEvent function
+type IEvent = (client: Client) => void;
+```
+
+### Exported Function
+
+-   **Type:** `(client: Client) => void`
+-   **Description:** This function is called by Discraft when your bot starts up. It receives the initialized `Discord.js Client` instance, allowing you to register event listeners using `client.on()`.
+-   **Required:** Yes, for each event file.
+
+#### Parameters:
+
+-   `client`: The `Discord.js Client` object. This is your main interface for interacting with the Discord API, accessing cached data (guilds, channels, users), and emitting events.
+
+#### Usage:
+
+```javascript
+// events/ready.js
+const { logger } = require("../utils/logger");
+
+module.exports = (client) => {
+  client.on("ready", () => {
+    if (client.user) {
+      logger.info(`Logged in as ${client.user.tag}!`);
+    }
+  });
+};
+```
+In this example, the exported function is called once during bot startup. Inside it, `client.on("ready", ...)` registers a listener that executes a callback function whenever the `ready` event is emitted by the Discord client.
+
+## Key Discord.js Events
+
+Here are some of the most common Discord.js events you might handle:
+
+### `ready`
+
+-   **Description:** Emitted when the client becomes ready to start working. This is a good place to log that your bot is online, set its presence, or perform initial setup tasks.
+-   **Parameters:** None (the `client` object is available via closure from the exported function).
+
+```javascript
+discraft-js/templates/javascript/events/ready.js#L1-9
+const { logger } = require("../utils/logger");
+
+module.exports = (client) => {
+  client.on("ready", () => {
+    if (client.user) {
+      logger.info(`Logged in as ${client.user.tag}!`);
+    }
+  });
+};
+```
+
+### `messageCreate`
+
+-   **Description:** Emitted whenever a message is created. This is crucial for bots that respond to text commands (though slash commands are preferred) or monitor chat content.
+-   **Parameters:** `(message: Message)` - The message object.
+-   **Important:** Requires the `MessageContent` [Gateway Intent](https://discord.com/developers/docs/topics/gateway#message-content-intent) to access message content.
+
+```javascript
+discraft-js/templates/javascript/events/messageCreate.js#L1-17
+module.exports = (client) => {
+  client.on("messageCreate", async (message) => {
+    // Ignore messages from bots to prevent infinite loops
+    if (message.author.bot) return;
+
+    // Example: Respond to a specific keyword
+    if (message.content.toLowerCase().includes("hello discraft")) {
+      await message.reply("Hello there! How can I help you?");
+    }
+
+    // Example: Simple prefix command (though slash commands are preferred)
+    const prefix = '!';
+    if (message.content.startsWith(prefix + 'echo')) {
+      const args = message.content.slice(prefix.length + 'echo'.length).trim();
+      await message.channel.send(args);
+    }
+  });
+};
+```
+
+### `interactionCreate`
+
+-   **Description:** Emitted when an interaction is created (e.g., slash command, button click, select menu use). Discraft handles slash commands automatically, but you'll use this for other interaction types.
+-   **Parameters:** `(interaction: Interaction)` - The interaction object.
+
+```javascript
+/dev/null/events/interactionCreate.js#L1-17
+module.exports = (client) => {
+  client.on("interactionCreate", async (interaction) => {
+    if (interaction.isButton()) {
+      // Handle button interactions
+      if (interaction.customId === 'primary_button') {
+        await interaction.reply({ content: 'You clicked the primary button!', ephemeral: true });
+      }
+    } else if (interaction.isSelectMenu()) {
+      // Handle select menu interactions
+      if (interaction.customId === 'select_menu') {
+        const selectedValue = interaction.values[0];
+        await interaction.reply({ content: `You selected: ${selectedValue}`, ephemeral: true });
+      }
+    }
+    // Discraft's command loader handles interaction.isCommand() separately
+  });
+};
+```
+
+### `guildMemberAdd`
+
+-   **Description:** Emitted whenever a user joins a guild (server). Useful for welcome messages, assigning default roles.
+-   **Parameters:** `(member: GuildMember)` - The member object.
+-   **Important:** Requires the `GuildMembers` [Gateway Intent](https://discord.com/developers/docs/topics/gateway#guild-members-intent).
+
+```javascript
+/dev/null/events/guildMemberAdd.js#L1-10
+const { EmbedBuilder } = require("discord.js");
+
+module.exports = (client) => {
+  client.on("guildMemberAdd", async (member) => {
+    const welcomeChannel = member.guild.channels.cache.find(ch => ch.name === 'welcome');
+    if (!welcomeChannel) return;
+
+    const welcomeEmbed = new EmbedBuilder()
+      .setTitle(`Welcome ${member.user.tag} to ${member.guild.name}!`)
+      .setDescription(`We're glad to have you here, ${member}!`);
+    await welcomeChannel.send({ embeds: [welcomeEmbed] });
+  });
+};
+```
+
+## Event Loading and Execution
+
+Discraft automatically scans the `events/` directory (or the configured events path) at startup. For each JavaScript/TypeScript file found, it `require`s (or `import`s) the exported function and immediately calls it with the `Discord.js Client` instance. This design ensures that all your event listeners are registered as soon as the bot application starts.
+
+## Error Handling in Events
+
+Errors within event handlers can cause your bot to crash or miss subsequent events. It's crucial to implement robust `try-catch` blocks within your event listener callbacks to handle potential issues gracefully.
+
+```javascript
+/dev/null/events/riskyEvent.js#L1-16
+module.exports = (client) => {
+  client.on("messageCreate", async (message) => {
+    try {
+      if (message.author.bot) return;
+
+      // Simulate an operation that might fail
+      if (message.content.toLowerCase() === "trigger error") {
+        throw new Error("Simulated error in event handler!");
+      }
+
+      // Normal event processing
+      await message.channel.send("Message processed successfully.");
+
+    } catch (error) {
+      console.error("Error processing messageCreate event:", error);
+      // Optionally, send an ephemeral message to the user or log to a dedicated error channel
+      // await message.channel.send({ content: "An internal error occurred.", ephemeral: true });
+    }
+  });
+};
+```
+
+## Best Practices for Event Handling
+
+1.  **Modularization:** Keep each event handler in its own file (e.g., `ready.js`, `messageCreate.js`) for better organization and maintainability.
+2.  **Required Gateway Intents:** Always verify which [Gateway Intents](https://discord.com/developers/docs/topics/gateway#gateway-intents) are required for the events you want to listen to. Enable them in both the Discord Developer Portal and your `Discord.js Client` initialization. Without correct intents, your bot will not receive the relevant events.
+3.  **Partial Structures:** Be aware of [Partial Structures](https://discord.js.org/#/docs/discord.js/main/class/PartialGuildMember) in Discord.js. For certain events (like `messageReactionAdd` or if a guild member is not cached), you might receive an incomplete object. You may need to `await item.fetch()` to get the full data.
+4.  **Error Logging:** Use a consistent logging strategy (`console.error`, a dedicated logger) to capture and review errors in your event handlers.
+5.  **Asynchronous Operations:** Most Discord.js API calls are asynchronous (`async`/`await`). Ensure your event handler callbacks are `async` if they perform such operations.
+6.  **Bot User Check:** Always check `if (message.author.bot)` at the start of `messageCreate` handlers to prevent your bot from reacting to its own messages or other bots, which can lead to infinite loops.
+
+## Related Resources
+
+-   [Discord.js Documentation - Events](https://discord.js.org/#/docs/discord.js/main/class/Client?tab=events): The official and comprehensive source for all Discord.js events.
+-   [Discord Developer Portal - Gateway Intents](https://discord.com/developers/docs/topics/gateway#gateway-intents): Understand the different intents and their requirements.
+-   [Core Concepts: Event Handling](/docs/core-concepts/event-handling): A more conceptual overview of how Discraft handles events.
+-   [Advanced Topics: Custom Events](/docs/advanced-topics/custom-events): Guidance on implementing and using custom events.

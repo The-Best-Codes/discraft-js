@@ -1,0 +1,209 @@
+---
+title: start Command
+description: Learn how to use the 'discraft start' command to run your bot in production mode.
+---
+
+# start Command
+
+The `discraft start` command runs your Discord bot in production mode, using the optimized build created by the `build` command.
+
+## Overview
+
+The `start` command is designed for running your bot in production environments. It:
+- Loads the compiled code from the build directory
+- Sets the environment to production
+- Optimizes for stability and performance
+- Handles errors appropriately for production
+
+## Basic Usage
+
+```bash
+npx discraft start
+```
+
+This starts your bot in production mode.
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--dir`, `-d` | Specify the directory containing the built code |
+| `--log-level`, `-l` | Set the logging level (error, warn, info, verbose, debug) |
+| `--help`, `-h` | Display help information |
+
+## Environment Variables
+
+The `start` command uses these environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DISCORD_TOKEN` | Your Discord bot token | Required |
+| `DISCORD_CLIENT_ID` | Your Discord application client ID | Required |
+| `NODE_ENV` | Node environment | Set to `"production"` |
+
+## Production Mode
+
+When running in production mode:
+
+1. **Performance Optimizations**: The bot runs with optimized settings for performance
+2. **Error Handling**: Errors are handled gracefully to prevent crashes
+3. **Logging**: Logging is configured for production (less verbose)
+4. **Command Registration**: Commands are registered globally (to all servers)
+
+## Prerequisites
+
+Before running `discraft start`, you must build your bot:
+
+```bash
+npx discraft build
+```
+
+This creates the optimized code that the `start` command will run.
+
+## Examples
+
+### Basic Start
+
+```bash
+npx discraft start
+```
+
+### Specify Build Directory
+
+```bash
+npx discraft start --dir ./build
+```
+
+### Set Logging Level
+
+```bash
+npx discraft start --log-level warn
+```
+
+## Running in Production Environments
+
+For production deployments, you should:
+
+1. **Set up environment variables**:
+   - Use a `.env.production` file or environment variables in your hosting platform
+   - Ensure `DISCORD_TOKEN` and `DISCORD_CLIENT_ID` are set
+
+2. **Build the bot**:
+   ```bash
+   npx discraft build
+   ```
+
+3. **Start the bot**:
+   ```bash
+   npx discraft start
+   ```
+
+## Process Management
+
+In production, you should use a process manager to keep your bot running and handle restarts:
+
+### Using PM2
+
+```bash
+# Install PM2
+npm install -g pm2
+
+# Start your bot with PM2
+pm2 start "npx discraft start" --name "discord-bot"
+
+# Set up auto-restart
+pm2 startup
+pm2 save
+```
+
+### Using Docker
+
+```dockerfile
+FROM node:18-alpine
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+RUN npx discraft build
+
+CMD ["npx", "discraft", "start"]
+```
+
+## Logging in Production
+
+Production logging is less verbose by default. You can control the log level:
+
+```bash
+# Minimal logging (errors only)
+npx discraft start --log-level error
+
+# Standard logging (errors and warnings)
+npx discraft start --log-level warn
+
+# Informational logging
+npx discraft start --log-level info
+```
+
+## Error Handling
+
+In production mode, errors are handled to prevent the bot from crashing:
+
+- Unhandled exceptions are caught and logged
+- Command errors are isolated to prevent affecting other commands
+- Connection issues trigger automatic reconnection attempts
+
+## Monitoring
+
+For production deployments, consider setting up monitoring:
+
+1. **Health checks**: Implement a simple HTTP server for health checks
+2. **Metrics**: Track command usage, errors, and performance
+3. **Alerts**: Set up notifications for critical errors
+
+## Troubleshooting
+
+### Bot Not Starting
+
+If your bot doesn't start:
+
+```bash
+# Check if the build exists
+ls -la dist/
+
+# Try rebuilding
+npx discraft build
+
+# Start with verbose logging
+NODE_DEBUG=* npx discraft start
+```
+
+### Command Registration Issues
+
+If commands aren't registering:
+
+```bash
+# Verify your client ID is correct
+echo $DISCORD_CLIENT_ID
+
+# Rebuild and restart
+npx discraft build
+npx discraft start
+```
+
+### Memory Issues
+
+If your bot is using too much memory:
+
+```bash
+# Limit Node.js memory usage
+NODE_OPTIONS="--max-old-space-size=512" npx discraft start
+```
+
+## Next Steps
+
+- [Deployment](/docs/deployment/index): Learn about different deployment options
+- [vercel-build Command](/docs/cli/vercel-build): Build for Vercel deployment
+- [exec-build Command](/docs/cli/exec-build): Build as a standalone executable

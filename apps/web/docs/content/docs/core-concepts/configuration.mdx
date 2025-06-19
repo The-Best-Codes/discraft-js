@@ -1,0 +1,213 @@
+---
+title: Configuration
+description: Learn how to configure your Discraft bot using environment variables and configuration files.
+---
+
+# Configuration
+
+Discraft uses a combination of environment variables and optional configuration files to manage your bot's settings. This guide explains the various configuration options and best practices.
+
+## Overview
+
+Proper configuration is essential for your Discord bot to function correctly. Discraft provides a flexible configuration system that balances security, ease of use, and customization.
+
+## Environment Variables
+
+Environment variables are the primary way to configure your Discraft bot. They're used for sensitive information like API tokens and for environment-specific settings.
+
+### Core Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DISCORD_TOKEN` | Your Discord bot token | Yes |
+| `DISCORD_CLIENT_ID` | Your Discord application client ID | Yes |
+| `DISCORD_GUILD_ID` | Development server ID for testing (dev mode only) | No |
+
+### Setting Up Environment Variables
+
+1. Create a `.env` file in your project root:
+
+```
+DISCORD_TOKEN=your_bot_token_here
+DISCORD_CLIENT_ID=your_application_client_id
+DISCORD_GUILD_ID=your_development_server_id
+```
+
+2. Discraft automatically loads these variables when your bot starts.
+
+### Environment-Specific Variables
+
+You can create environment-specific `.env` files:
+
+- `.env.development` - Used only in development mode
+- `.env.production` - Used only in production mode
+
+These files override the values in the base `.env` file when running in the respective environment.
+
+## Configuration Files
+
+For more complex configuration, you can create a `discraft.config.js` or `discraft.config.ts` file in your project root.
+
+### Example Configuration File
+
+```typescript
+// discraft.config.ts
+export default {
+  // Bot configuration
+  bot: {
+    // Custom presence status
+    presence: {
+      status: "online", // online, idle, dnd, invisible
+      activities: [
+        {
+          name: "with Discraft",
+          type: "PLAYING" // PLAYING, STREAMING, LISTENING, WATCHING, COMPETING
+        }
+      ]
+    },
+    
+    // Intents configuration
+    intents: [
+      "Guilds",
+      "GuildMessages",
+      "MessageContent"
+      // Add other intents as needed
+    ],
+    
+    // Command registration options
+    commands: {
+      // Whether to register commands globally or to specific guilds
+      global: process.env.NODE_ENV === "production",
+      
+      // Guild IDs to register commands to in development
+      guilds: process.env.DISCORD_GUILD_ID ? [process.env.DISCORD_GUILD_ID] : [],
+      
+      // Command directory (relative to project root)
+      directory: "./commands"
+    },
+    
+    // Event handler options
+    events: {
+      // Event handler directory (relative to project root)
+      directory: "./events"
+    }
+  },
+  
+  // Development options
+  development: {
+    // Whether to enable verbose logging
+    verbose: true,
+    
+    // Files to watch for changes (glob patterns)
+    watch: ["commands/**/*", "events/**/*", "utils/**/*"]
+  },
+  
+  // Build options
+  build: {
+    // Output directory for builds
+    outDir: "./dist",
+    
+    // Whether to include source maps
+    sourceMaps: false,
+    
+    // Files to include in the build (glob patterns)
+    include: ["**/*.ts", "**/*.js"],
+    
+    // Files to exclude from the build (glob patterns)
+    exclude: ["**/*.test.ts", "**/*.spec.ts"]
+  }
+};
+```
+
+### Configuration Options
+
+The configuration file supports a wide range of options:
+
+#### Bot Options
+
+- **presence**: Configure your bot's status and activity
+- **intents**: Specify which Discord gateway intents to use
+- **commands**: Configure command registration behavior
+- **events**: Configure event handler behavior
+
+#### Development Options
+
+- **verbose**: Enable detailed logging during development
+- **watch**: Specify which files to watch for changes
+- **port**: Set a custom port for the development server
+
+#### Build Options
+
+- **outDir**: Specify the output directory for builds
+- **sourceMaps**: Enable or disable source maps
+- **include**: Specify files to include in the build
+- **exclude**: Specify files to exclude from the build
+
+## Configuration Precedence
+
+Discraft resolves configuration in the following order (later sources override earlier ones):
+
+1. Default values built into Discraft
+2. Configuration file (`discraft.config.js` or `discraft.config.ts`)
+3. Base environment variables (`.env`)
+4. Environment-specific variables (`.env.development` or `.env.production`)
+5. Command-line arguments
+
+This allows for flexible configuration while maintaining sensible defaults.
+
+## Accessing Configuration in Your Code
+
+You can access environment variables in your code using `process.env`:
+
+```typescript
+// Access your Discord token
+const token = process.env.DISCORD_TOKEN;
+
+// Check the current environment
+const isProduction = process.env.NODE_ENV === "production";
+```
+
+For configuration from your `discraft.config.js` file, you can import it directly:
+
+```typescript
+import config from "../discraft.config";
+
+// Access configuration values
+const activityName = config.bot.presence.activities[0].name;
+```
+
+## Environment-Specific Code
+
+You can conditionally run code based on the environment:
+
+```typescript
+if (process.env.NODE_ENV === "development") {
+  // Development-only code
+  console.log("Running in development mode");
+} else {
+  // Production-only code
+  console.log("Running in production mode");
+}
+```
+
+## Sensitive Information
+
+Always keep sensitive information like tokens in environment variables, not in your code:
+
+- **DO**: Store tokens in `.env` files and add `.env` to your `.gitignore`
+- **DON'T**: Hardcode tokens in your source code or commit them to version control
+
+## Configuration Best Practices
+
+1. **Use environment variables for secrets**: Keep tokens and sensitive data in `.env` files
+2. **Add `.env` to `.gitignore`**: Prevent accidentally committing secrets
+3. **Provide a `.env.example`**: Include a template with dummy values for other developers
+4. **Validate configuration**: Check that required variables exist before using them
+5. **Use sensible defaults**: Provide fallbacks when possible
+6. **Document your configuration**: Comment your `discraft.config.js` file
+
+## Next Steps
+
+- [CLI Reference](/docs/cli/index): Learn about Discraft's command-line interface
+- [Deployment](/docs/deployment/index): Learn how to deploy your bot to production
+- [Advanced Configuration](/docs/advanced/index): Explore advanced configuration options

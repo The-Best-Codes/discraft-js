@@ -1,0 +1,326 @@
+---
+title: JavaScript Template
+description: Learn about the JavaScript template for Discraft Discord bots.
+---
+
+# JavaScript Template
+
+The JavaScript template provides a straightforward foundation for building Discord bots with Discraft. This template is ideal for developers who prefer JavaScript or are new to Discord bot development.
+
+## Overview
+
+The JavaScript template includes:
+- Simple command and event handling
+- Example commands and events
+- Logging utilities
+- Hot reloading for development
+- No compilation step required
+
+## Template Structure
+
+```
+my-discraft-project/
+├── commands/
+│   ├── longcommand.js    # Example of a command with subcommands
+│   ├── messageinfo.js    # Command to display message information
+│   ├── ping.js           # Simple ping command
+│   └── userinfo.js       # Command to display user information
+├── events/
+│   ├── error.js          # Error handling
+│   ├── messageCreate.js  # Message event handling
+│   └── ready.js          # Bot ready event
+├── clients/
+│   └── discord.js        # Discord client configuration
+├── utils/
+│   └── logger.js         # Logging utility
+├── .env.example          # Example environment variables
+├── .gitignore            # Git ignore configuration
+├── index.js              # Main entry point
+└── package.json          # Project dependencies and scripts
+```
+
+## Getting Started
+
+### Creating a New Project
+
+```bash
+# Initialize a new project with the JavaScript template
+discraft init --template js
+
+# Or select it from the interactive prompt
+discraft init
+# Then select "JavaScript" when prompted
+```
+
+### Configuration
+
+1. Copy `.env.example` to `.env` and add your Discord bot token:
+   ```
+   DISCORD_TOKEN=your_bot_token_here
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn
+   # or
+   pnpm install
+   ```
+
+### Development
+
+Start the development server with hot reloading:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+```
+
+This will start your bot and automatically restart when files are modified.
+
+### Running in Production
+
+Start your bot in production mode:
+
+```bash
+npm start
+# or
+yarn start
+# or
+pnpm start
+```
+
+## Key Components
+
+### Commands
+
+Commands are defined in the `commands/` directory. Each command is a separate file that exports a command definition:
+
+```javascript
+// commands/ping.js
+const command = {
+  name: "ping",
+  description: "Replies with Pong!",
+  execute: async (interaction) => {
+    await interaction.reply("Pong!");
+  },
+};
+
+module.exports = command;
+```
+
+### Events
+
+Events are defined in the `events/` directory. Each event handler is a separate file:
+
+```javascript
+// events/ready.js
+const { logger } = require("../utils/logger");
+
+module.exports = (client) => {
+  client.on("ready", () => {
+    if (client.user) {
+      logger.info(`Logged in as ${client.user.tag}!`);
+    }
+  });
+};
+```
+
+### Discord Client
+
+The Discord client is configured in `clients/discord.js`:
+
+```javascript
+// clients/discord.js
+const { Client, GatewayIntentBits } = require("discord.js");
+
+// Create a new client instance
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
+
+module.exports = client;
+```
+
+### Entry Point
+
+The main entry point (`index.js`) loads commands and events:
+
+```javascript
+// index.js
+const { Collection } = require("discord.js");
+const fs = require("fs");
+const path = require("path");
+const client = require("./clients/discord");
+const { logger } = require("./utils/logger");
+
+// Load commands
+client.commands = new Collection();
+const commandFiles = fs
+  .readdirSync(path.join(__dirname, "commands"))
+  .filter((file) => file.endsWith(".js"));
+
+for (const file of commandFiles) {
+  const command = require(`./commands/${file}`);
+  client.commands.set(command.name, command);
+}
+
+// Load events
+const eventFiles = fs
+  .readdirSync(path.join(__dirname, "events"))
+  .filter((file) => file.endsWith(".js"));
+
+for (const file of eventFiles) {
+  const event = require(`./events/${file}`);
+  event(client);
+}
+
+// Login to Discord
+client.login(process.env.DISCORD_TOKEN);
+```
+
+## Adding Custom Commands
+
+To add a new command:
+
+1. Create a new file in the `commands/` directory:
+   ```javascript
+   // commands/hello.js
+   const command = {
+     name: "hello",
+     description: "Greets the user",
+     execute: async (interaction) => {
+       await interaction.reply(`Hello, ${interaction.user.username}!`);
+     },
+   };
+   
+   module.exports = command;
+   ```
+
+2. The command will be automatically loaded when you restart the bot
+
+## Adding Custom Events
+
+To add a new event handler:
+
+1. Create a new file in the `events/` directory:
+   ```javascript
+   // events/guildCreate.js
+   const { logger } = require("../utils/logger");
+   
+   module.exports = (client) => {
+     client.on("guildCreate", (guild) => {
+       logger.info(`Joined a new guild: ${guild.name}`);
+     });
+   };
+   ```
+
+2. The event handler will be automatically loaded when you restart the bot
+
+## Command Options and Arguments
+
+For commands with options:
+
+```javascript
+// commands/greet.js
+const { SlashCommandBuilder } = require("discord.js");
+
+const command = {
+  data: new SlashCommandBuilder()
+    .setName("greet")
+    .setDescription("Greets someone")
+    .addUserOption(option => 
+      option.setName("user")
+        .setDescription("The user to greet")
+        .setRequired(true)
+    ),
+  execute: async (interaction) => {
+    const user = interaction.options.getUser("user");
+    await interaction.reply(`Hello, ${user.username}!`);
+  },
+};
+
+module.exports = command;
+```
+
+## Subcommands
+
+For commands with subcommands:
+
+```javascript
+// commands/profile.js
+const { SlashCommandBuilder } = require("discord.js");
+
+const command = {
+  data: new SlashCommandBuilder()
+    .setName("profile")
+    .setDescription("User profile commands")
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName("view")
+        .setDescription("View a user's profile")
+        .addUserOption(option => 
+          option.setName("user")
+            .setDescription("The user to view")
+            .setRequired(true)
+        )
+    )
+    .addSubcommand(subcommand =>
+      subcommand
+        .setName("edit")
+        .setDescription("Edit your profile")
+        .addStringOption(option =>
+          option.setName("bio")
+            .setDescription("Your new bio")
+            .setRequired(true)
+        )
+    ),
+  execute: async (interaction) => {
+    const subcommand = interaction.options.getSubcommand();
+    
+    if (subcommand === "view") {
+      const user = interaction.options.getUser("user");
+      await interaction.reply(`Viewing ${user.username}'s profile`);
+    } else if (subcommand === "edit") {
+      const bio = interaction.options.getString("bio");
+      await interaction.reply(`Updated your bio to: ${bio}`);
+    }
+  },
+};
+
+module.exports = command;
+```
+
+## Logging
+
+The template includes a simple logging utility:
+
+```javascript
+// utils/logger.js
+const logger = {
+  info: (message) => console.log(`[INFO] ${message}`),
+  warn: (message) => console.warn(`[WARN] ${message}`),
+  error: (message) => console.error(`[ERROR] ${message}`),
+  debug: (message) => {
+    if (process.env.NODE_ENV !== "production") {
+      console.debug(`[DEBUG] ${message}`);
+    }
+  },
+};
+
+module.exports = { logger };
+```
+
+## Next Steps
+
+- [Core Concepts: Command System](/docs/core-concepts/command-system): Learn more about the command system
+- [Core Concepts: Event Handling](/docs/core-concepts/event-handling): Learn more about event handling
+- [Deployment: Traditional](/docs/deployment/traditional): Deploy your JavaScript bot to a server

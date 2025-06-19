@@ -1,0 +1,253 @@
+---
+title: Standalone Executable
+description: Learn how to package your Discraft bot as a standalone executable for easy distribution and deployment.
+---
+
+# Standalone Executable
+
+This guide covers packaging your Discraft bot as a standalone executable, allowing for easy distribution and deployment without requiring Node.js or other dependencies.
+
+## Overview
+
+Creating a standalone executable of your bot offers several advantages:
+- Distribution to users without technical knowledge
+- No need to install Node.js or npm on the target system
+- Simplified installation and setup process
+- Protection of your source code
+- Consistent runtime environment
+
+## Prerequisites
+
+Before creating an executable, you'll need:
+
+1. A working Discraft bot project
+2. Your bot built for production (`discraft build`)
+3. Discraft CLI installed (`npm install -g @discraft/cli`)
+
+## Building an Executable
+
+Discraft provides a specialized command for creating executables:
+
+```bash
+discraft exec build --target <target-platform>
+```
+
+### Supported Platforms
+
+The `--target` parameter specifies which platform to build for:
+
+| Target | Description |
+|--------|-------------|
+| `linux-x64` | 64-bit Linux (most common Linux distributions) |
+| `linux-arm64` | ARM64 Linux (Raspberry Pi 4, AWS Graviton, etc.) |
+| `windows-x64` | 64-bit Windows |
+| `darwin-x64` | 64-bit macOS (Intel) |
+| `darwin-arm64` | ARM64 macOS (Apple Silicon M1/M2/M3) |
+
+### Example
+
+```bash
+# Build for 64-bit Windows
+discraft exec build --target windows-x64
+
+# Build for Apple Silicon Mac
+discraft exec build --target darwin-arm64
+```
+
+### Additional Options
+
+The `exec build` command supports additional options:
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--entry <path>` | Custom entry point | `dist/index.js` |
+| `--outfile <path>` | Output file name | `dist/discraft-bot` |
+
+Example with custom options:
+```bash
+discraft exec build --target linux-x64 --entry src/main.js --outfile my-bot
+```
+
+## How It Works
+
+The executable build process:
+
+1. Bundles your code and all dependencies into a single JavaScript file
+2. Packages this file with a Node.js runtime
+3. Creates a platform-specific executable that runs your bot
+
+The resulting executable is completely self-contained and doesn't require Node.js to be installed on the target system.
+
+## Best Practices
+
+### Environment Variables
+
+For production deployments, sensitive information should be loaded from environment variables rather than being hardcoded:
+
+```typescript
+// Load token from environment variable
+const token = process.env.DISCORD_TOKEN;
+if (!token) {
+  console.error('DISCORD_TOKEN environment variable is required');
+  process.exit(1);
+}
+```
+
+You can create a wrapper script or documentation to explain how to set these variables.
+
+### File System Access
+
+Remember that executables have different working directories than development environments:
+
+```typescript
+// Use __dirname to reference files relative to your code
+import path from 'path';
+const configPath = path.join(__dirname, 'config.json');
+```
+
+### Cross-Platform Compatibility
+
+If you're distributing to multiple platforms, ensure your code is cross-platform compatible:
+
+```typescript
+// Use path.join for cross-platform path handling
+import path from 'path';
+const logPath = path.join(process.cwd(), 'logs', 'bot.log');
+
+// Use cross-platform line endings
+const content = 'Line 1\n' + 'Line 2';
+```
+
+## Distribution
+
+### Windows (.exe)
+
+For Windows users:
+
+1. Distribute the `.exe` file
+2. Create a batch file to set environment variables:
+   ```batch
+   @echo off
+   set DISCORD_TOKEN=your_token_here
+   start discraft-bot.exe
+   ```
+
+### Linux/macOS
+
+For Linux/macOS users:
+
+1. Distribute the executable file
+2. Make it executable: `chmod +x discraft-bot`
+3. Create a shell script to set environment variables:
+   ```bash
+   #!/bin/bash
+   export DISCORD_TOKEN=your_token_here
+   ./discraft-bot
+   ```
+
+## Running as a Service
+
+### Windows Service
+
+To run your bot as a Windows service:
+
+1. Install [NSSM (Non-Sucking Service Manager)](https://nssm.cc/)
+2. Open Command Prompt as Administrator
+3. Run:
+   ```batch
+   nssm install DiscraftBot "C:\path\to\your\discraft-bot.exe"
+   nssm set DiscraftBot AppEnvironmentExtra "DISCORD_TOKEN=your_token_here"
+   nssm start DiscraftBot
+   ```
+
+### Linux Systemd Service
+
+To run your bot as a systemd service on Linux:
+
+1. Create a service file at `/etc/systemd/system/discraft-bot.service`:
+   ```ini
+   [Unit]
+   Description=Discraft Discord Bot
+   After=network.target
+
+   [Service]
+   ExecStart=/path/to/discraft-bot
+   Restart=always
+   User=youruser
+   Environment=DISCORD_TOKEN=your_token_here
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+2. Enable and start the service:
+   ```bash
+   sudo systemctl enable discraft-bot
+   sudo systemctl start discraft-bot
+   ```
+
+### macOS Launch Daemon
+
+To run your bot as a launch daemon on macOS:
+
+1. Create a plist file at `~/Library/LaunchAgents/com.discraft.bot.plist`:
+   ```xml
+   <?xml version="1.0" encoding="UTF-8"?>
+   <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+   <plist version="1.0">
+   <dict>
+       <key>Label</key>
+       <string>com.discraft.bot</string>
+       <key>ProgramArguments</key>
+       <array>
+           <string>/path/to/discraft-bot</string>
+       </array>
+       <key>EnvironmentVariables</key>
+       <dict>
+           <key>DISCORD_TOKEN</key>
+           <string>your_token_here</string>
+       </dict>
+       <key>RunAtLoad</key>
+       <true/>
+       <key>KeepAlive</key>
+       <true/>
+   </dict>
+   </plist>
+   ```
+
+2. Load the launch agent:
+   ```bash
+   launchctl load ~/Library/LaunchAgents/com.discraft.bot.plist
+   ```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **"Permission denied" error on Linux/macOS**
+   - Make the file executable: `chmod +x discraft-bot`
+
+2. **Missing environment variables**
+   - Ensure environment variables are set before running the executable
+   - Check for typos in variable names
+
+3. **Antivirus flagging the executable**
+   - This can happen with packaged executables
+   - Add an exception in your antivirus software
+   - Consider code signing for production applications
+
+4. **File path issues**
+   - Use absolute paths or paths relative to the executable
+   - Avoid hardcoded paths that might not exist on the target system
+
+## Limitations
+
+- Executable size is larger than the source code (typically 50-100MB)
+- Native modules might require special handling
+- Updates require distributing a new executable
+
+## Next Steps
+
+- [Templates](/docs/templates/index): Explore Discraft templates for different use cases
+- [Advanced: Custom Commands](/docs/advanced/custom-commands): Create advanced command systems
+- [Advanced: Troubleshooting](/docs/advanced/troubleshooting): Solve common issues

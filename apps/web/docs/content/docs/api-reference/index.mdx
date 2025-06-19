@@ -1,0 +1,38 @@
+---
+title: API Reference
+description: Comprehensive documentation for Discraft's core APIs and structures.
+---
+
+# API Reference
+
+This section provides detailed documentation for the various APIs and internal structures used within Discraft. Understanding these APIs will enable you to customize and extend your bot's functionality more effectively.
+
+Discraft builds upon the powerful [Discord.js](https://discord.js.org/) library, and this reference will cover how Discraft abstracts and enhances Discord.js components, as well as any Discraft-specific utilities and interfaces.
+
+## API Categories
+
+-   [Command API](/docs/api-reference/command-api): Detailed reference for defining, handling, and interacting with Discord Slash Commands in Discraft.
+-   [Event API](/docs/api-reference/event-api): Information on how to register and manage event listeners for various Discord events.
+-   [Client API](/docs/api-reference/client-api): Documentation for the Discraft Discord client, including its initialization, properties, and methods.
+
+## Key Concepts
+
+Before diving into the specifics, it's helpful to understand a few core concepts:
+
+-   **Interactions:** In the context of Discord Slash Commands, an "interaction" represents the user's invocation of a command. The `interaction` object provides methods to reply, defer, and access command options.
+-   **Client:** The `Client` instance is the main hub for interacting with the Discord API. It manages connections, caches data, and emits events.
+-   **Collections:** Discord.js heavily uses `Collection` (an extended `Map`) for managing cached data like commands, guilds, and users. Discraft often stores its loaded commands in a `Collection`.
+
+For in-depth understanding of underlying Discord.js structures (like `Guild`, `Channel`, `User`, `Message`, `EmbedBuilder`, etc.), please refer to the [official Discord.js documentation](https://discord.js.org/#/docs/discord.js/main/general/welcome).
+
+## How to Use This Reference
+
+Each API reference page will detail:
+
+-   **Overview:** A brief description of the API's purpose.
+-   **Classes/Objects:** Key classes or objects involved, their properties, and methods.
+-   **Usage Examples:** Code snippets demonstrating how to use the API.
+-   **Parameters:** Description of arguments for functions/methods.
+-   **Return Values:** What a function/method returns.
+
+If you are looking for how to *implement* features, start with the [Core Concepts](/docs/core-concepts) or [Advanced Topics](/docs/advanced-topics) sections. This API Reference is best used for understanding the specific technical details and available properties/methods once you know *what* you want to build.

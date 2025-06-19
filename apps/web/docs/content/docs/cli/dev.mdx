@@ -1,0 +1,213 @@
+---
+title: dev Command
+description: Learn how to use the 'discraft dev' command to run your bot in development mode with hot reloading.
+---
+
+# dev Command
+
+The `discraft dev` command runs your Discord bot in development mode with hot reloading, allowing you to see changes in real-time as you edit your code.
+
+## Overview
+
+Development mode is designed to provide a smooth development experience with:
+- Hot reloading when files change
+- Automatic command registration
+- Enhanced error reporting
+- Development-specific optimizations
+
+## Basic Usage
+
+```bash
+npx discraft dev
+```
+
+This starts your bot in development mode and watches for file changes.
+
+## Options
+
+| Option | Description |
+|--------|-------------|
+| `--port`, `-p` | Specify the port for the development server |
+| `--no-watch` | Disable file watching and hot reloading |
+| `--watch-dir`, `-w` | Specify additional directories to watch |
+| `--verbose`, `-v` | Enable verbose logging |
+| `--help`, `-h` | Display help information |
+
+## Environment Variables
+
+The `dev` command uses these environment variables:
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DISCORD_TOKEN` | Your Discord bot token | Required |
+| `DISCORD_CLIENT_ID` | Your Discord application client ID | Required |
+| `DISCORD_GUILD_ID` | Development server ID for testing | Optional |
+| `NODE_ENV` | Node environment | `"development"` |
+
+## Development Server
+
+When you run `discraft dev`, a development server starts that:
+
+1. Compiles your TypeScript code (if using TypeScript)
+2. Starts your Discord bot
+3. Watches for file changes
+4. Recompiles and updates the bot when files change
+
+## Command Registration
+
+In development mode, commands are registered to a specific guild (server) for instant updates. This bypasses Discord's global command registration delay, which can be up to an hour.
+
+To enable this feature, set the `DISCORD_GUILD_ID` environment variable in your `.env` file:
+
+```
+DISCORD_GUILD_ID=your_development_server_id
+```
+
+## Hot Reloading
+
+Hot reloading automatically updates your bot when you make changes to your code. This includes:
+
+- Command files
+- Event handlers
+- Utility functions
+- Other modules
+
+For more details on how hot reloading works, see the [Hot Reloading](/docs/core-concepts/hot-reloading) guide.
+
+## Examples
+
+### Basic Development Mode
+
+```bash
+npx discraft dev
+```
+
+### Specify a Port
+
+```bash
+npx discraft dev --port 3001
+```
+
+### Disable File Watching
+
+```bash
+npx discraft dev --no-watch
+```
+
+### Watch Additional Directories
+
+```bash
+npx discraft dev --watch-dir ./custom-modules
+```
+
+### Enable Verbose Logging
+
+```bash
+npx discraft dev --verbose
+```
+
+## Development Workflow
+
+A typical development workflow with Discraft:
+
+1. Start development mode:
+   ```bash
+   npx discraft dev
+   ```
+
+2. Edit your code (e.g., modify a command)
+
+3. Save the file
+   - Discraft detects the change
+   - The file is recompiled
+   - The bot is updated with the new code
+
+4. Test the changes in Discord
+   - Use the command or trigger the event you modified
+   - See the changes take effect immediately
+
+5. Repeat steps 2-4 until satisfied
+
+6. When ready for production:
+   ```bash
+   npx discraft build
+   ```
+
+## Console Output
+
+When running in development mode, you'll see output like:
+
+```
+[INFO] Starting Discraft in development mode...
+[INFO] Compiling TypeScript...
+[INFO] TypeScript compilation complete
+[INFO] Watching for file changes...
+[INFO] Bot is online and connected to Discord!
+[INFO] Registered 5 commands to guild 123456789012345678
+```
+
+When you make changes to a file:
+
+```
+[INFO] File changed: commands/ping.ts
+[INFO] Recompiling...
+[INFO] Recompilation complete
+[INFO] Bot updated successfully
+[INFO] Command 'ping' updated
+```
+
+## Error Handling
+
+When errors occur during development:
+
+```
+[ERROR] Failed to compile commands/ping.ts
+[ERROR] TypeScript error: Type 'string' is not assignable to type 'number'
+[ERROR] at commands/ping.ts:15:10
+```
+
+Discraft provides detailed error messages and continues running when possible, allowing you to fix errors without restarting.
+
+## Troubleshooting
+
+### Command Not Registering
+
+If your commands aren't registering:
+
+```bash
+# Ensure you've set the development guild ID
+echo "DISCORD_GUILD_ID=your_guild_id" >> .env
+
+# Restart development mode
+npx discraft dev
+```
+
+### Hot Reloading Not Working
+
+If changes aren't being detected:
+
+```bash
+# Try specifying the watch directory explicitly
+npx discraft dev --watch-dir ./commands --watch-dir ./events
+
+# Or restart with verbose logging
+npx discraft dev --verbose
+```
+
+### TypeScript Errors
+
+If you're getting TypeScript errors:
+
+```bash
+# Check your TypeScript configuration
+cat tsconfig.json
+
+# Make sure you have the correct types installed
+npm install --save-dev @types/node discord.js
+```
+
+## Next Steps
+
+- [build Command](/docs/cli/build): Learn how to build your bot for production
+- [Hot Reloading](/docs/core-concepts/hot-reloading): Understand how hot reloading works
+- [Command System](/docs/core-concepts/command-system): Learn how to create bot commands

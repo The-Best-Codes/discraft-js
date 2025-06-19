@@ -1,12 +1,38 @@
 {
-    "pages": [
-        "index",
-        "cli",
-        "init",
-        "dev",
-        "build",
-        "start",
-        "vercel-build",
-        "exec-build"
-    ]
+  "pages": [
+    "index",
+    "getting-started/index",
+    "getting-started/installation",
+    "getting-started/quick-start",
+    "getting-started/project-structure",
+    "core-concepts/index",
+    "core-concepts/command-system",
+    "core-concepts/event-handling",
+    "core-concepts/hot-reloading",
+    "core-concepts/configuration",
+    "cli/index",
+    "cli/init",
+    "cli/dev",
+    "cli/build",
+    "cli/start",
+    "cli/vercel-build",
+    "cli/exec-build",
+    "deployment/index",
+    "deployment/traditional",
+    "deployment/vercel",
+    "deployment/executable",
+    "templates/index",
+    "templates/typescript",
+    "templates/javascript",
+    "templates/vercel-ai",
+    "advanced/index",
+    "advanced/custom-commands",
+    "advanced/custom-events",
+    "advanced/ai-integration",
+    "advanced/troubleshooting",
+    "api-reference/index",
+    "api-reference/command-api",
+    "api-reference/event-api",
+    "api-reference/client-api"
+  ]
 }
