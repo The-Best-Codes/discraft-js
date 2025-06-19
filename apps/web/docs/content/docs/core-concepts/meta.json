@@ -1,0 +1,10 @@
+{
+  "title": "Core Concepts",
+  "pages": [
+    "index",
+    "command-system",
+    "event-handling",
+    "hot-reloading",
+    "configuration"
+  ]
+}
