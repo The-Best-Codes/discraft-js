@@ -1,10 +1,4 @@
 {
   "title": "Advanced",
-  "pages": [
-    "index",
-    "custom-commands",
-    "custom-events",
-    "ai-integration",
-    "troubleshooting"
-  ]
+  "pages": ["index", "troubleshooting"]
 }
