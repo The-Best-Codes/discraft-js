@@ -1,0 +1,283 @@
+---
+title: TypeScript Template
+description: Learn about the TypeScript template for Discraft Discord bots.
+---
+
+The TypeScript template provides a strongly-typed foundation for building robust Discord bots with Discraft. This template leverages TypeScript's type system to catch errors during development and provide better IDE support.
+
+## Overview
+
+The TypeScript template includes:
+
+- Type-safe command and event handling
+- Preconfigured TypeScript settings
+- Example commands and events
+- Logging utilities
+- Hot reloading for development
+
+## Template Structure
+
+```
+my-discraft-project/
+├── commands/
+│   ├── longcommand.ts    # Example of a command with subcommands
+│   ├── messageinfo.ts    # Command to display message information
+│   ├── ping.ts           # Simple ping command
+│   └── userinfo.ts       # Command to display user information
+├── events/
+│   ├── error.ts          # Error handling
+│   ├── messageCreate.ts  # Message event handling
+│   └── ready.ts          # Bot ready event
+├── clients/
+│   └── discord.ts        # Discord client configuration
+├── utils/
+│   └── logger.ts         # Logging utility
+├── .env.example          # Example environment variables
+├── .gitignore            # Git ignore configuration
+├── index.ts              # Main entry point
+├── package.json          # Project dependencies and scripts
+└── tsconfig.json         # TypeScript configuration
+```
+
+## Getting Started
+
+### Creating a New Project
+
+```bash
+# Initialize a new project with the TypeScript template
+discraft init --template ts
+
+# Or select it from the interactive prompt
+discraft init
+# Then select "TypeScript" when prompted
+```
+
+### Configuration
+
+1. Copy `.env.example` to `.env` and add your Discord bot token:
+
+   ```
+   DISCORD_TOKEN=your_bot_token_here
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   # or
+   yarn
+   # or
+   pnpm install
+   ```
+
+### Development
+
+Start the development server with hot reloading:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+```
+
+This will:
+
+1. Compile your TypeScript code
+2. Start your bot
+3. Watch for changes and automatically restart when files are modified
+
+### Building for Production
+
+Build your bot for production:
+
+```bash
+npm run build
+# or
+yarn build
+# or
+pnpm build
+```
+
+### Running in Production
+
+Start your bot in production mode:
+
+```bash
+npm start
+# or
+yarn start
+# or
+pnpm start
+```
+
+## Key Components
+
+### Commands
+
+Commands are defined in the `commands/` directory. Each command is a separate file that exports a command definition:
+
+```typescript
+// commands/ping.ts
+import { CommandInteraction } from "discord.js";
+import { Command } from "../types";
+
+const command: Command = {
+  name: "ping",
+  description: "Replies with Pong!",
+  execute: async (interaction: CommandInteraction) => {
+    await interaction.reply("Pong!");
+  },
+};
+
+export default command;
+```
+
+### Events
+
+Events are defined in the `events/` directory. Each event handler is a separate file:
+
+```typescript
+// events/ready.ts
+import { Client } from "discord.js";
+import { logger } from "../utils/logger";
+
+export default (client: Client): void => {
+  client.on("ready", () => {
+    if (client.user) {
+      logger.info(`Logged in as ${client.user.tag}!`);
+    }
+  });
+};
+```
+
+### Discord Client
+
+The Discord client is configured in `clients/discord.ts`:
+
+```typescript
+// clients/discord.ts
+import { Client, GatewayIntentBits } from "discord.js";
+
+// Create a new client instance
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
+});
+
+export default client;
+```
+
+### Entry Point
+
+The main entry point (`index.ts`) loads commands and events:
+
+```typescript
+// index.ts
+import { Collection } from "discord.js";
+import fs from "fs";
+import path from "path";
+import client from "./clients/discord";
+import { Command } from "./types";
+import { logger } from "./utils/logger";
+
+// Load commands
+const commands = new Collection<string, Command>();
+const commandFiles = fs
+  .readdirSync(path.join(__dirname, "commands"))
+  .filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
+
+for (const file of commandFiles) {
+  import(`./commands/${file}`).then((command) => {
+    commands.set(command.default.name, command.default);
+  });
+}
+
+// Load events
+const eventFiles = fs
+  .readdirSync(path.join(__dirname, "events"))
+  .filter((file) => file.endsWith(".js") || file.endsWith(".ts"));
+
+for (const file of eventFiles) {
+  import(`./events/${file}`).then((event) => {
+    event.default(client);
+  });
+}
+
+// Login to Discord
+client.login(process.env.DISCORD_TOKEN);
+```
+
+## TypeScript Configuration
+
+The template includes a preconfigured `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## Adding Custom Commands
+
+To add a new command:
+
+1. Create a new file in the `commands/` directory:
+
+   ```typescript
+   // commands/hello.ts
+   import { CommandInteraction } from "discord.js";
+   import { Command } from "../types";
+
+   const command: Command = {
+     name: "hello",
+     description: "Greets the user",
+     execute: async (interaction: CommandInteraction) => {
+       await interaction.reply(`Hello, ${interaction.user.username}!`);
+     },
+   };
+
+   export default command;
+   ```
+
+2. The command will be automatically loaded when you restart the bot
+
+## Adding Custom Events
+
+To add a new event handler:
+
+1. Create a new file in the `events/` directory:
+
+   ```typescript
+   // events/guildCreate.ts
+   import { Client } from "discord.js";
+   import { logger } from "../utils/logger";
+
+   export default (client: Client): void => {
+     client.on("guildCreate", (guild) => {
+       logger.info(`Joined a new guild: ${guild.name}`);
+     });
+   };
+   ```
+
+2. The event handler will be automatically loaded when you restart the bot
+
+## Next Steps
+
+- [Core Concepts: Command System](/docs/core-concepts/command-system): Learn more about the command system
+- [Core Concepts: Event Handling](/docs/core-concepts/event-handling): Learn more about event handling
+- [Deployment: Traditional](/docs/deployment/traditional): Deploy your TypeScript bot to a server

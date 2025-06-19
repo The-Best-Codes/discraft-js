@@ -1,61 +1,78 @@
 ---
-title: Discraft Docs
+title: Discraft Documentation
 description: Comprehensive documentation for Discraft, a modern developer-friendly framework for building Discord bots with ease.
 ---
 
-# What is Discraft?
+Welcome to the official documentation for Discraft, a modern, developer-friendly framework for building Discord bots with ease. Think of it as "Next.js for Discord bots" — batteries included, ready to go.
 
-Welcome to Discraft!
-Discraft is a modern, developer-friendly framework for building Discord bots with ease. Think of it as "Next.js for Discord bots" — batteries included, ready to go.
+## What is Discraft?
+
+Discraft is a comprehensive framework designed to simplify the process of creating, developing, and deploying Discord bots. It provides a robust CLI, sensible conventions, and first-class support for modern workflows including traditional hosting, serverless deployments, and standalone executables.
+
+### Key Features
+
+- **Zero-config to start**: Get going with a single command
+- **TypeScript-first**: Full TypeScript support out of the box
+- **Hot reload/dev mode**: Iterate quickly with automatic reloading
+- **Production builds**: Optimized output for fast, reliable bots
+- **Serverless ready**: Deploy to Vercel in minutes
+- **Standalone executables**: Package your bot as a self-contained binary
 
 ## Philosophy
 
-Discraft is built for speed, simplicity, and flexibility. Whether you're prototyping or deploying at scale, Discraft gives you a powerful CLI, sensible conventions, and first-class support for modern workflows (including serverless and Vercel deploys).
+Discraft is built on three core principles:
 
-- **Zero-config to start**: Get going with a single command.
-- **TypeScript-first**: Full TS support out of the box.
-- **Hot reload/dev mode**: Iterate quickly.
-- **Production builds**: Optimized output for fast, reliable bots.
-- **Serverless ready**: Deploy to Vercel in minutes.
+1. **Developer Experience First**: Commands and workflows are designed to be intuitive and efficient, reducing friction in the development process.
 
-## Quickstart
+2. **Convention Over Configuration**: Sensible defaults and project structures let you focus on building features rather than configuring tools.
 
-1. **Create a new project:**
-   ```bash
-   npx discraft init
-   cd my-bot
-   npx discraft dev
-   ```
-2. **Build for production:**
-   ```bash
-   npx discraft build
-   npx discraft start
-   ```
-3. **Deploy to Vercel:**
-   ```bash
-   npx discraft vercel build
-   # Push to your Vercel-connected repo
-   ```
+3. **Flexibility Without Complexity**: Advanced features are available when you need them, but they don't get in your way when you don't.
 
-## Docs & Guides
+## Documentation Structure
 
-- [CLI Reference](/docs/cli)
-- [Initialize a Project](/docs/init)
-- [Development Mode](/docs/dev)
-- [Production Build](/docs/build)
-- [Start in Production](/docs/start)
-- [Standalone Executable](/docs/exec-build)
-- [Deploying to Vercel](/docs/vercel-build)
+Our documentation is organized into the following sections:
 
-### AI Development
+- **[Getting Started](/docs/getting-started/)**: Installation instructions, quick start guide, and basic concepts
+- **[Core Concepts](/docs/core-concepts/)**: Detailed explanations of Discraft's fundamental features
+- **[CLI Reference](/docs/cli/)**: Comprehensive guide to all CLI commands and options
+- **[Deployment](/docs/deployment/)**: Various ways to deploy your Discraft bot
+- **[Templates](/docs/templates/)**: Available project templates and their use cases
+- **[Advanced Topics](/docs/advanced/)**: In-depth guides for advanced use cases
+- **[API Reference](/docs/api-reference/)**: Technical reference for Discraft's APIs
 
-Discraft soon plans to have built-in MCP server options.
-Discraft also has an [LLMs.txt](/llms.txt) file to give AI models information about Discraft when you are "vibe coding".
+## Quick Navigation
 
-### Deploying to Vercel
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div className="p-4 border rounded-lg">
+    <h3>🚀 New to Discraft?</h3>
+    <p>
+      Start with our <a href="/docs/getting-started/">Getting Started</a> guide.
+    </p>
+  </div>
+  <div className="p-4 border rounded-lg">
+    <h3>🔧 Need CLI help?</h3>
+    <p>
+      Check out the <a href="/docs/cli/">CLI Reference</a>.
+    </p>
+  </div>
+  <div className="p-4 border rounded-lg">
+    <h3>🌐 Ready to deploy?</h3>
+    <p>
+      Visit our <a href="/docs/deployment/">Deployment</a> section.
+    </p>
+  </div>
+  <div className="p-4 border rounded-lg">
+    <h3>🧠 Looking for advanced topics?</h3>
+    <p>
+      Explore <a href="/docs/advanced/">Advanced Topics</a>.
+    </p>
+  </div>
+</div>
 
-Discraft supports seamless deployment to [Vercel](https://vercel.com/) for serverless Discord bots. Use `discraft vercel build` to generate API routes and bundle your bot for Vercel’s platform. See the [Deploying to Vercel guide](/docs/vercel-build) for full instructions and troubleshooting.
+## Community and Support
 
----
+- **GitHub**: [Report issues and contribute](https://github.com/The-Best-Codes/discraft-js)
+- **Discord**: [Join our community](https://discord.gg/dKeuR9yfBs)
+- **NPM**: [View package](https://www.npmjs.com/package/discraft)
 
-Need help? Check the guides above or open an issue on GitHub!
+Ready to build your Discord bot? Let's get started!

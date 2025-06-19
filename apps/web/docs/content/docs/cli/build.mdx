@@ -1,0 +1,211 @@
+---
+title: build Command
+description: Learn how to use the 'discraft build' command to compile your bot for production deployment.
+---
+
+The `discraft build` command compiles your Discord bot for production deployment, optimizing it for performance and reliability.
+
+## Overview
+
+The build process:
+
+- Compiles TypeScript to JavaScript (if using TypeScript)
+- Optimizes code for production
+- Generates command and event registries
+- Creates a production-ready output in the `dist/` directory
+
+## Basic Usage
+
+```bash
+npx discraft build
+```
+
+This builds your bot for production deployment.
+
+## Options
+
+| Option                | Description                                |
+| --------------------- | ------------------------------------------ |
+| `--out-dir`, `-o`     | Specify the output directory               |
+| `--source-maps`, `-s` | Generate source maps                       |
+| `--minify`, `-m`      | Minify the output code                     |
+| `--clean`, `-c`       | Clean the output directory before building |
+| `--help`, `-h`        | Display help information                   |
+
+## Environment Variables
+
+The `build` command uses these environment variables:
+
+| Variable   | Description      | Default                            |
+| ---------- | ---------------- | ---------------------------------- |
+| `NODE_ENV` | Node environment | Set to `"production"` during build |
+
+## Build Process
+
+When you run `discraft build`, the following steps occur:
+
+1. **Preparation**:
+
+   - The output directory is created (or cleaned if using `--clean`)
+   - Environment is set to production
+
+2. **Compilation**:
+
+   - TypeScript files are compiled to JavaScript (if using TypeScript)
+   - JavaScript files are processed and optimized
+
+3. **Command Processing**:
+
+   - Command files are discovered
+   - A command registry is generated
+
+4. **Event Processing**:
+
+   - Event handlers are discovered
+   - An event registry is generated
+
+5. **Optimization**:
+
+   - Code is optimized for production
+   - Unused code is removed (tree-shaking)
+   - Code is minified (if using `--minify`)
+
+6. **Output**:
+   - Compiled files are written to the output directory
+   - Source maps are generated (if using `--source-maps`)
+
+## Output Structure
+
+After building, your output directory (default: `dist/`) will contain:
+
+```
+dist/
+├── clients/          # Compiled client files
+├── commands/         # Compiled command files
+├── events/           # Compiled event handlers
+├── utils/            # Compiled utility functions
+├── .discraft/        # Generated registries
+└── index.js          # Main entry point
+```
+
+## Examples
+
+### Basic Build
+
+```bash
+npx discraft build
+```
+
+### Specify Output Directory
+
+```bash
+npx discraft build --out-dir ./build
+```
+
+### Generate Source Maps
+
+```bash
+npx discraft build --source-maps
+```
+
+### Minify Output
+
+```bash
+npx discraft build --minify
+```
+
+### Clean Output Directory
+
+```bash
+npx discraft build --clean
+```
+
+### Combine Multiple Options
+
+```bash
+npx discraft build --out-dir ./build --source-maps --minify --clean
+```
+
+## Production Optimizations
+
+The build process includes several optimizations for production:
+
+1. **Command Registration**: Commands are set up for global registration
+2. **Error Handling**: Production-appropriate error handling is implemented
+3. **Performance**: Code is optimized for performance
+4. **Size**: Unused code is removed to reduce bundle size
+5. **Stability**: Development-only code is excluded
+
+## Command Registration in Production
+
+In production builds, commands are configured for global registration by default. This means:
+
+- Commands are registered to all servers where your bot is present
+- Command updates may take up to an hour to propagate (Discord API limitation)
+- The registration process is optimized for stability
+
+## Running the Built Bot
+
+After building, you can run your bot with:
+
+```bash
+node dist/index.js
+```
+
+Or using the `discraft start` command:
+
+```bash
+npx discraft start
+```
+
+## Environment Configuration
+
+For production deployment, create a `.env.production` file with your production environment variables:
+
+```
+DISCORD_TOKEN=your_production_bot_token
+DISCORD_CLIENT_ID=your_production_client_id
+```
+
+## Troubleshooting
+
+### Build Errors
+
+If you encounter build errors:
+
+```bash
+# Check for TypeScript errors
+npx tsc --noEmit
+
+# Try with verbose logging
+npx discraft build --verbose
+```
+
+### Missing Dependencies
+
+If you're missing dependencies in the build:
+
+```bash
+# Ensure dependencies are correctly listed in package.json
+npm install
+
+# Rebuild
+npx discraft build
+```
+
+### Large Build Size
+
+If your build is unexpectedly large:
+
+```bash
+# Use minification
+npx discraft build --minify
+
+# Check for large dependencies that could be externalized
+```
+
+## Next Steps
+
+- [start Command](/docs/cli/start): Learn how to run your built bot
+- [Deployment](/docs/deployment/index): Learn how to deploy your bot
+- [vercel-build Command](/docs/cli/vercel-build): Build for Vercel deployment

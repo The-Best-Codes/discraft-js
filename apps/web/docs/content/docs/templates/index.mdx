@@ -1,0 +1,74 @@
+---
+title: Templates
+description: Overview of the available project templates in Discraft.
+---
+
+Discraft provides several project templates to help you get started quickly with different types of Discord bots. Each template is designed for specific use cases and includes all the necessary files and configurations.
+
+## Available Templates
+
+Discraft currently offers three main templates:
+
+1. **[TypeScript](/docs/templates/typescript)**: A strongly-typed template for building robust Discord bots
+2. **[JavaScript](/docs/templates/javascript)**: A simpler template for JavaScript developers
+3. **[Vercel + TypeScript + AI](/docs/templates/vercel-ai)**: A serverless template for AI-powered Discord bots on Vercel
+
+## Using Templates
+
+You can use these templates when initializing a new Discraft project:
+
+```bash
+discraft init
+# You'll be prompted to select a template
+```
+
+Or specify a template directly:
+
+```bash
+discraft init --template ts        # TypeScript template
+discraft init --template js        # JavaScript template
+discraft init --template vercel-ts-ai  # Vercel AI template
+```
+
+## Template Comparison
+
+| Feature            | TypeScript  | JavaScript  | Vercel + TypeScript + AI |
+| ------------------ | ----------- | ----------- | ------------------------ |
+| **Language**       | TypeScript  | JavaScript  | TypeScript               |
+| **Type Safety**    | ✅          | ❌          | ✅                       |
+| **Deployment**     | Traditional | Traditional | Serverless (Vercel)      |
+| **AI Integration** | ❌          | ❌          | ✅ (Google AI)           |
+| **Event Handling** | ✅          | ✅          | ❌ (Interactions only)   |
+| **Hot Reloading**  | ✅          | ✅          | ✅                       |
+| **Complexity**     | Medium      | Low         | Medium-High              |
+
+## Template Structure
+
+All templates follow a similar structure with some variations:
+
+```
+project/
+├── commands/       # Bot commands
+├── events/         # Event handlers (not in Vercel template)
+├── utils/          # Utility functions
+├── clients/        # Client configurations (not in Vercel template)
+├── index.ts/js     # Entry point
+└── package.json    # Dependencies and scripts
+```
+
+## Customizing Templates
+
+You can customize any template after initialization:
+
+1. Add new commands in the `commands/` directory
+2. Create new event handlers in the `events/` directory (traditional templates)
+3. Modify the entry point to add custom logic
+4. Install additional dependencies as needed
+
+## Next Steps
+
+Explore each template in detail:
+
+- [TypeScript Template](/docs/templates/typescript): For type-safe bot development
+- [JavaScript Template](/docs/templates/javascript): For simpler JavaScript-based bots
+- [Vercel + TypeScript + AI Template](/docs/templates/vercel-ai): For serverless AI-powered bots

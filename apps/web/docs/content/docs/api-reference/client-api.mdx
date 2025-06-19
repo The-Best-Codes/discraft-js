@@ -1,0 +1,134 @@
+---
+title: Client API
+description: Detailed reference for Discraft's Client API, including its initialization, properties, and methods.
+---
+
+Discraft relies on the `Discord.js Client` instance as the central hub for all interactions with the Discord API. This API reference details how the Discord client is configured within a Discraft project, its key properties, and common methods you'll use to build your bot.
+
+Understanding the Client API is fundamental, as it manages your bot's connection to Discord, caches data, handles events, and provides the interface for sending messages and performing other Discord-related operations.
+
+## Client Initialization
+
+The Discord client is typically initialized in a dedicated file (e.g., `clients/discord.js` in Discraft templates). The most crucial part of client initialization is defining its [Gateway Intents](https://discord.com/developers/docs/topics/gateway#gateway-intents) and optionally, [Partials](https://discord.js.org/#/docs/discord.js/main/general/partials).
+
+```javascript
+discraft-js/templates/javascript/clients/discord.js#L1-12
+const { Client, GatewayIntentBits } = require("discord.js");
+
+// Create a new client instance
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,           // Required for guild-related events, members, channels
+    GatewayIntentBits.GuildMessages,    // Required for message-related events in guilds
+    GatewayIntentBits.MessageContent,   // REQUIRED to access message.content for non-privileged messages
+    GatewayIntentBits.GuildMembers,     // Required for guildMemberAdd/Remove, member updates
+    GatewayIntentBits.DirectMessages,   // For DM-related events
+    GatewayIntentBits.DirectMessageTyping,
+    GatewayIntentBits.GuildMessageReactions, // For message reaction events
+    // Add other intents as needed for your bot's functionality
+  ],
+  partials: ['CHANNEL', 'MESSAGE', 'REACTION', 'USER', 'GUILD_MEMBER'], // Enable partials for cached data
+});
+
+module.exports = client;
+```
+
+### `Client` Constructor Parameters
+
+- **`intents` (Array\<GatewayIntentBits | BitFieldResolvable\>):** This is a mandatory array of [Gateway Intents](https://discord.com/developers/docs/topics/gateway#gateway-intents) that specify which events your bot wants to receive from Discord. Without the correct intents, your bot will not receive data for certain events. You must enable these intents both in your code and in your bot's settings on the [Discord Developer Portal](https://discord.com/developers/applications).
+
+  - `GatewayIntentBits.Guilds`: Necessary for most bot functionalities, including guild creation, updates, and deletion events, as well as accessing guild information.
+  - `GatewayIntentBits.GuildMessages`: Required to receive messages sent in guild channels.
+  - `GatewayIntentBits.MessageContent`: **Crucial and Privileged!** Required to access the `content` property of messages for non-privileged messages. Without this, your bot cannot read user message content (e.g., for prefix commands or keyword responses). You _must_ enable this intent in the Discord Developer Portal for your bot.
+  - `GatewayIntentBits.GuildMembers`: **Privileged!** Required for events related to guild member additions, removals, and updates.
+  - `GatewayIntentBits.GuildPresences`: **Privileged!** Required for events related to user presences (online/offline status, activity).
+
+- **`partials` (Array\<Partials\>):** An optional array that tells Discord.js to cache partial data for certain structures. This is important for events where the full object might not be immediately available in the cache (e.g., a reaction on an old message).
+
+  - `Partials.Message`: For messages that might not be fully cached.
+  - `Partials.Channel`: For channels that might not be fully cached (e.g., DM channels).
+  - `Partials.Reaction`: For reactions on messages that might not be cached.
+  - `Partials.User`: For users who might not be fully cached.
+  - `Partials.GuildMember`: For guild members who might not be fully cached.
+
+## Key `Client` Properties and Methods
+
+The `client` object, once initialized and logged in, provides access to a wealth of Discord data and functionalities.
+
+### Properties
+
+- **`client.user` (ClientUser):** Represents the bot's own user account.
+
+  - `client.user.tag`: The bot's username and discriminator (e.g., `MyBot#1234`).
+  - `client.user.id`: The bot's Discord user ID.
+  - `client.user.setActivity(name, options)`: Sets the bot's presence (e.g., "Playing Awesome Game").
+
+- **`client.guilds` (GuildManager):** Manages guilds (servers) the bot is in.
+
+  - `client.guilds.cache`: A `Collection` of `Guild` objects the bot has access to.
+  - `client.guilds.fetch(id)`: Fetches a `Guild` by its ID from the API.
+
+- **`client.channels` (ChannelManager):** Manages channels the bot has access to.
+
+  - `client.channels.cache`: A `Collection` of `Channel` objects.
+  - `client.channels.fetch(id)`: Fetches a `Channel` by its ID from the API.
+
+- **`client.users` (UserManager):** Manages users the bot can see.
+
+  - `client.users.cache`: A `Collection` of `User` objects.
+  - `client.users.fetch(id)`: Fetches a `User` by their ID from the API.
+
+- **`client.commands` (Collection):** A Discraft-specific `Collection` where loaded `ICommand` objects are stored, keyed by their command `name`. This is populated by Discraft's command loader.
+
+### Methods
+
+- **`client.login(token: string)`:** Establishes the connection to Discord using your bot token. This is typically the last step in your bot's main entry file (`index.js`).
+
+  ```javascript
+  // index.js
+  require("dotenv").config(); // Load environment variables
+  const client = require("./clients/discord");
+
+  // Load commands and events (handled by Discraft internally, or via custom logic)
+  // ...
+
+  client.login(process.env.DISCORD_TOKEN);
+  ```
+
+- **`client.on(event: string, listener: Function)`:** Registers an event listener for a specific Discord.js event. This is the core method used by Discraft's Event API.
+
+  ```javascript
+  // In an event file (e.g., events/ready.js)
+  module.exports = (client) => {
+    client.on("ready", () => {
+      console.log(`Logged in as ${client.user.tag}!`);
+    });
+  };
+  ```
+
+- **`client.destroy()`:** Destroys the client, effectively logging the bot out of Discord.
+
+## Client's Role in Discraft
+
+In a Discraft project, the `client` instance is the backbone that ties everything together:
+
+1.  **Connection Management:** It maintains the WebSocket connection to Discord.
+2.  **Event Emission:** It emits events (e.g., `messageCreate`, `interactionCreate`, `ready`) that your event handlers listen to.
+3.  **Command/Event Loading:** Discraft's core system initializes this client and then passes it to your command and event files to allow them to register their functionalities.
+4.  **API Interaction:** All subsequent interactions with Discord (sending messages, managing roles, fetching data) are performed through this `client` object or its managers (e.g., `client.guilds`, `client.channels`).
+
+## Best Practices
+
+- **Single Client Instance:** Only create one `Client` instance per bot application.
+- **Intents are Key:** Always ensure you have enabled _all_ necessary Gateway Intents, both in your code and in the Discord Developer Portal, for your bot to function correctly and receive the data it needs.
+- **Error Handling:** Listen for `client.on('error', ...)` to catch critical errors from the Discord.js library itself.
+- **Logging:** Use `client.on('debug', ...)` for verbose debugging output during development, but avoid in production unless troubleshooting a specific issue, as it can be very chatty.
+- **Token Security:** Never hardcode your `DISCORD_TOKEN` directly in your code. Always load it from environment variables (e.g., `.env` file).
+
+## Related Resources
+
+- [Discord.js Client Documentation](https://discord.js.org/#/docs/discord.js/main/class/Client): The official and comprehensive reference for the `Discord.js Client` class.
+- [Discord Developer Portal - Bot Settings](https://discord.com/developers/applications): Manage your bot's token, intents, and public/private status.
+- [Core Concepts: Event Handling](/docs/core-concepts/event-handling)
+- [Core Concepts: Command System](/docs/core-concepts/command-system)
+- [Advanced Topics: Troubleshooting](/docs/advanced-topics/troubleshooting)

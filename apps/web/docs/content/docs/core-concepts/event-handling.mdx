@@ -1,0 +1,290 @@
+---
+title: Event Handling
+description: Learn how to respond to Discord events in your Discraft bot.
+---
+
+Discraft provides a streamlined system for handling Discord events, allowing your bot to respond to various activities like messages, reactions, member joins, and more.
+
+## Overview
+
+Discord bots can listen for and respond to a wide range of events that occur on the platform. Discraft simplifies event handling through a file-based convention system similar to commands.
+
+## Event File Structure
+
+Each event handler in Discraft is defined in its own file within the `events/` directory. A typical event file has this structure:
+
+```typescript
+// events/messageCreate.ts
+import { Message } from "discord.js";
+
+export default {
+  // Event name (must match Discord.js event names)
+  name: "messageCreate",
+
+  // Whether to run once or every time (usually false)
+  once: false,
+
+  // Event handler function
+  execute(message: Message) {
+    // Skip messages from bots to prevent loops
+    if (message.author.bot) return;
+
+    // Event handling logic
+    console.log(`Received message: ${message.content}`);
+
+    // Respond to specific messages
+    if (message.content.toLowerCase() === "hello") {
+      message.reply("Hello there!");
+    }
+  },
+};
+```
+
+### Key Components
+
+1. **`name`**: The Discord.js event name to listen for
+2. **`once`**: Boolean indicating whether to run once or every time the event occurs
+   - `true`: Event handler runs only the first time the event occurs
+   - `false`: Event handler runs every time the event occurs
+3. **`execute`**: Function that runs when the event is triggered
+   - Receives event-specific parameters
+   - Handles the event logic
+
+## Event Discovery and Registration
+
+Discraft automatically:
+
+1. Discovers all files in the `events/` directory
+2. Extracts the event handlers
+3. Registers them with the Discord client
+4. Calls the appropriate handler when events occur
+
+This happens:
+
+- During development when you run `discraft dev`
+- During the build process when you run `discraft build`
+
+## Common Discord Events
+
+Here are some commonly used Discord events and how to handle them:
+
+### Ready Event (Bot Startup)
+
+```typescript
+// events/ready.ts
+import { Client } from "discord.js";
+
+export default {
+  name: "ready",
+  once: true, // Only runs once when the bot starts
+  execute(client: Client) {
+    console.log(`Logged in as ${client.user.tag}!`);
+    client.user.setActivity("with Discraft");
+  },
+};
+```
+
+### Message Creation
+
+```typescript
+// events/messageCreate.ts
+import { Message } from "discord.js";
+
+export default {
+  name: "messageCreate",
+  once: false,
+  execute(message: Message) {
+    if (message.author.bot) return;
+
+    // Log all messages
+    console.log(
+      `[${message.guild?.name ?? "DM"}] ${message.author.tag}: ${
+        message.content
+      }`
+    );
+
+    // Respond to specific content
+    if (message.content.includes("hello")) {
+      message.reply("Hello!");
+    }
+  },
+};
+```
+
+### Guild Member Join
+
+```typescript
+// events/guildMemberAdd.ts
+import { GuildMember } from "discord.js";
+
+export default {
+  name: "guildMemberAdd",
+  once: false,
+  execute(member: GuildMember) {
+    // Send welcome message
+    const channel = member.guild.systemChannel;
+    if (channel) {
+      channel.send(`Welcome to the server, ${member}!`);
+    }
+
+    // Add default role
+    const role = member.guild.roles.cache.find((r) => r.name === "Member");
+    if (role) {
+      member.roles.add(role);
+    }
+  },
+};
+```
+
+### Interaction Creation (Button Clicks, Select Menus, etc.)
+
+```typescript
+// events/interactionCreate.ts
+import { Interaction } from "discord.js";
+
+export default {
+  name: "interactionCreate",
+  once: false,
+  execute(interaction: Interaction) {
+    // Handle button interactions
+    if (interaction.isButton()) {
+      const { customId } = interaction;
+
+      if (customId === "primary_button") {
+        interaction.reply("You clicked the primary button!");
+      }
+    }
+
+    // Handle select menu interactions
+    if (interaction.isStringSelectMenu()) {
+      const { customId, values } = interaction;
+
+      if (customId === "color_select") {
+        interaction.reply(`You selected: ${values.join(", ")}`);
+      }
+    }
+
+    // Note: Command interactions are handled by Discraft's command system
+  },
+};
+```
+
+### Error Handling
+
+```typescript
+// events/error.ts
+export default {
+  name: "error",
+  once: false,
+  execute(error) {
+    console.error("Discord client error:", error);
+  },
+};
+```
+
+## Advanced Event Handling
+
+### Combining Related Events
+
+For related events, you can create multiple handlers in a single file:
+
+```typescript
+// events/voiceEvents.ts
+import { VoiceState } from "discord.js";
+
+// Voice channel join
+export const voiceStateUpdate = {
+  name: "voiceStateUpdate",
+  once: false,
+  execute(oldState: VoiceState, newState: VoiceState) {
+    // User joined a voice channel
+    if (!oldState.channelId && newState.channelId) {
+      console.log(
+        `${newState.member.user.tag} joined voice channel ${newState.channel.name}`
+      );
+    }
+
+    // User left a voice channel
+    if (oldState.channelId && !newState.channelId) {
+      console.log(
+        `${oldState.member.user.tag} left voice channel ${oldState.channel.name}`
+      );
+    }
+
+    // User switched voice channels
+    if (
+      oldState.channelId &&
+      newState.channelId &&
+      oldState.channelId !== newState.channelId
+    ) {
+      console.log(
+        `${newState.member.user.tag} switched from ${oldState.channel.name} to ${newState.channel.name}`
+      );
+    }
+  },
+};
+
+// Default export for Discraft to recognize
+export default voiceStateUpdate;
+```
+
+### Event Utilities
+
+You can create utility functions for common event handling patterns:
+
+```typescript
+// utils/eventUtils.ts
+import { Message } from "discord.js";
+
+// Check if a message contains a command prefix
+export function isCommand(message: Message, prefix: string = "!") {
+  return message.content.startsWith(prefix);
+}
+
+// Parse command and arguments from a message
+export function parseCommand(message: Message, prefix: string = "!") {
+  const args = message.content.slice(prefix.length).trim().split(/ +/);
+  const command = args.shift().toLowerCase();
+  return { command, args };
+}
+```
+
+Then use them in your event handlers:
+
+```typescript
+// events/messageCreate.ts
+import { Message } from "discord.js";
+import { isCommand, parseCommand } from "../utils/eventUtils";
+
+export default {
+  name: "messageCreate",
+  once: false,
+  execute(message: Message) {
+    if (message.author.bot) return;
+
+    // Handle legacy prefix commands
+    if (isCommand(message, "!")) {
+      const { command, args } = parseCommand(message, "!");
+
+      if (command === "ping") {
+        message.reply("Pong!");
+      }
+    }
+  },
+};
+```
+
+## Best Practices
+
+1. **Keep handlers focused**: Each event handler should have a clear purpose
+2. **Avoid heavy processing in frequently triggered events**: Events like `messageCreate` can fire very frequently
+3. **Use appropriate error handling**: Wrap event logic in try/catch blocks for stability
+4. **Consider rate limiting**: Prevent spam by implementing cooldowns for responses
+5. **Separate concerns**: Use utility functions for reusable logic
+6. **Log important events**: Maintain logs for debugging and monitoring
+
+## Next Steps
+
+- [Hot Reloading](/docs/core-concepts/hot-reloading): Learn how Discraft's development mode works
+- [Advanced Events](/docs/advanced/custom-events): Create more sophisticated event handling
+- [API Reference: Event API](/docs/api-reference/event-api): Technical reference for the event system

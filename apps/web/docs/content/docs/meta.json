@@ -1,12 +1,12 @@
 {
-    "pages": [
-        "index",
-        "cli",
-        "init",
-        "dev",
-        "build",
-        "start",
-        "vercel-build",
-        "exec-build"
-    ]
+  "pages": [
+    "index",
+    "getting-started",
+    "core-concepts",
+    "cli",
+    "deployment",
+    "templates",
+    "advanced",
+    "api-reference"
+  ]
 }

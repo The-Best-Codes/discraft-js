@@ -1,0 +1,189 @@
+---
+title: Command API
+description: Detailed reference for Discraft's Command API, including interfaces and methods for defining and interacting with commands.
+---
+
+Discraft's Command API provides a structured way to define, register, and handle Discord Slash Commands. It abstracts much of the complexity of raw Discord API interactions, allowing you to focus on your bot's logic.
+
+Discraft commands are built on top of [Discord.js SlashCommandBuilder](https://discord.js.org/#/docs/builders/main/class/SlashCommandBuilder) for command definition and utilize the `Interaction` object for execution.
+
+## `ICommand` Interface (Conceptual)
+
+While not explicitly an exported TypeScript interface in a JavaScript project, Discraft commands conform to a specific structure. Conceptually, a command object should look like this:
+
+```typescript
+/dev/null/ICommand.ts#L1-6
+interface ICommand {
+  data: SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
+  execute: (interaction: CommandInteraction) => Promise<void> | void;
+  // Optional: other properties like cooldown, permissions, etc.
+}
+```
+
+### `data` Property
+
+- **Type:** `SlashCommandBuilder` (from `discord.js/builders`)
+- **Description:** This property defines the command's structure, including its name, description, and any options or subcommands it accepts. It uses the fluent API of `SlashCommandBuilder`.
+- **Required:** Yes
+
+#### Usage:
+
+```javascript
+/dev/null/command_data_examples.js#L1-30
+const { SlashCommandBuilder } = require("discord.js");
+
+// Basic command
+const commandData = new SlashCommandBuilder()
+  .setName("ping")
+  .setDescription("Replies with Pong!");
+
+// Command with options
+const greetCommandData = new SlashCommandBuilder()
+  .setName("greet")
+  .setDescription("Greets a user.")
+  .addUserOption(option =>
+    option.setName("user")
+      .setDescription("The user to greet")
+      .setRequired(true)
+  );
+
+// Command with subcommands
+const settingsCommandData = new SlashCommandBuilder()
+  .setName("settings")
+  .setDescription("Manage settings.")
+  .addSubcommand(subcommand =>
+    subcommand
+      .setName("volume")
+      .setDescription("Adjust volume.")
+      .addIntegerOption(option =>
+        option.setName("level")
+          .setDescription("Volume level")
+          .setRequired(true)
+      )
+  );
+```
+
+### `execute` Method
+
+- **Type:** `(interaction: CommandInteraction) => Promise<void> | void`
+- **Description:** This asynchronous function contains the core logic that runs when the command is invoked by a user. It receives a `CommandInteraction` object, which provides access to the command options, user, channel, and methods for replying.
+- **Required:** Yes
+
+#### Parameters:
+
+- `interaction`: The `CommandInteraction` object representing the user's command invocation. Key properties and methods of `CommandInteraction` include:
+  - `interaction.reply(options: string | MessagePayload | InteractionReplyOptions)`: Sends an initial response to the command. Can be a string, embed, or other message content. Use `{ ephemeral: true }` to make the reply visible only to the command invoker.
+  - `interaction.deferReply(options?: InteractionDeferReplyOptions)`: Acknowledges the interaction and indicates that a response will follow. Useful for long-running tasks (over 3 seconds).
+  - `interaction.editReply(options: string | MessagePayload | InteractionEditReplyOptions)`: Edits the initial reply, particularly after `deferReply()`.
+  - `interaction.followUp(options: string | MessagePayload | InteractionReplyOptions)`: Sends an additional message after the initial reply.
+  - `interaction.options`: An object providing methods to retrieve command option values (e.g., `getString()`, `getUser()`, `getInteger()`, `getSubcommand()`, `getSubcommandGroup()`).
+  - `interaction.user`: The `User` object of the person who invoked the command.
+  - `interaction.channel`: The `TextChannel` or `DMChannel` object where the command was invoked.
+
+#### Usage:
+
+```javascript
+/dev/null/ping_command_api.js#L1-9
+// In your command file (e.g., commands/ping.js)
+const command = {
+  data: new SlashCommandBuilder()
+    .setName("ping")
+    .setDescription("Replies with Pong!"),
+  async execute(interaction) {
+    await interaction.reply("Pong!");
+  },
+};
+
+module.exports = command;
+```
+
+```javascript
+/dev/null/greet_command_api.js#L1-19
+// In your command file (e.g., commands/greet.js)
+const { SlashCommandBuilder } = require("discord.js");
+
+const command = {
+  data: new SlashCommandBuilder()
+    .setName("greet")
+    .setDescription("Greets a specified user.")
+    .addUserOption(option =>
+      option.setName("user")
+        .setDescription("The user to greet")
+        .setRequired(true)
+    ),
+  async execute(interaction) {
+    const user = interaction.options.getUser("user");
+    await interaction.reply(`Hello, ${user.username}!`);
+  },
+};
+
+module.exports = command;
+```
+
+```javascript
+/dev/null/longtask_command_api.js#L1-17
+// In a command with deferred reply (e.g., commands/longtask.js)
+const { SlashCommandBuilder } = require("discord.js");
+
+const command = {
+  data: new SlashCommandBuilder()
+    .setName("longtask")
+    .setDescription("Performs a long-running task."),
+  async execute(interaction) {
+    await interaction.deferReply({ ephemeral: true }); // Acknowledge immediately
+
+    // Simulate a long task
+    await new Promise(resolve => setTimeout(resolve, 5000)); // 5-second delay
+
+    await interaction.editReply("Task completed after 5 seconds!");
+  },
+};
+
+module.exports = command;
+```
+
+## Command Loading and Registration
+
+Discraft automatically discovers and loads command files from the `commands/` directory (or a path specified in your Discraft configuration). During the development process (`npm run dev`), commands are registered with Discord for immediate testing. In production builds, a separate step handles global command registration.
+
+- **Location:** Command files are typically placed in `src/commands/` or `commands/` in your project root.
+- **Export:** Each command file must `module.exports` (JavaScript) or `export default` (TypeScript) an object conforming to the `ICommand` structure.
+
+## Error Handling
+
+It is highly recommended to implement `try-catch` blocks within your `execute` methods to handle potential errors gracefully during command execution, providing informative feedback to the user.
+
+```javascript
+/dev/null/riskycommand_api.js#L1-26
+// commands/riskycommand.js
+const { SlashCommandBuilder } = require("discord.js");
+
+const command = {
+  data: new SlashCommandBuilder()
+    .setName("risky")
+    .setDescription("A command that might throw an error."),
+  async execute(interaction) {
+    try {
+      // Simulate an operation that might fail
+      if (Math.random() > 0.5) {
+        throw new Error("Something unpredictable happened!");
+      }
+      await interaction.reply("Operation successful!");
+    } catch (error) {
+      console.error("Error in risky command:", error);
+      await interaction.reply({
+        content: "An error occurred while running this command. Please try again later.",
+        ephemeral: true
+      });
+    }
+  },
+};
+
+module.exports = command;
+```
+
+## Related Resources
+
+- [Discord.js Guide - Slash Commands](https://discord.js.org/#/docs/discord.js/main/general/slash-commands/concepts)
+- [Advanced Topics: Custom Commands](/docs/advanced-topics/custom-commands)
+- [Core Concepts: Command System](/docs/core-concepts/command-system)

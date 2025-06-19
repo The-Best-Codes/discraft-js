@@ -1,0 +1,192 @@
+---
+title: init Command
+description: Learn how to use the 'discraft init' command to create new Discord bot projects.
+---
+
+The `discraft init` command creates a new Discraft project with all the necessary files and dependencies to start building your Discord bot.
+
+## Overview
+
+The `init` command is typically the first command you'll run when starting with Discraft. It creates a new project based on a template, sets up the directory structure, and installs dependencies.
+
+## Basic Usage
+
+```bash
+npx discraft init
+```
+
+This launches an interactive setup process that guides you through creating a new project.
+
+## Options
+
+| Option                    | Description                                    |
+| ------------------------- | ---------------------------------------------- |
+| `--template`, `-t`        | Specify the template to use                    |
+| `--directory`, `-d`       | Specify the directory to create the project in |
+| `--package-manager`, `-p` | Specify the package manager to use             |
+| `--yes`, `-y`             | Skip confirmation prompts and use defaults     |
+| `--help`, `-h`            | Display help information                       |
+
+## Templates
+
+Discraft provides several project templates:
+
+| Template       | Description                                                             |
+| -------------- | ----------------------------------------------------------------------- |
+| `typescript`   | TypeScript template with full type support (default)                    |
+| `javascript`   | JavaScript template for those who prefer JS                             |
+| `vercel-ts-ai` | TypeScript template optimized for Vercel deployment with AI integration |
+
+## Interactive Setup
+
+When you run `discraft init` without options, you'll be guided through an interactive setup process:
+
+1. **Template Selection**: Choose which template to use
+2. **Project Location**: Decide where to create the project
+3. **Package Manager**: Select your preferred package manager
+4. **Installation**: Dependencies are automatically installed
+
+## Examples
+
+### Basic Interactive Setup
+
+```bash
+npx discraft init
+```
+
+### Specify a Template
+
+```bash
+npx discraft init --template typescript
+```
+
+### Specify a Directory
+
+```bash
+npx discraft init --directory my-discord-bot
+```
+
+### Specify a Package Manager
+
+```bash
+npx discraft init --package-manager yarn
+```
+
+### Non-Interactive Setup with Defaults
+
+```bash
+npx discraft init --yes
+```
+
+### Combine Multiple Options
+
+```bash
+npx discraft init --template vercel-ts-ai --directory ai-bot --package-manager pnpm
+```
+
+## Project Structure
+
+After initialization, your project will have the following structure:
+
+```
+my-discord-bot/
+├── clients/          # Discord client configuration
+├── commands/         # Bot commands
+├── events/           # Event handlers
+├── utils/            # Utility functions
+├── .env.example      # Example environment variables
+├── .gitignore        # Git ignore file
+├── index.ts          # Main entry point
+├── package.json      # Project dependencies and scripts
+└── tsconfig.json     # TypeScript configuration (if using TS)
+```
+
+## Post-Initialization Steps
+
+After creating your project:
+
+1. **Configure environment variables**:
+
+   ```bash
+   cp .env.example .env
+   # Edit .env with your Discord bot token
+   ```
+
+2. **Start development mode**:
+
+   ```bash
+   cd my-discord-bot
+   npx discraft dev
+   ```
+
+3. **Create your first command**:
+   Add a new file in the `commands/` directory
+
+## Template Customization
+
+Each template provides different features:
+
+### TypeScript Template
+
+- Full TypeScript support
+- Type definitions for Discord.js
+- ESLint and Prettier configuration
+- Sample commands and events
+
+### JavaScript Template
+
+- ES modules support
+- Sample commands and events
+- Simplified structure without type definitions
+
+### Vercel + TypeScript + AI Template
+
+- Optimized for serverless deployment
+- AI integration with Google AI
+- Webhook-based command handling
+- Vercel configuration files
+
+## Troubleshooting
+
+### Permission Issues
+
+If you encounter permission errors:
+
+```bash
+# Try with sudo (Linux/macOS)
+sudo npx discraft init
+
+# Or use a local directory you have write access to
+npx discraft init --directory ./my-bot
+```
+
+### Package Manager Not Found
+
+If your selected package manager isn't installed:
+
+```bash
+# Install the package manager first
+npm install -g yarn
+
+# Then run init
+npx discraft init --package-manager yarn
+```
+
+### Template Download Issues
+
+If template download fails:
+
+```bash
+# Try with a specific template
+npx discraft init --template typescript
+
+# Or check your network connection and try again
+```
+
+## Next Steps
+
+After initializing your project:
+
+- [Start development](/docs/cli/dev): Learn how to use the dev command
+- [Project structure](/docs/getting-started/project-structure): Understand the project layout
+- [Create commands](/docs/core-concepts/command-system): Learn how to create bot commands

@@ -1,0 +1,4 @@
+{
+  "title": "API Reference",
+  "pages": ["index", "command-api", "event-api", "client-api"]
+}

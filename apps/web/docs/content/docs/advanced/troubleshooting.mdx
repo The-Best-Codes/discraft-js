@@ -1,0 +1,174 @@
+---
+title: Troubleshooting
+description: Find solutions to common problems and debugging tips for your Discraft bot.
+---
+
+This guide provides solutions to common issues you might encounter while developing and deploying your Discraft Discord bot. If you're facing a problem, check the sections below for potential fixes and general debugging strategies.
+
+## Common Issues and Solutions
+
+### 1. Bot Not Coming Online / Offline
+
+If your bot isn't showing as online in Discord or fails to start, consider these points:
+
+- **Incorrect `DISCORD_TOKEN`:**
+
+  - **Problem:** Your bot token in the `.env` file is incorrect, expired, or has a leading/trailing space.
+  - **Solution:** Double-check your `DISCORD_TOKEN` in your `.env` file against the token in your [Discord Developer Portal](https://discord.com/developers/applications) under your application's "Bot" section. Regenerate it if necessary.
+  - **Verify:** Ensure your `.env` file is in the root of your project where `index.js` (or similar entry point) is run.
+
+- **Missing Gateway Intents:**
+  - **Problem:** Your bot is not receiving events because necessary [Gateway Intents](https://discord.com/developers/docs/topics/gateway#gateway-intents) are not enabled.
+  - **Solution:** In your Discord Developer Portal, go to your application -> "Bot" and enable all "Privileged Gateway Intents" (PRESENCE INTENT, SERVER MEMBERS INTENT, MESSAGE CONTENT INTENT) if your bot needs them. Also, ensure these intents are correctly specified in your `Client` initialization in `clients/discord.js` (or equivalent).
+  ```javascript
+  discraft-js/templates/javascript/clients/discord.js#L6-10
+  const client = new Client({
+    intents: [
+      GatewayIntentBits.Guilds,
+      GatewayIntentBits.GuildMessages,
+      GatewayIntentBits.MessageContent, // Often required for message-based events
+    ],
+  });
+  ```
+- **Network/Firewall Issues:**
+  - **Problem:** Your machine or server is blocking outgoing connections to Discord's API.
+  - **Solution:** Check your firewall rules, proxy settings, or corporate network restrictions.
+
+### 2. Slash Commands Not Appearing or Not Responding
+
+If your slash commands (`/mycommand`) aren't showing up in Discord or aren't executing:
+
+- **Command Registration Issues:**
+  - **Problem:** Commands are not correctly registered with Discord's API.
+  - **Solution:** Discraft handles command registration automatically during `npm run dev` and `npm run build`. Ensure your bot starts successfully and that there are no errors in the console during startup that indicate command registration failures. If deploying manually, ensure the registration step is run.
+  - **Check CLI Output:** Look for messages like "Successfully reloaded application (/) commands." during startup.
+- **Incorrect `SlashCommandBuilder` Usage:**
+
+  - **Problem:** The `data` property of your command is not correctly defined using `SlashCommandBuilder`.
+  - **Solution:** Review your command files (`commands/*.js`) to ensure they correctly use `SlashCommandBuilder` for defining command structure, options, and subcommands.
+
+  ```javascript
+  /dev/null/example.js#L1-10
+  const { SlashCommandBuilder } = require('discord.js');
+
+  const command = {
+    data: new SlashCommandBuilder()
+      .setName('mycommand')
+      .setDescription('My command description.'),
+    async execute(interaction) {
+      await interaction.reply('Command executed!');
+    },
+  };
+  module.exports = command;
+  ```
+
+- **Missing `await interaction.reply()` or `deferReply()`:**
+  - **Problem:** Discord requires a response to an interaction within 3 seconds. If your command logic takes longer, Discord will report it as "failed".
+  - **Solution:** Use `await interaction.deferReply();` at the beginning of your `execute` function for commands that perform long-running tasks (like API calls) and then `await interaction.editReply('Your response here');` once the task is complete.
+- **Permissions:**
+  - **Problem:** The bot doesn't have the necessary Discord permissions (e.g., `application.commands` permissions in the guild, or specific channel permissions).
+  - **Solution:** Ensure the bot has the "Use Application Commands" permission in the relevant channels/guilds.
+
+### 3. Events Not Firing
+
+If your event listeners (e.g., `messageCreate`, `guildMemberAdd`) are not being triggered:
+
+- **Missing Gateway Intents:**
+  - **Problem:** As mentioned above, Discord requires specific intents to receive certain events.
+  - **Solution:** Verify that the required intents are enabled in both your Discord Developer Portal and your bot's `Client` initialization. For example, `MESSAGE_CONTENT` is required to read message content.
+- **Partial Structures:**
+  - **Problem:** Some events (like reactions or old messages in cache) might return "partial" objects. If you try to access properties of a partial object without fetching its full data, it can cause errors.
+  - **Solution:** For events involving partials, use `if (item.partial) await item.fetch();` before accessing their properties.
+  ```javascript
+  /dev/null/events/reactionAdd.js#L1-5
+  module.exports = (client) => {
+    client.on("messageReactionAdd", async (reaction, user) => {
+      if (reaction.partial) await reaction.fetch(); // Fetch full reaction data
+      // ... rest of your event logic
+    });
+  };
+  ```
+
+### 4. Hot Reloading Not Working in Development (`npm run dev`)
+
+If changes to your code aren't automatically restarting your bot:
+
+- **File Path Issues:**
+  - **Problem:** `nodemon` (or similar watcher) might not be configured to watch the correct directories or file types.
+  - **Solution:** Check the `dev` script in your `package.json` and any associated `nodemon.json` (or similar config) to ensure it's watching your `commands/`, `events/`, and other relevant source directories.
+- **Syntax Errors:**
+  - **Problem:** A syntax error in your code prevents `nodemon` from successfully restarting the application.
+  - **Solution:** Check the console output for syntax errors immediately after saving a file. Fix them, and the hot reload should resume.
+- **Module Caching:**
+  - **Problem:** Sometimes, Node.js might cache modules aggressively.
+  - **Solution:** While Discraft's hot reloading tries to mitigate this, a full restart (`Ctrl+C` and `npm run dev` again) can resolve stubborn caching issues.
+
+### 5. Environment Variable Issues (`.env` files)
+
+If `process.env.YOUR_VARIABLE` is `undefined`:
+
+- **Missing `.env` file:**
+  - **Problem:** The `.env` file does not exist in the directory where your main bot script is run.
+  - **Solution:** Create a `.env` file in the root of your project.
+- **`dotenv` Not Loaded:**
+  - **Problem:** The `dotenv` package is not loaded at the very beginning of your main entry file (`index.js` or `src/index.ts`).
+  - **Solution:** Ensure `require('dotenv').config();` (for JavaScript) or `import 'dotenv/config';` (for TypeScript) is the _very first line_ in your primary bot file.
+  ```javascript
+  /dev/null/index.js#L1-2
+  require('dotenv').config(); // This should be at the very top!
+  const client = require('./clients/discord');
+  // ... rest of your bot setup
+  ```
+- **Variable Naming/Typos:**
+  - **Problem:** A typo in the `.env` file or in your code when accessing the variable.
+  - **Solution:** Double-check the variable name in both `.env` (e.g., `DISCORD_TOKEN=your_token`) and your code (`process.env.DISCORD_TOKEN`).
+
+### 6. AI Integration Errors
+
+If you're having trouble with AI commands or responses:
+
+- **Incorrect API Key:**
+  - **Problem:** Your `OPENAI_API_KEY` (or other AI service key) is incorrect or missing.
+  - **Solution:** Verify your API key in your `.env` file and ensure it's correctly loaded.
+- **Rate Limits:**
+  - **Problem:** You're making too many requests to the AI API too quickly.
+  - **Solution:** Implement retry logic with exponential backoff, or space out your AI requests. Check the specific API's rate limit documentation.
+- **Model Availability/Errors:**
+  - **Problem:** The AI model specified might be unavailable, or the prompt caused an internal error in the AI service.
+  - **Solution:** Check the `console.error` messages for details returned by the AI API. Try a simpler prompt to rule out prompt-related issues.
+- **Network Issues:**
+  - **Problem:** Connectivity problems with the AI service.
+  - **Solution:** Ensure your server has stable internet access and is not blocked by firewalls.
+
+## General Debugging Strategies
+
+1.  **Check Bot Console Logs:** Your bot's console (where you run `npm run dev` or `npm start`) is your first line of defense. Pay close attention to any error messages, warnings, or custom logs you've implemented.
+    ```javascript
+    discraft-js/templates/javascript/utils/logger.js#L1-8
+    const logger = {
+      info: (message) => console.log(`[INFO] ${message}`),
+      warn: (message) => console.warn(`[WARN] ${message}`),
+      error: (message) => console.error(`[ERROR] ${message}`),
+      debug: (message) => {
+        if (process.env.NODE_ENV !== "production") {
+          console.debug(`[DEBUG] ${message}`);
+        }
+      },
+    };
+    ```
+2.  **Use `console.log()` / `logger.debug()`:** Sprinkle `console.log()` or your custom `logger.debug()` statements throughout your code to trace variable values and execution flow. This helps pinpoint exactly where an issue is occurring.
+3.  **Isolate the Problem:**
+    - **Minimal Reproduction:** Can you create a simpler version of your command/event that still exhibits the problem? This helps rule out interactions with other parts of your code.
+    - **Comment Out Code:** Temporarily comment out sections of your code to see if the problem disappears. This helps narrow down the problematic area.
+4.  **Discord Developer Portal:**
+    - Review your bot's settings, intents, and public/private bot status.
+    - Check for any messages or alerts from Discord regarding your bot.
+5.  **Discord.js Documentation:** Many issues are due to misunderstandings of the Discord.js library. Refer to the official [Discord.js Guide](https://discord.js.org/#/docs/main/stable/general/welcome) and [Documentation](https://discord.js.org/#/docs/discord.js/main/general/welcome).
+6.  **Node.js Debugger:** For complex issues, consider using Node.js's built-in debugger. You can start your application with `node --inspect index.js` (or similar) and connect a debugger from your IDE (like VS Code) or Chrome DevTools.
+7.  **Community Support:** If you're stuck, don't hesitate to seek help. Provide clear descriptions of your problem, what you've tried, and any relevant error messages.
+
+## Next Steps
+
+- [Core Concepts: Hot Reloading](/docs/core-concepts/hot-reloading): Understand how hot reloading works and its dependencies.
+- [API Reference: Client API](/docs/api-reference/client-api): Review Discord.js client initialization and intents.
+- [Deployment](/docs/deployment): Ensure your deployment environment is correctly configured.

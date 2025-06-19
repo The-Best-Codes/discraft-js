@@ -1,0 +1,80 @@
+---
+title: Core Concepts
+description: Understanding the fundamental concepts and principles behind Discraft.
+---
+
+This section covers the fundamental concepts and principles that power Discraft. Understanding these core concepts will help you build more effective Discord bots and take full advantage of the framework's capabilities.
+
+## Overview
+
+Discraft is built around several key concepts that work together to provide a seamless development experience:
+
+1. **Command System**: A structured approach to defining and handling Discord slash commands
+2. **Event Handling**: A system for responding to Discord events
+3. **Hot Reloading**: Development-time feature that updates your bot as you code
+4. **Configuration**: How Discraft manages environment variables and settings
+
+## The Discraft Philosophy
+
+Discraft follows these guiding principles:
+
+### 1. Convention Over Configuration
+
+Discraft uses sensible defaults and file-based conventions to minimize the amount of configuration needed. By placing files in the right directories with the right structure, they're automatically discovered and integrated into your bot.
+
+### 2. Developer Experience First
+
+The framework prioritizes a smooth development experience with features like:
+
+- Hot reloading during development
+- Clear error messages
+- Automatic command registration
+- Streamlined deployment options
+
+### 3. Flexibility Without Complexity
+
+Discraft is designed to be flexible enough for complex use cases without adding unnecessary complexity for simple ones. Advanced features are available when you need them but don't get in your way when you don't.
+
+## Key Components
+
+### Commands
+
+Commands are the primary way users interact with your Discord bot. In Discraft, each command is defined in its own file in the `commands/` directory. The framework automatically:
+
+- Discovers all command files
+- Registers them with Discord's API
+- Routes incoming interactions to the appropriate handler
+
+[Learn more about the Command System →](/docs/core-concepts/command-system)
+
+### Events
+
+Events allow your bot to respond to various Discord activities like messages, reactions, member joins, and more. Discraft provides a simple way to define event handlers in the `events/` directory.
+
+[Learn more about Event Handling →](/docs/core-concepts/event-handling)
+
+### Development Mode
+
+Discraft's development mode (`discraft dev`) provides:
+
+- Hot reloading when files change
+- Automatic command registration
+- Real-time error reporting
+- Development-specific optimizations
+
+[Learn more about Hot Reloading →](/docs/core-concepts/hot-reloading)
+
+### Configuration
+
+Discraft uses environment variables and optional configuration files to manage settings. This approach keeps sensitive information (like bot tokens) secure while making configuration straightforward.
+
+[Learn more about Configuration →](/docs/core-concepts/configuration)
+
+## Next Steps
+
+To dive deeper into each core concept, explore the following pages:
+
+- [Command System](/docs/core-concepts/command-system)
+- [Event Handling](/docs/core-concepts/event-handling)
+- [Hot Reloading](/docs/core-concepts/hot-reloading)
+- [Configuration](/docs/core-concepts/configuration)

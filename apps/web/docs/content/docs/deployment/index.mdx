@@ -1,0 +1,125 @@
+---
+title: Deployment
+description: Learn about the various ways to deploy your Discraft bot to production.
+---
+
+This section covers the different methods for deploying your Discraft bot to production environments. Discraft supports multiple deployment strategies to fit various use cases and hosting environments.
+
+## Overview
+
+Deploying a Discord bot involves making it available 24/7 with reliable hosting, proper error handling, and efficient resource usage. Discraft provides tools and optimizations for several deployment scenarios.
+
+## Deployment Options
+
+Discraft supports three main deployment strategies:
+
+1. **[Traditional Deployment](/docs/deployment/traditional)**: Running your bot on a server or VPS
+2. **[Serverless Deployment (Vercel)](/docs/deployment/vercel)**: Deploying as serverless functions
+3. **[Standalone Executable](/docs/deployment/executable)**: Packaging as a self-contained executable
+
+Each approach has its own advantages and trade-offs:
+
+| Deployment Type | Pros                                        | Cons                                              | Best For                             |
+| --------------- | ------------------------------------------- | ------------------------------------------------- | ------------------------------------ |
+| Traditional     | Full feature support, persistent connection | Requires server management                        | Feature-rich bots, event listeners   |
+| Serverless      | Low cost, auto-scaling, zero maintenance    | Limited to interactions, no persistent connection | Simple command bots, AI integrations |
+| Executable      | Easy distribution, no Node.js required      | Larger file size, manual updates                  | Distribution to non-technical users  |
+
+## Choosing a Deployment Strategy
+
+Consider these factors when choosing a deployment strategy:
+
+### Traditional Deployment
+
+Choose traditional deployment if your bot:
+
+- Needs to listen for events (messages, reactions, etc.)
+- Maintains state between interactions
+- Performs background tasks or scheduled operations
+- Requires persistent connections to external services
+
+### Serverless Deployment
+
+Choose serverless deployment if your bot:
+
+- Primarily responds to slash commands
+- Doesn't need to listen for events
+- Has minimal state requirements
+- Benefits from auto-scaling and zero maintenance
+
+### Executable Deployment
+
+Choose executable deployment if your bot:
+
+- Needs to be distributed to users without technical knowledge
+- Runs in environments without Node.js
+- Benefits from simplified installation
+- Needs to run as a desktop application
+
+## General Deployment Considerations
+
+Regardless of your deployment strategy, consider these best practices:
+
+### Environment Variables
+
+Store sensitive information like tokens in environment variables, not in your code:
+
+```
+DISCORD_TOKEN=your_bot_token
+DISCORD_CLIENT_ID=your_client_id
+```
+
+### Error Handling
+
+Implement robust error handling to prevent crashes:
+
+```typescript
+try {
+  // Bot operations
+} catch (error) {
+  console.error("Error:", error);
+  // Recovery logic
+}
+```
+
+### Logging
+
+Set up appropriate logging for production:
+
+```typescript
+// Production-friendly logging
+const logger = {
+  error: (msg) => console.error(`[ERROR] ${msg}`),
+  warn: (msg) => console.warn(`[WARN] ${msg}`),
+  info: (msg) => console.info(`[INFO] ${msg}`),
+  // Only log debug in development
+  debug: (msg) =>
+    process.env.NODE_ENV !== "production" && console.debug(`[DEBUG] ${msg}`),
+};
+```
+
+### Monitoring
+
+Consider setting up monitoring for your bot:
+
+- Health checks
+- Performance metrics
+- Error alerts
+- Usage statistics
+
+### Scaling
+
+Plan for scaling as your bot grows:
+
+- Database connections
+- API rate limits
+- Memory usage
+- CPU utilization
+
+## Next Steps
+
+Explore the specific deployment guides for detailed instructions:
+
+- [Traditional Deployment](/docs/deployment/traditional): Deploy to a VPS or dedicated server
+- [Serverless Deployment (Vercel)](/docs/deployment/vercel): Deploy to Vercel's serverless platform
+- [Standalone Executable](/docs/deployment/executable): Package as a self-contained executable
