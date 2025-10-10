@@ -9,13 +9,14 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
-    "next": "15.4.5",
-    "react": "^19.1.1",
-    "react-dom": "^19.1.1",
-    "fumadocs-ui": "15.6.8",
+    "escape-html": "^1.0.3",
     "fumadocs-core": "15.6.8",
     "fumadocs-mdx": "11.7.3",
-    "escape-html": "^1.0.3"
+    "fumadocs-ui": "15.6.8",
+    "gray-matter": "^4.0.3",
+    "next": "15.4.5",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
