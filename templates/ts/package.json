@@ -11,12 +11,12 @@
     "dev": "discraft dev"
   },
   "devDependencies": {
-    "discraft": "^1.7.9",
+    "discraft": "^1.7.10",
     "typescript": "^5.9.3"
   },
   "dependencies": {
     "consola": "^3.4.2",
-    "discord.js": "^14.23.2",
+    "discord.js": "^14.25.1",
     "dotenv": "^17.2.3"
   }
 }
