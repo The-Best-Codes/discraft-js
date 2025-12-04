@@ -32,7 +32,7 @@ jobs:
           else
             echo "tag=latest" >> $GITHUB_OUTPUT
           fi
+      - name: Update npm to latest version
+        run: npm install -g npm@latest
       - name: Publish to npm
         run: npm publish --provenance --tag ${{ steps.npm_tag.outputs.tag }}
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

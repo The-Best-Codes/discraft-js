@@ -11,7 +11,7 @@
     "dev": "discraft dev"
   },
   "devDependencies": {
-    "discraft": "^1.7.10"
+    "discraft": "^1.7.11"
   },
   "dependencies": {
     "consola": "^3.4.2",
