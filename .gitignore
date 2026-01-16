@@ -2,3 +2,5 @@
 !.env.example
 
 node_modules
+
+.turbo
