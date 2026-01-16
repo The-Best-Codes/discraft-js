@@ -1,5 +1,5 @@
 {
-  "name": "@discraft/cli",
+  "name": "discraft",
   "version": "2.0.0-alpha.0",
   "module": "src/index.ts",
   "type": "module",
