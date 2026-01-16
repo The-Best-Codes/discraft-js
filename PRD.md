@@ -77,3 +77,21 @@ templates/
 - `discraft start`: Starts the bot (using Node if detected, else Bun, allow overrides via CLI args)
 - `discraft add`: Add new stuff to the project (adapters, extensions, etc.)
 - `discraft init`: Initialize a new project
+
+### Expected packages
+
+- @discraft/\_core
+- @discraft/\_templates (used by CLI, contains templates in .hbs format or something)
+- @discraft/extension-persistence
+- @discraft/extension-cron
+- @discraft/extension-commands (enabled by default)
+- @discraft/extension-events (enabled by default)
+- @discraft/adapter-bun
+- @discraft/adapter-node (default adapter used)
+- @discraft/adapter-vercel
+- @discraft/adapter-coolify
+- discraft (CLI)
+
+---
+
+Putting all that together, I've created a pseudo-project in prd-example/. It's an imagination of what output you would get if you ran `discraft init` and chose the TypeScript template and default options.
