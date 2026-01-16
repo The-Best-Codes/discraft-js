@@ -75,5 +75,5 @@ templates/
 - `discraft dev`: Starts the development server
 - `discraft build`: Builds the project (builds for all targets specificied in the discraft config, or you can override via CLI args)
 - `discraft start`: Starts the bot (using Node if detected, else Bun, allow overrides via CLI args)
-- `discraft add`: Add new stuff to the project (commands, events, adapters, extensions, etc.)
+- `discraft add`: Add new stuff to the project (adapters, extensions, etc.)
 - `discraft init`: Initialize a new project
