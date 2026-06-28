@@ -9,6 +9,8 @@
 [![CodeQL](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/The-Best-Codes/discraft-js/actions/workflows/github-code-scanning/codeql)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/The-Best-Codes/discraft-js)
 
+> Please note: This project is now only receiving security updates. Development is stalled as I don't have time to work on v2 at the moment.
+
 Discraft is a modern, developer-friendly framework for building Discord bots with ease.
 It provides a robust CLI and a set of tools to streamline the development process, allowing you to focus on creating amazing bot experiences.
 Think of it as a "batteries-included" approach, letting you get started quickly and efficiently. It's like Next.js for Discord bots.
