@@ -11,6 +11,10 @@ bun run dev
 
 Open http://localhost:3000 with your browser to see the result.
 
+Set `NEXT_PUBLIC_SITE_URL` (e.g. `https://discraft.example.com`) when deploying so
+OG images and other absolute URLs resolve correctly. On Vercel it falls back to
+the production domain automatically.
+
 ## Explore
 
 In the project, you can see:
@@ -29,6 +33,14 @@ In the project, you can see:
 Collections are defined with the [Macro API](https://fumadocs.dev/docs/mdx/macro) in `lib/source.ts`.
 
 Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
+
+### Next.js config
+
+`next.config.ts` follows the Next.js 16.4 `create-next-app` defaults:
+
+- Tailwind CSS v4 is loaded through the `@tailwindcss/turbopack` loader (no PostCSS).
+- `cacheComponents` and `partialPrefetching` are enabled, so route handlers are
+  prerendered by default and don't need `export const revalidate`.
 
 ## Learn More
 

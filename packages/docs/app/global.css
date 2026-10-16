@@ -2,6 +2,14 @@
 @import "fumadocs-ui/css/neutral.css";
 @import "fumadocs-ui/css/preset.css";
 
+/*
+ * Lightning CSS (used by Turbopack) doesn't recognise `::highlight()` yet and
+ * warns on every build, so skip Fumadocs' generated utilities for it. The
+ * equivalent rule is inlined in `app/layout.tsx` instead.
+ */
+@source not inline("[&_::highlight(fd-search)]:text-fd-primary");
+@source not inline("[&_::highlight(fd-search)]:underline");
+
 html {
   scrollbar-gutter: stable;
 }

@@ -3,8 +3,6 @@ import { notFound } from "next/navigation";
 import { generateOGImage } from "fumadocs-ui/og";
 import { appName, getPageImageUrl } from "@/lib/shared";
 
-export const revalidate = false;
-
 export async function GET(
   _req: Request,
   { params }: RouteContext<"/og/docs/[...slug]">,
