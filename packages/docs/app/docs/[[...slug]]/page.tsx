@@ -13,6 +13,10 @@ import type { Metadata } from "next";
 import { createRelativeLink } from "fumadocs-ui/mdx";
 import { getPageImageUrl, getPageMarkdownUrl, gitConfig } from "@/lib/shared";
 
+// docs are fully static: unknown slugs wait for the full render instead of
+// streaming the fallback shell, so `notFound()` can still send a real 404
+export const ensureStatic = "navigation";
+
 export default async function Page(props: PageProps<"/docs/[[...slug]]">) {
   const params = await props.params;
   const page = source.getPage(params.slug);

@@ -42,6 +42,12 @@ Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
 - `cacheComponents` and `partialPrefetching` are enabled, so route handlers are
   prerendered by default and don't need `export const revalidate`.
 
+Unknown docs pages return a real `404`. The docs page sets
+`ensureStatic = "navigation"` so unlisted slugs wait for a full static render
+instead of streaming the fallback shell, and `proxy.ts` rejects slugs that
+aren't in `source` before rendering starts (the status can't change once
+streaming begins).
+
 ## Learn More
 
 To learn more about Next.js and Fumadocs, take a look at the following
