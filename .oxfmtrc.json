@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "printWidth": 80,
+  "ignorePatterns": [
+    ".next",
+    ".turbo",
+    ".source",
+    "dist",
+    "*.tsbuildinfo",
+    "bun.lock",
+    "prd-example/.discraft/_dist"
+  ]
+}

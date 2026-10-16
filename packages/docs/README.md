@@ -6,11 +6,7 @@ This is a Next.js application generated with
 Run development server:
 
 ```bash
-npm run dev
-# or
-pnpm dev
-# or
-yarn dev
+bun run dev
 ```
 
 Open http://localhost:3000 with your browser to see the result.
@@ -30,7 +26,7 @@ In the project, you can see:
 
 ### Fumadocs MDX
 
-A `source.config.ts` config file has been included, you can customise different options like frontmatter schema.
+Collections are defined with the [Macro API](https://fumadocs.dev/docs/mdx/macro) in `lib/source.ts`.
 
 Read the [Introduction](https://fumadocs.dev/docs/mdx) for further details.
 

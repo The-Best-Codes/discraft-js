@@ -1,22 +1,23 @@
 {
   "name": "discraft",
   "version": "2.0.0-alpha.0",
-  "module": "src/index.ts",
-  "type": "module",
-  "scripts": {
-    "build": "bun build src/index.ts --minify --outfile dist/index.js --format esm --packages external"
-  },
-  "bin": {
-    "discraft": "./dist/index.js"
-  },
   "author": {
     "name": "The-Best-Codes",
     "url": "https://bestcodes.dev"
   },
+  "bin": {
+    "discraft": "./dist/index.js"
+  },
+  "type": "module",
+  "module": "src/index.ts",
+  "scripts": {
+    "build": "bun build src/index.ts --minify --outfile dist/index.js --format esm --packages external",
+    "types:check": "tsc --noEmit"
+  },
   "devDependencies": {
-    "@types/bun": "^1.3.6"
+    "@types/bun": "^1.4.3"
   },
   "peerDependencies": {
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   }
 }

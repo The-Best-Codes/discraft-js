@@ -4,15 +4,22 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "types:check": "turbo types:check",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "fmt": "oxfmt",
+    "fmt:check": "oxfmt --check"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.73.0",
+    "oxlint": "^1.88.0",
+    "turbo": "^2.11.9"
+  },
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "bun@1.3.6",
-  "scripts": {
-    "fmt": "prettier . -w  --cache --cache-strategy=metadata --cache-location=./.prettier-cache"
-  },
-  "devDependencies": {
-    "prettier": "^3.8.0",
-    "turbo": "^2.7.4"
-  }
+  "packageManager": "bun@1.4.3"
 }

@@ -11,9 +11,6 @@
     "dev": {
       "persistent": true,
       "cache": false
-    },
-    "//#fmt": {
-      "outputs": [".prettier-cache"]
     }
   }
 }

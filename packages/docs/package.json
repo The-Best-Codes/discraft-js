@@ -6,26 +6,26 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "types:check": "fumadocs-mdx && tsc --noEmit",
-    "postinstall": "fumadocs-mdx"
+    "types:check": "next typegen && tsc --noEmit"
   },
   "dependencies": {
-    "fumadocs-core": "16.4.7",
-    "fumadocs-mdx": "14.2.5",
-    "fumadocs-ui": "16.4.7",
-    "lucide-react": "^0.562.0",
-    "next": "16.1.2",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "cn": "^0.5.0",
+    "fumadocs-core": "16.17.5",
+    "fumadocs-mdx": "15.4.7",
+    "fumadocs-ui": "npm:@fumadocs/base-ui@16.17.5",
+    "lucide-react": "^1.58.0",
+    "next": "16.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
-    "@types/mdx": "^2.0.13",
-    "@types/node": "^25.0.9",
-    "@types/react": "^19.2.8",
-    "@types/react-dom": "^19.2.3",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^4.1.18",
-    "typescript": "^5.9.3"
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/mdx": "^2.0.14",
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "postcss": "^8.5.30",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2"
   }
 }

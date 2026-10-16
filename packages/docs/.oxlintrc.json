@@ -1,0 +1,14 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "extends": ["../../.oxlintrc.json"],
+  "plugins": ["typescript", "unicorn", "oxc", "import", "react", "nextjs"],
+  "settings": {
+    "react": {
+      "version": "19.3.0"
+    },
+    "tailwindcss": {
+      "callees": ["clsx", "cva", "cn"]
+    }
+  },
+  "ignorePatterns": [".next/", ".source/"]
+}
